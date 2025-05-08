@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  clerkId   String   @unique
+  email     String   @unique
+  firstname String?
+  lastname  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  subscription Subscription?
+  automations  Automations[]
+  integrations Integrations[]
+}
+
+model Subscription {
+  id         String           @id @default(uuid()) @db.Uuid
+  plan       SubscriptionPlan @default(FREE)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @default(now())
+  customerId String?          @unique
+
+  User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique @db.Uuid
+}
+
+model Integrations {
+  id            String          @id @default(uuid()) @db.Uuid
+  name          IntegrationType @default(INSTAGRAM)
+  token         String          @unique
+  integrationId String?         @unique
+  expiresAt     DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now())
+
+  User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique @db.Uuid
+}
+
+model Automations {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @default("Untitled")
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+
+  triggers Trigger[]
+  listener Listener?
+  posts    Post[]
+  keywords Keyword[]
+  dms      Dms[]
+}
+
+model Trigger {
+  id        String   @id @default(uuid()) @db.Uuid
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId String?      @db.Uuid
+}
+
+model Keyword {
+  id        String   @id @default(uuid()) @db.Uuid
+  word      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userId    String
+
+  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId String?      @db.Uuid
+
+  @@unique([automationId, word])
+  Dms Dms[]
+}
+
+model Listener {
+  id           String       @id @default(uuid()) @db.Uuid
+  listener     ListenerType @default(MESSAGE)
+  prompt       String
+  commentReply String?
+  dmCount      Int
+  commentCount Int
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now())
+
+  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId String?      @unique @db.Uuid
+}
+
+model Dms {
+  id       String  @id @default(uuid()) @db.Uuid
+  senderId String?
+  reciever String?
+  message  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  system_dm Boolean
+  usedSmartAI   Boolean
+
+  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId String?      @db.Uuid
+
+  Keyword   Keyword? @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  keywordId String?      @db.Uuid
+}
+
+model Post {
+  id        String    @id @default(uuid()) @db.Uuid
+  postid    String
+  caption   String?
+  media     String
+  mediaType MediaType @default(IMAGE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+
+  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId String?      @db.Uuid
+}
+
+enum SubscriptionPlan {
+  PRO
+  FREE
+}
+
+enum IntegrationType {
+  INSTAGRAM
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  CAROUSEL_ALBUM
+}
+
+enum ListenerType {
+  SMARTAI
+  MESSAGE
+}
