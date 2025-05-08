@@ -143,14 +143,15 @@ export const onGetProfilePosts = async () => {
     }
 
     const profile = await findUser(user.id);
-    const token = profile?.integrations.find(int => (int.name = 'INSTAGRAM'));
+    const integration = profile?.integrations.find(
+      int => (int.name = 'INSTAGRAM'),
+    );
+    const token = integration?.token;
 
     if (token) {
       const posts = await fetch(
         `${process.env.INSTAGRAM_BASE_URL}/me/media?fields=id,caption,media_type,media_url,timestamp&limit=10&access_token=${token}`,
       );
-
-      console.log('Posts', posts);
 
       const parsed = await posts.json();
       if (parsed) return { status: 200, data: parsed.data };
