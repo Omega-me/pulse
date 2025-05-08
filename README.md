@@ -1,21 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Pulse - Instagram Automation for Comments & DMs
 
-## Getting Started
+**Pulse** is an AI-powered automation tool designed to help online businesses reply to Instagram comments and DMs instantly. By engaging potential customers with smart, context-aware responses, Pulse turns interactions into qualified leads—helping you grow your business on autopilot.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. To use it locally you will need a tool like ngrok for instgram to work
+- 🤖 **Auto-Replies to Comments & DMs**  
+  Respond to customer inquiries 24/7 using intelligent, natural-sounding messages.
 
-## About Pulse
+- 📈 **Lead Generation (Incoming feature)**  
+  Turn every comment and message into a sales opportunity by collecting contact info and qualifying leads.
 
-Pulse is an instagram automation replier for comments and dms and generate good leeds for your online bussines
+- 🔗 **Smart Product Linking (Incoming feature)**  
+  Detect product interest and instantly share relevant links, posts, or offers.
+
+- 📊 **Dashboard Insights**  
+  Monitor engagement, leads generated, and performance metrics all in one place.
+
+- 🔒 **Secure & Private**  
+  All data is handled securely with compliance in mind.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Next.js, Tailwind CSS
+- **Backend:** Next.js API Routes
+- **Database:** PostgreSQL
+- **AI Integration:** Gemini API (Incoming feature, use you own key)
+- **Instagram API:** Instagram Graph API
