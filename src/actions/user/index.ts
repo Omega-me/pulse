@@ -20,14 +20,20 @@ export const onBoardUser = async () => {
     if (found) {
       if (found.integrations.length > 0) {
         const today = new Date();
-        const integration = found.integrations.find((i) => i.name === 'INSTAGRAM');
+        const integration = found?.integrations.find(
+          i => i.name === 'INSTAGRAM',
+        );
         const time_left = integration.expiresAt?.getTime()! - today.getTime();
         const days = Math.round(time_left / (1000 * 3600 * 24));
         if (days > 5) {
           console.log('Refresh');
           const refresh = await refreshToken(integration.token);
           const expire_date = today.setDate(today.getDate() + 60);
-          const update_token = await updateIntegration(refresh.access_token, new Date(expire_date), integration.id);
+          const update_token = await updateIntegration(
+            refresh.access_token,
+            new Date(expire_date),
+            integration.id,
+          );
           if (!update_token) {
             console.log('Update token failed!');
           }
