@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
-import { cn } from '../../../lib/utils';
 import { Loader2Icon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Props extends PropsWithChildren {
   state: boolean;

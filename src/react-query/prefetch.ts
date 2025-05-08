@@ -1,5 +1,4 @@
 import { onGetAllAutomations, onGetAutomationInfo } from '@/actions/automation';
-import { findAutomation } from '@/actions/automation/query';
 import { onUserInfo } from '@/actions/user';
 import { QueryClient, QueryFunction } from '@tanstack/react-query';
 
