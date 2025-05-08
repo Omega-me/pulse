@@ -16,14 +16,18 @@ import {
   removePosts,
   updateAutomation,
 } from './query';
-import { deleteUploadedFiles, uploadInstagramImages } from '@/lib/uploadthing.lib';
+import {
+  deleteUploadedFiles,
+  uploadInstagramImages,
+} from '@/lib/uploadthing.lib';
 
 export const onCreateAutomation = async () => {
   const user = await onCurrentUser();
   const userInfo = await findUser(user.id);
   try {
     const create = await createAutomation(userInfo.id);
-    if (create) return { status: 201, data: 'Automation created', id: create.id };
+    if (create)
+      return { status: 201, data: 'Automation created', id: create.id };
     return { status: 404, data: 'Oops! Something went wrong' };
   } catch (error) {
     return { status: 500, data: 'Internal server error' };
@@ -58,19 +62,25 @@ export const onUpdateAutomationName = async (
     name?: string;
     active?: boolean;
     automation?: string;
-  }
+  },
 ) => {
   await onCurrentUser();
   try {
     const automation = await updateAutomation(id, data);
-    if (automation) return { status: 200, data: 'Automation successfully updated' };
+    if (automation)
+      return { status: 200, data: 'Automation successfully updated' };
     return { status: 404, data: 'Oops! Could not find an automation' };
   } catch (error) {
     return { status: 500, data: 'Oops! Something went wrong' };
   }
 };
 
-export const onSaveListener = async (automationId: string, listener: 'SMARTAI' | 'MESSAGE', prompt: string, reply?: string) => {
+export const onSaveListener = async (
+  automationId: string,
+  listener: 'SMARTAI' | 'MESSAGE',
+  prompt: string,
+  reply?: string,
+) => {
   await onCurrentUser();
   try {
     const created = await addListener(automationId, listener, prompt, reply);
@@ -81,7 +91,10 @@ export const onSaveListener = async (automationId: string, listener: 'SMARTAI' |
   }
 };
 
-export const onSaveTrigger = async (automationId: string, trigger: string[]) => {
+export const onSaveTrigger = async (
+  automationId: string,
+  trigger: string[],
+) => {
   await onCurrentUser();
   try {
     const created = await addTrigger(automationId, trigger);
@@ -96,9 +109,12 @@ export const onSaveKeyword = async (automationId: string, keyword: string) => {
   const user = await onCurrentUser();
   try {
     const myKeywords = await getKeywords(user.id);
-    const keywords = myKeywords.map((k) => k.word.trim().toLowerCase());
+    const keywords = myKeywords.map(k => k.word.trim().toLowerCase());
     if (keywords.includes(keyword.trim().toLowerCase())) {
-      return { status: 400, data: 'Keyword already exists, please use a different keyword name' };
+      return {
+        status: 400,
+        data: 'Keyword already exists, please use a different keyword name',
+      };
     }
     const created = await addKeyword(user.id, automationId, keyword);
     if (created) return { status: 200, data: 'Keyword added successfully' };
@@ -127,12 +143,14 @@ export const onGetProfilePosts = async () => {
     }
 
     const profile = await findUser(user.id);
-    const token = profile?.integrations.find((int) => (int.name = 'INSTAGRAM'));
+    const token = profile?.integrations.find(int => (int.name = 'INSTAGRAM'));
 
     if (token) {
       const posts = await fetch(
-        `${process.env.INSTAGRAM_BASE_URL}/me/media?fields=id,caption,media_type,media_url,timestamp&limit=10&access_token=${token}`
+        `${process.env.INSTAGRAM_BASE_URL}/me/media?fields=id,caption,media_type,media_url,timestamp&limit=10&access_token=${token}`,
       );
+
+      console.log('Posts', posts);
 
       const parsed = await posts.json();
       if (parsed) return { status: 200, data: parsed.data };
@@ -150,7 +168,7 @@ export const onGetProfilePosts = async () => {
 export const onSavePosts = async (automationId: string, posts: Post[]) => {
   await onCurrentUser();
   try {
-    const urls = posts.map((post) => {
+    const urls = posts.map(post => {
       return post.media;
     });
     const newUrls = await uploadInstagramImages(urls);
@@ -181,7 +199,10 @@ export const onRemovePosts = async (postId: string) => {
   }
 };
 
-export const onActivateAutomation = async (automationId: string, state: boolean) => {
+export const onActivateAutomation = async (
+  automationId: string,
+  state: boolean,
+) => {
   await onCurrentUser();
   try {
     const activated = await updateAutomation(automationId, { active: state });
@@ -204,7 +225,7 @@ export const onDeleteAutomation = async (automationId: string) => {
       return { status: 404, data: 'Automation not found' };
     }
     if (automation.posts.length > 0) {
-      const urls = automation.posts.map((post) => post.media);
+      const urls = automation.posts.map(post => post.media);
       await deleteUploadedFiles(urls);
     }
     const removed = await deleteAutomation(automationId);
