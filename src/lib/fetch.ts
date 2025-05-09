@@ -2,12 +2,19 @@ import axios from 'axios';
 
 export const refreshToken = async (token: string) => {
   const refresh_token = await axios.get(
-    `${process.env.INSTAGRAM_BASE_URL as string}/refresh_access_token?grant_type=ig_refresh_token&access_token=${token}`
+    `${
+      process.env.INSTAGRAM_BASE_URL as string
+    }/refresh_access_token?grant_type=ig_refresh_token&access_token=${token}`,
   );
   return refresh_token.data;
 };
 
-export const sendDM = async (userId: string, recieverId: string, prompt: string, token: string) => {
+export const sendDM = async (
+  userId: string,
+  recieverId: string,
+  prompt: string,
+  token: string,
+) => {
   if (process.env.NODE_ENV === 'development') {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   }
@@ -29,7 +36,7 @@ export const sendDM = async (userId: string, recieverId: string, prompt: string,
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
     return response;
   } catch (error) {
@@ -38,7 +45,12 @@ export const sendDM = async (userId: string, recieverId: string, prompt: string,
   }
 };
 
-export const sendPrivateDM = async (userId: string, recieverId: string, prompt: string, token: string) => {
+export const sendPrivateDM = async (
+  userId: string,
+  recieverId: string,
+  prompt: string,
+  token: string,
+) => {
   if (process.env.NODE_ENV === 'development') {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   }
@@ -60,7 +72,7 @@ export const sendPrivateDM = async (userId: string, recieverId: string, prompt: 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
     return response;
   } catch (error) {
@@ -96,6 +108,7 @@ const getShortLivedToken = async (code: string) => {
     throw new Error(`Failed to get short token: ${data.error_message}`);
   }
 
+  console.log(data);
   // TODO: check user permission to know if he has the correct permissions on his instagram account
 
   return data.access_token;
@@ -103,7 +116,7 @@ const getShortLivedToken = async (code: string) => {
 
 const getLongLivedToken = async (shortToken: string) => {
   const res = await fetch(
-    `${process.env.INSTAGRAM_BASE_URL}/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_CLIENT_SECRET}&access_token=${shortToken}`
+    `${process.env.INSTAGRAM_BASE_URL}/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_CLIENT_SECRET}&access_token=${shortToken}`,
   );
 
   const data = await res.json();
@@ -120,7 +133,11 @@ const getLongLivedToken = async (shortToken: string) => {
 };
 
 export const getInstagramId = async (access_token: string) => {
-  const insta_id = await axios.get(`${process.env.INSTAGRAM_BASE_URL as string}/me?fields=user_id&access_token=${access_token}`);
+  const insta_id = await axios.get(
+    `${
+      process.env.INSTAGRAM_BASE_URL as string
+    }/me?fields=user_id&access_token=${access_token}`,
+  );
   if (insta_id) {
     return insta_id.data;
   }
