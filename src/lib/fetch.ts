@@ -1,5 +1,17 @@
 import axios from 'axios';
 
+interface InstagramShortToken {
+  access_token: string;
+  user_id: string;
+  permissions: Array<
+    | 'instagram_business_basic'
+    | 'instagram_business_manage_messages'
+    | 'instagram_business_content_publish'
+    | 'instagram_business_manage_insights'
+    | 'instagram_business_manage_comments'
+  >;
+}
+
 export const refreshToken = async (token: string) => {
   const refresh_token = await axios.get(
     `${
@@ -108,8 +120,22 @@ const getShortLivedToken = async (code: string) => {
     throw new Error(`Failed to get short token: ${data.error_message}`);
   }
 
-  console.log(data);
-  // TODO: check user permission to know if he has the correct permissions on his instagram account
+  const REQUIRED_PERMISSIONS = [
+    'instagram_business_basic',
+    'instagram_business_manage_messages',
+  ] as const;
+
+  const hasPermissions = REQUIRED_PERMISSIONS.every(p =>
+    data.permissions.includes(p),
+  );
+
+  if (!hasPermissions) {
+    throw new Error(
+      `Missing instagram permissions, [instagram_business_basic, instagram_business_manage_messages] are required permissions: ${
+        (data as InstagramShortToken).permissions
+      }`,
+    );
+  }
 
   return data.access_token;
 };
@@ -122,7 +148,6 @@ const getLongLivedToken = async (shortToken: string) => {
   const data = await res.json();
 
   if (!res.ok) {
-    console.log(data.error.message);
     throw new Error(`Failed to get long token: ${data.error.message}`);
   }
 
