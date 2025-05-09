@@ -24,19 +24,24 @@ export const onIntegrate = async (code: string) => {
         if (insta_id) {
           const today = new Date();
           const expire_date = today.setDate(today.getDate() + 60);
-          const create = await createIntegration(user.id, token.accessToken, new Date(expire_date), insta_id.user_id);
+          const create = await createIntegration(
+            user.id,
+            token.accessToken,
+            new Date(expire_date),
+            insta_id.user_id,
+          );
           return { status: 200, data: create };
         }
         console.log(401);
-        return { status: 401 };
+        return { status: 401, data: 'Instagram ID not found' };
       }
       console.log(401);
-      return { status: 401 };
+      return { status: 401, data: 'Token not found' };
     }
     console.log(404);
-    return { status: 404 };
+    return { status: 404, data: 'Integration not found' };
   } catch (error) {
     console.log(500, error);
-    return { status: 500 };
+    return { status: 500, data: 'Internal server error' };
   }
 };
