@@ -1,8 +1,13 @@
-'use server';
+"use server";
 
-import { client } from '@/lib/prisma.lib';
+import { client } from "@/lib/prisma.lib";
+import { IntegrationType } from "@prisma/client";
 
-export const updateIntegration = async (token: string, expiresAt: Date, id: string) => {
+export const updateIntegration = async (
+  token: string,
+  expiresAt: Date,
+  id: string
+) => {
   return await client.integrations.update({
     where: { id },
     data: {
@@ -12,20 +17,39 @@ export const updateIntegration = async (token: string, expiresAt: Date, id: stri
   });
 };
 
-export const getIntegration = async (clerkId: string) => {
+export const getInstagramIntegration = async (clerkId: string) => {
   return await client.user.findUnique({
     where: { clerkId },
     select: {
       integrations: {
         where: {
-          name: 'INSTAGRAM',
+          name: IntegrationType.INSTAGRAM,
         },
       },
     },
   });
 };
 
-export const createIntegration = async (clerkId: string, token: string, expire: Date, igId?: string) => {
+export const getFacebookIntegration = async (clerkId: string) => {
+  return await client.user.findUnique({
+    where: { clerkId },
+    select: {
+      integrations: {
+        where: {
+          name: IntegrationType.FACEBOOK,
+        },
+      },
+    },
+  });
+};
+
+export const createIntegration = async (
+  clerkId: string,
+  token: string,
+  expire: Date,
+  name: IntegrationType,
+  integrationId?: string
+) => {
   return await client.user.update({
     where: { clerkId },
     data: {
@@ -33,7 +57,8 @@ export const createIntegration = async (clerkId: string, token: string, expire: 
         create: {
           token,
           expiresAt: expire,
-          integrationId: igId,
+          integrationId,
+          name,
         },
       },
     },

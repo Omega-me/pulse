@@ -1,15 +1,17 @@
-'use server';
+"use server";
 
-import { currentUser } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import { createUser, findUser, updateSubscription } from './queries';
-import { refreshToken } from '@/lib/fetch';
-import { updateIntegration } from '../integrations/query';
-import { stripe } from '@/lib/stripe.lib';
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { createUser, findUser, updateSubscription } from "./queries";
+import { refreshFacebookToken, refreshInstagramToken } from "@/lib/fetch";
+import { updateIntegration } from "../integrations/query";
+import { stripe } from "@/lib/stripe.lib";
+import { Integrations, IntegrationType } from "@prisma/client";
+import { findIntegration, Integration } from "@/utils";
 
 export const onCurrentUser = async () => {
   const user = await currentUser();
-  if (!user) return redirect('sign-in');
+  if (!user) return redirect("sign-in");
   return user;
 };
 
@@ -19,24 +21,28 @@ export const onBoardUser = async () => {
     const found = await findUser(user.id);
     if (found) {
       if (found.integrations.length > 0) {
-        const today = new Date();
-        const integration = found?.integrations.find(
-          i => i.name === 'INSTAGRAM',
+        // handle instagram token refresh
+        const instagramIntegration = findIntegration(
+          found.integrations,
+          IntegrationType.INSTAGRAM
         );
-        const time_left = integration.expiresAt?.getTime()! - today.getTime();
-        const days = Math.round(time_left / (1000 * 3600 * 24));
-        if (days > 5) {
-          console.log('Refresh');
-          const refresh = await refreshToken(integration.token);
-          const expire_date = today.setDate(today.getDate() + 60);
-          const update_token = await updateIntegration(
-            refresh.access_token,
-            new Date(expire_date),
-            integration.id,
+        if (instagramIntegration) {
+          handleInstagramAndFacebookTokenRefresh(
+            instagramIntegration,
+            IntegrationType.INSTAGRAM
           );
-          if (!update_token) {
-            console.log('Update token failed!');
-          }
+        }
+
+        // handle facebook token refresh
+        const facebookIntegration = findIntegration(
+          found.integrations,
+          IntegrationType.FACEBOOK
+        );
+        if (facebookIntegration) {
+          handleInstagramAndFacebookTokenRefresh(
+            facebookIntegration,
+            IntegrationType.FACEBOOK
+          );
         }
       }
       // user exists
@@ -68,6 +74,36 @@ export const onBoardUser = async () => {
   }
 };
 
+const handleInstagramAndFacebookTokenRefresh = async (
+  integration: Integration,
+  type: IntegrationType
+) => {
+  const today = new Date();
+  const time_left = integration.expiresAt?.getTime()! - today.getTime();
+  const days = Math.round(time_left / (1000 * 3600 * 24));
+  if (days > 5) {
+    console.log("Refresh");
+    let refresh: any;
+
+    if (type === IntegrationType.INSTAGRAM) {
+      refresh = await refreshInstagramToken(integration.token);
+      const expire_date = today.setDate(today.getDate() + 60);
+      const update_token = await updateIntegration(
+        refresh.access_token,
+        new Date(expire_date),
+        integration.id
+      );
+      if (!update_token) {
+        console.log("Update token failed!");
+      }
+    }
+
+    if (type === IntegrationType.FACEBOOK) {
+      refresh = await refreshFacebookToken(integration.token);
+    }
+  }
+};
+
 export const onUserInfo = async () => {
   const user = await onCurrentUser();
   try {
@@ -87,7 +123,7 @@ export const onSubscribe = async (session_id: string) => {
     if (session) {
       const subscribed = await updateSubscription(user.id, {
         customerId: session.customer as string,
-        plan: 'PRO',
+        plan: "PRO",
       });
 
       if (subscribed) return { status: 200 };

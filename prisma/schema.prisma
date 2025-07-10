@@ -87,9 +87,9 @@ model Keyword {
 
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
   automationId String?      @db.Uuid
+  Dms          Dms[]
 
   @@unique([automationId, word])
-  Dms Dms[]
 }
 
 model Listener {
@@ -112,16 +112,16 @@ model Dms {
   reciever String?
   message  String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  system_dm Boolean
-  usedSmartAI   Boolean
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  system_dm   Boolean
+  usedSmartAI Boolean
 
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
   automationId String?      @db.Uuid
 
   Keyword   Keyword? @relation(fields: [keywordId], references: [id], onDelete: Cascade)
-  keywordId String?      @db.Uuid
+  keywordId String?  @db.Uuid
 }
 
 model Post {
@@ -144,6 +144,7 @@ enum SubscriptionPlan {
 
 enum IntegrationType {
   INSTAGRAM
+  FACEBOOK
 }
 
 enum MediaType {

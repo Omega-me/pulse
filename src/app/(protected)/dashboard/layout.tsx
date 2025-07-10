@@ -1,11 +1,18 @@
-import { onBoardUser } from '@/actions/user';
-import Navbar from '@/components/global/navbar';
-import Sidebar from '@/components/global/sidebar';
-import React, { PropsWithChildren } from 'react';
-import { redirect } from 'next/navigation';
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import { PrefetchAutomations, PrefetchUserProfile } from '@/react-query/prefetch';
-import AppFooter from '@/components/global/app-footer';
+import { onBoardUser } from "@/actions/user";
+import Navbar from "@/components/global/navbar";
+import Sidebar from "@/components/global/sidebar";
+import React, { PropsWithChildren } from "react";
+import { redirect } from "next/navigation";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import {
+  PrefetchAutomations,
+  PrefetchUserProfile,
+} from "@/react-query/prefetch";
+import AppFooter from "@/components/global/app-footer";
 
 interface Props extends PropsWithChildren {}
 
@@ -18,9 +25,9 @@ const Layout = async (props: Props) => {
     };
   };
 
-  if (user.status === 500) return redirect('/sign-in');
-  let userName = `${user.data?.firstname || ''}  ${user.data?.lastname || ''}`;
-  if (userName.trim() === '') userName = 'Anonymous Ally';
+  if (user.status === 500) return redirect("/sign-in");
+  let userName = `${user.data?.firstname || ""}  ${user.data?.lastname || ""}`;
+  if (userName.trim() === "") userName = "Anonymous Ally";
 
   // prefetch data
   const client = new QueryClient();
