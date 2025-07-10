@@ -1,6 +1,7 @@
-import { onSubscribe } from '@/actions/user';
-import { redirect } from 'next/navigation';
-import React from 'react';
+import { onSubscribe } from "@/actions/user";
+import AppError from "@/components/global/error/app-error";
+import { redirect } from "next/navigation";
+import React from "react";
 
 interface Props {
   searchParams: Promise<{
@@ -12,24 +13,18 @@ interface Props {
 const Page = async (props: Props) => {
   const { cancel, session_id } = await props.searchParams;
 
-  const renderError = () => (
-    <div className="flex flex-col justify-center items-center h-screen w-full">
-      <h4 className="text-5xl font-bold">404</h4>
-      <p className="text-xl font-bold">Oopps! Something went wrong</p>
-    </div>
-  );
-
   if (session_id) {
     const customer = await onSubscribe(session_id);
 
     if (customer.status === 200) {
-      return redirect('/dashboard');
+      return redirect("/dashboard");
     }
-    return renderError();
+
+    return <AppError />;
   }
 
   if (cancel) {
-    return renderError();
+    return <AppError />;
   }
 };
 

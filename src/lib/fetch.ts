@@ -116,6 +116,10 @@ export const replyToInstagramComment = async (
 
 // Instagram integration functions
 export const refreshInstagramToken = async (token: string) => {
+  if (process.env.NODE_ENV === "development") {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  }
+
   const refresh_token = await axios.get(
     `${
       process.env.INSTAGRAM_BASE_URL as string
