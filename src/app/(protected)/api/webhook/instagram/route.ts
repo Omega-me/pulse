@@ -1,12 +1,20 @@
-import { onGenerateSmartAiMessage } from '@/actions/webhook';
-import { createChatHistory, getChatHistory, getKeywordAutomation, getKeywordPost, matchKeyword, trackResponses } from '@/actions/webhook/queries';
-import { sendDM, sendPrivateDM } from '@/lib/fetch';
-import { NextRequest, NextResponse } from 'next/server';
-import { Keyword } from '@prisma/client';
-import { client } from '@/lib/prisma.lib';
+import { onGenerateSmartAiMessage } from "@/actions/webhook";
+import {
+  createChatHistory,
+  getChatHistory,
+  getKeywordAutomation,
+  getKeywordPost,
+  matchKeyword,
+  trackResponses,
+} from "@/actions/webhook/queries";
+import { replyToInstagramComment, sendDM, sendPrivateDM } from "@/lib/fetch";
+import { NextRequest, NextResponse } from "next/server";
+import { IntegrationType, Keyword } from "@prisma/client";
+import { client } from "@/lib/prisma.lib";
+import { findIntegration } from "@/utils";
 
 interface Changes {
-  field: 'comments' | 'messages';
+  field: "comments" | "messages";
   value: {
     from: { id: string; username: string };
     media: { id: string; media_product_type: string };
@@ -31,7 +39,7 @@ interface Entry {
 }
 
 export async function GET(req: NextRequest) {
-  const hub = req.nextUrl.searchParams.get('hub.challenge');
+  const hub = req.nextUrl.searchParams.get("hub.challenge");
   return new NextResponse(hub);
 }
 
@@ -39,29 +47,37 @@ export async function POST(req: NextRequest) {
   const payload = await req.json();
   const entry: Entry = payload.entry?.[0];
 
-  if (!entry) return jsonResponse('Invalid payload');
+  if (!entry) return jsonResponse("Invalid payload");
 
   const messaging = entry.messaging?.[0];
   const comment = entry.changes?.[0];
   const text = messaging?.message?.text ?? comment?.value?.text;
 
-  if (!text) return jsonResponse('No message text found');
+  if (!text) return jsonResponse("No message text found");
   // if (messaging?.message?.is_echo) return jsonResponse('Skipping echo message');
 
   try {
     const keyword = await matchKeyword(text);
-    const source = messaging ? 'DM' : 'COMMENT';
+    const source = messaging ? "DM" : "COMMENT";
     const senderId = entry.id;
     const receiverId = messaging?.sender.id ?? comment?.value.from.id;
     if (senderId === receiverId) {
-      return jsonResponse('You are trying to send e message to yourself');
+      return jsonResponse("You are trying to send e message to yourself");
     }
 
-    if (keyword) return await handleKeywordMatch(keyword, text, source, senderId, receiverId, comment);
+    if (keyword)
+      return await handleKeywordMatch(
+        keyword,
+        text,
+        source,
+        senderId,
+        receiverId,
+        comment
+      );
     return await handleFallback(entry, text, messaging);
   } catch (error) {
-    console.error('Webhook Error:', error);
-    return jsonResponse('Server error');
+    console.error("Webhook Error:", error);
+    return jsonResponse("Server error");
   }
 }
 
@@ -70,38 +86,70 @@ function jsonResponse(message: string) {
   return NextResponse.json({ message }, { status: 200 });
 }
 
-async function handleKeywordMatch(keyword: Keyword, text: string, source: 'DM' | 'COMMENT', senderId: string, receiverId: string, comment?: Changes) {
+async function handleKeywordMatch(
+  keyword: Keyword,
+  text: string,
+  source: "DM" | "COMMENT",
+  senderId: string,
+  receiverId: string,
+  comment?: Changes
+) {
   const automation = await getKeywordAutomation(keyword.automationId);
-  if (!automation || !automation.active || !automation.listener || !automation.triggers?.length)
-    return jsonResponse('Invalid or inactive automation');
+  if (
+    !automation ||
+    !automation.active ||
+    !automation.listener ||
+    !automation.triggers?.length
+  )
+    return jsonResponse("Invalid or inactive automation");
 
-  const token = automation.User?.integrations?.find((int) => int.name === 'INSTAGRAM')?.token;
-  if (!token) return jsonResponse('Missing Instagram token');
+  const instagramToken = findIntegration(
+    automation.User?.integrations,
+    IntegrationType.INSTAGRAM
+  )?.token;
+  const facebookToken = findIntegration(
+    automation.User?.integrations,
+    IntegrationType.FACEBOOK
+  )?.token;
 
-  const isPro = automation.User.subscription?.plan === 'PRO';
-  const listenerType = automation.listener.listener;
-  const prompt = automation.listener.prompt;
+  if (!instagramToken) return jsonResponse("Missing Instagram token");
+
+  const isPro = automation.User.subscription?.plan === "PRO";
+  const listenerType = automation.listener?.listener;
+  const prompt = automation.listener?.prompt;
   const triggers = automation.triggers.map((t) => t.type);
+  const commentReply = automation.listener?.commentReply;
 
-  if (source === 'COMMENT') {
-    const postCheck = await getKeywordPost(automation.id, comment!.value.media.id);
-    if (!postCheck) return jsonResponse('Post not automated');
+  if (source === "COMMENT") {
+    const postCheck = await getKeywordPost(
+      automation.id,
+      comment!.value.media.id
+    );
+    if (!postCheck) return jsonResponse("Post not automated");
   }
 
-  if (!triggers.includes(source)) return jsonResponse('Trigger type mismatch');
+  if (!triggers.includes(source)) return jsonResponse("Trigger type mismatch");
 
-  if (listenerType === 'MESSAGE') {
-    const status = await (source === 'COMMENT'
-      ? sendPrivateDM(senderId, comment!.value.id, prompt, token)
-      : sendDM(senderId, receiverId, prompt, token));
+  if (listenerType === "MESSAGE") {
+    const message = await (source === "COMMENT"
+      ? sendPrivateDM(senderId, comment!.value.id, prompt, instagramToken)
+      : sendDM(senderId, receiverId, prompt, instagramToken));
 
-    if (status.status === 200) await trackResponses(automation.id, source);
+    if (facebookToken && source === "COMMENT" && commentReply) {
+      await replyToInstagramComment(
+        comment!.value.id,
+        commentReply,
+        facebookToken
+      );
+    }
+
+    if (message.status === 200) await trackResponses(automation.id, source);
   }
 
-  if (listenerType === 'SMARTAI' && isPro) {
+  if (listenerType === "SMARTAI" && isPro) {
     const history = await getChatHistory(senderId, receiverId);
     let promptMessage: string;
-    if (source === 'COMMENT') {
+    if (source === "COMMENT") {
       promptMessage = prompt;
     } else {
       if (!history) {
@@ -114,8 +162,11 @@ async function handleKeywordMatch(keyword: Keyword, text: string, source: 'DM' |
         promptMessage = text;
       }
     }
-    const aiMessage = await onGenerateSmartAiMessage(history?.chatHistory, promptMessage);
-    if (!aiMessage?.trim()) return jsonResponse('AI failed');
+    const aiMessage = await onGenerateSmartAiMessage(
+      history?.chatHistory,
+      promptMessage
+    );
+    if (!aiMessage?.trim()) return jsonResponse("AI failed");
     await handleCreateChatHistory({
       automationId: automation.id,
       senderId,
@@ -125,40 +176,61 @@ async function handleKeywordMatch(keyword: Keyword, text: string, source: 'DM' |
       keywordId: keyword.id,
     });
 
-    const status = await (source === 'COMMENT'
-      ? sendPrivateDM(senderId, comment!.value.id, aiMessage, token)
-      : sendDM(senderId, receiverId, aiMessage, token));
+    const status = await (source === "COMMENT"
+      ? sendPrivateDM(senderId, comment!.value.id, aiMessage, instagramToken)
+      : sendDM(senderId, receiverId, aiMessage, instagramToken));
+
+    if (facebookToken && source === "COMMENT" && commentReply) {
+      await replyToInstagramComment(
+        comment!.value.id,
+        commentReply,
+        facebookToken
+      );
+    }
 
     if (status.status === 200) await trackResponses(automation.id, source);
   }
 
-  return jsonResponse('DM sent');
+  return jsonResponse("DM sent");
 }
 
-async function handleFallback(entry: Entry, text: string, messaging?: Messaging) {
+async function handleFallback(
+  entry: Entry,
+  text: string,
+  messaging?: Messaging
+) {
   if (!messaging) {
-    return jsonResponse('Fallback not available if comment different from a keword');
+    return jsonResponse(
+      "Fallback not available if comment different from a keword"
+    );
   }
   const senderId = entry.id;
   const receiverId = messaging?.sender.id;
   if (senderId === receiverId) {
-    return jsonResponse('You are trying to send e message to yourself');
+    return jsonResponse("You are trying to send e message to yourself");
   }
   const history = await getChatHistory(senderId, receiverId);
-  if (!history) return jsonResponse('No Ai chat history found with this user');
+  if (!history) return jsonResponse("No Ai chat history found with this user");
 
   const automation = await getKeywordAutomation(history.automationId);
-  if (!automation || !automation.active || !automation.listener || !automation.triggers?.length)
-    return jsonResponse('Invalid or inactive automation');
+  if (
+    !automation ||
+    !automation.active ||
+    !automation.listener ||
+    !automation.triggers?.length
+  )
+    return jsonResponse("Invalid or inactive automation");
 
-  const token = automation.User?.integrations?.find((int) => int.name === 'INSTAGRAM')?.token;
-  if (!token) return jsonResponse('Missing Instagram token');
+  const token = automation.User?.integrations?.find(
+    (int) => int.name === "INSTAGRAM"
+  )?.token;
+  if (!token) return jsonResponse("Missing Instagram token");
 
-  const isPro = automation.User.subscription?.plan === 'PRO';
-  if (!isPro) return jsonResponse('User is not a pro member');
+  const isPro = automation.User.subscription?.plan === "PRO";
+  if (!isPro) return jsonResponse("User is not a pro member");
 
   const aiMessage = await onGenerateSmartAiMessage(history.chatHistory, text);
-  if (!aiMessage?.trim()) return jsonResponse('AI failed');
+  if (!aiMessage?.trim()) return jsonResponse("AI failed");
   await handleCreateChatHistory({
     automationId: automation.id,
     senderId,
@@ -169,9 +241,9 @@ async function handleFallback(entry: Entry, text: string, messaging?: Messaging)
   });
 
   const status = await sendDM(senderId, receiverId!, aiMessage, token);
-  if (status.status === 200) await trackResponses(automation.id, 'DM');
+  if (status.status === 200) await trackResponses(automation.id, "DM");
 
-  return jsonResponse('Message sent via fallback');
+  return jsonResponse("Message sent via fallback");
 }
 
 async function handleCreateChatHistory(opts: {

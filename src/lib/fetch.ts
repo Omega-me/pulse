@@ -25,7 +25,7 @@ export const sendDM = async (
   console.log("Sending DM to user");
   try {
     const response = await axios.post(
-      `${process.env.INSTAGRAM_BASE_URL as string}/v22.0/${userId}/messages`,
+      `${process.env.INSTAGRAM_BASE_URL as string}/v23.0/${userId}/messages`,
       {
         recipient: {
           id: recieverId,
@@ -84,6 +84,36 @@ export const sendPrivateDM = async (
   }
 };
 
+export const replyToInstagramComment = async (
+  commentId: string,
+  message: string,
+  accessToken: string
+) => {
+  console.log("Leaving reply to Instagram comment");
+  try {
+    const response = await axios.post(
+      `${process.env.FACEBOOK_BASE_URL}/v23.0/${commentId}/replies`,
+      {
+        message,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response;
+  } catch (error: any) {
+    console.error(
+      "Failed to reply to comment:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
 // Instagram integration functions
 export const refreshInstagramToken = async (token: string) => {
   const refresh_token = await axios.get(
@@ -108,6 +138,10 @@ const getInstagramShortLivedToken = async (code: string) => {
   formData.append("grant_type", "authorization_code");
   formData.append("redirect_uri", process.env.INSTAGRAM_REDIRECT_URI);
   formData.append("code", code);
+
+  if (process.env.NODE_ENV === "development")
+    // This is needed to bypass SSL verification in development
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
   const res = await fetch(process.env.INSTAGRAM_TOKEN_URL, {
     method: "POST",

@@ -48,7 +48,9 @@ model Integrations {
   updatedAt     DateTime        @default(now())
 
   User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique @db.Uuid
+  userId String @db.Uuid
+
+  Product Product[]
 }
 
 model Automations {
@@ -137,6 +139,36 @@ model Post {
   automationId String?      @db.Uuid
 }
 
+model Product {
+  id          String        @id @default(uuid()) @db.Uuid
+  source      ProductSource
+  externalId  String? // ID from Shopify or WooCommerce
+  title       String
+  description String?
+  price       Float?
+  discount    Float?        @default(0.0) // Percentage discount
+  currency    String?       @default("EUR")
+  imageUrl    String?
+  productUrl  String? // Link to Shopify/WooCommerce product
+  sku         String?
+  units       Int?          @default(1) // Number of units available
+  available   Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  metadata    Json?
+
+  // Source references
+  integrationId String?       @db.Uuid
+  Integration   Integrations? @relation(fields: [integrationId], references: [id])
+}
+
+enum ProductSource {
+  SHOPIFY
+  WOOCOMMERCE
+  INSTAGRAM
+  MANUAL
+}
+
 enum SubscriptionPlan {
   PRO
   FREE
@@ -145,6 +177,8 @@ enum SubscriptionPlan {
 enum IntegrationType {
   INSTAGRAM
   FACEBOOK
+  SHOPIFY
+  WOOCOMMERCE
 }
 
 enum MediaType {

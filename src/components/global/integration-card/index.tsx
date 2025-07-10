@@ -3,6 +3,7 @@ import { onOAuthIntegration } from "@/actions/integrations";
 import { Button } from "@/components/ui/button";
 import { IntegrationCardProps } from "@/constants/integrations";
 import { useQueryUser } from "@/hooks/use-queries";
+import { findIntegration } from "@/utils";
 import React, { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
@@ -16,9 +17,7 @@ const IntegrationCard = (props: Props) => {
 
   const { data: user } = useQueryUser();
 
-  const integrated = user?.data?.integrations.find(
-    (integration) => integration.name === props.strategy
-  );
+  const integrated = findIntegration(user?.data?.integrations, props.strategy);
 
   useEffect(() => {
     if (props.message && !hasRun.current) {
