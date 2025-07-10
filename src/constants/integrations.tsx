@@ -1,6 +1,8 @@
 import { v4 as uuid } from "uuid";
 import { FaInstagram } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
+import { FaShopify } from "react-icons/fa";
+import { SiWoo } from "react-icons/si";
 import { IntegrationType } from "@prisma/client";
 
 export interface IntegrationCardProps {
@@ -18,7 +20,7 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
     descriptions:
       "Connect your Instagram account to automate messages, track comments, and manage interactions directly from your dashboard.",
     icon: <FaInstagram color="#3352cc" size={35} />,
-    strategy: "INSTAGRAM",
+    strategy: IntegrationType.INSTAGRAM,
   },
   {
     id: uuid(),
@@ -26,6 +28,22 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
     descriptions:
       "Connect your Facebook account to automate messages, track comments, and manage interactions directly from your dashboard.",
     icon: <FaFacebook color="#3352cc" size={35} />,
-    strategy: "FACEBOOK",
+    strategy: IntegrationType.FACEBOOK,
+  },
+  {
+    id: uuid(),
+    title: "Connect Shopify",
+    descriptions:
+      "Sync your Shopify store with Pulse to import products, manage messages, track post comments, and place orders — all from one smart dashboard.",
+    icon: <FaShopify color="#3352cc" size={35} />,
+    strategy: IntegrationType.SHOPIFY,
+  },
+  {
+    id: uuid(),
+    title: "Connect WooCommerce",
+    descriptions:
+      "Connect your WooCommerce store with Pulse to import products, manage messages, track post comments, and place orders — all from one smart dashboard.",
+    icon: <SiWoo color="#3352cc" size={35} />,
+    strategy: IntegrationType.WOOCOMMERCE,
   },
 ];

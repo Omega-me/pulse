@@ -1,11 +1,11 @@
-import { client } from '@/lib/prisma.lib';
+import { client } from "@/lib/prisma.lib";
 
 export const matchKeyword = async (keyword: string) => {
   return await client.keyword.findFirst({
     where: {
       word: {
         equals: keyword.trim(),
-        mode: 'insensitive',
+        mode: "insensitive",
       },
     },
   });
@@ -27,12 +27,7 @@ export const getKeywordAutomation = async (automationId: string) => {
               plan: true,
             },
           },
-          integrations: {
-            select: {
-              token: true,
-              name: true,
-            },
-          },
+          integrations: true,
         },
       },
     },
@@ -41,8 +36,11 @@ export const getKeywordAutomation = async (automationId: string) => {
   return automation;
 };
 
-export const trackResponses = async (automationId: string, type: 'COMMENT' | 'DM') => {
-  if (type === 'COMMENT') {
+export const trackResponses = async (
+  automationId: string,
+  type: "COMMENT" | "DM"
+) => {
+  if (type === "COMMENT") {
     return await client.listener.update({
       where: {
         automationId,
@@ -55,7 +53,7 @@ export const trackResponses = async (automationId: string, type: 'COMMENT' | 'DM
     });
   }
 
-  if (type === 'DM') {
+  if (type === "DM") {
     return await client.listener.update({
       where: {
         automationId,
@@ -104,7 +102,7 @@ export const getChatHistory = async (senderId: string, receiverId: string) => {
       senderId,
       reciever: receiverId,
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
     take: 10,
   });
 
@@ -131,7 +129,11 @@ export const getChatHistory = async (senderId: string, receiverId: string) => {
   if (!keyword) return null;
 
   // Return the keyword, its automationId, and the recent chat history
-  return { keyword, automationId: keyword.automationId, chatHistory: recentMessages };
+  return {
+    keyword,
+    automationId: keyword.automationId,
+    chatHistory: recentMessages,
+  };
 };
 
 export const getKeywordPost = async (automationId: string, postId: string) => {
