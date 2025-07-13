@@ -11,7 +11,7 @@ import { replyToInstagramComment, sendDM, sendPrivateDM } from "@/lib/fetch";
 import { NextRequest, NextResponse } from "next/server";
 import { IntegrationType, Keyword } from "@prisma/client";
 import { client } from "@/lib/prisma.lib";
-import { findIntegration } from "@/utils";
+import { findIntegration } from "@/lib/utils";
 
 interface Changes {
   field: "comments" | "messages";

@@ -6,8 +6,8 @@ import { createUser, findUser, updateSubscription } from "./queries";
 import { refreshFacebookToken, refreshInstagramToken } from "@/lib/fetch";
 import { updateIntegration } from "../integrations/query";
 import { stripe } from "@/lib/stripe.lib";
-import { Integrations, IntegrationType } from "@prisma/client";
-import { findIntegration, Integration } from "@/utils";
+import { IntegrationType } from "@prisma/client";
+import { findIntegration, Integration } from "@/lib/utils";
 
 export const onCurrentUser = async () => {
   const user = await currentUser();

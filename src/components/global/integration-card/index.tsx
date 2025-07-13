@@ -3,7 +3,7 @@ import { onOAuthIntegration } from "@/actions/integrations";
 import { Button } from "@/components/ui/button";
 import { IntegrationCardProps } from "@/constants/integrations";
 import { useQueryUser } from "@/hooks/use-queries";
-import { findIntegration } from "@/utils";
+import { findIntegration } from "@/lib/utils";
 import React, { useEffect, useRef } from "react";
 import { toast } from "sonner";
 

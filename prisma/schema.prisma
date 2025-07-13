@@ -42,7 +42,7 @@ model Integrations {
   id            String          @id @default(uuid()) @db.Uuid
   name          IntegrationType @default(INSTAGRAM)
   token         String          @unique
-  integrationId String?         @unique
+  integrationId String?         @unique // TODO: display a message to the user if id exists when creating an integration
   expiresAt     DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @default(now())
@@ -161,6 +161,8 @@ model Product {
   integrationId String?       @db.Uuid
   Integration   Integrations? @relation(fields: [integrationId], references: [id])
 }
+
+// TODO: Orders table
 
 enum ProductSource {
   SHOPIFY
