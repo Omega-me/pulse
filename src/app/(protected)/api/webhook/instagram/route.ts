@@ -58,7 +58,6 @@ export async function POST(req: NextRequest) {
   // if (messaging?.message?.is_echo) return jsonResponse('Skipping echo message');
 
   try {
-    // const keyword = await matchKeyword(text, comment!.value.media.id);
     const matchedResult = await matchKeyword(text, comment!.value.media.id);
     const source = messaging ? "DM" : "COMMENT";
     const senderId = entry.id;
@@ -90,8 +89,10 @@ function jsonResponse(message: string) {
 
 async function handleKeywordMatch(
   matchedResult: {
-    automation: any;
-    keyword: any;
+    automation: {
+      id: string;
+    };
+    keyword: Keyword;
   },
   text: string,
   source: "DM" | "COMMENT",
@@ -99,7 +100,7 @@ async function handleKeywordMatch(
   receiverId: string,
   comment?: Changes
 ) {
-  const keyword = matchedResult.keyword as Keyword;
+  const { keyword } = matchedResult;
   const automation = await getKeywordAutomation(matchedResult.automation.id);
   if (
     !automation ||

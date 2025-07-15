@@ -25,23 +25,18 @@ export const matchKeyword = async (keyword: string, postid: string) => {
     },
   });
 
-  // return await client.keyword.findFirst({
-  //   where: {
-  //     word: {
-  //       equals: keyword.trim(),
-  //       mode: "insensitive",
-  //     },
-  //   },
-  // });
+  if (post && post.Automation) {
+    const matchedKeyword = post?.Automation?.keywords.find(
+      (k) => k.word === keyword.trim()
+    );
 
-  const matchedKeyword = post?.Automation?.keywords.find(
-    (k) => k.word === keyword.trim()
-  );
+    return {
+      automation: post.Automation,
+      keyword: matchedKeyword,
+    };
+  }
 
-  return {
-    automation: post.Automation,
-    keyword: matchedKeyword,
-  };
+  return null;
 };
 
 export const getKeywordAutomation = async (automationId: string) => {
