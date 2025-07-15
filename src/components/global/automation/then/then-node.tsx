@@ -1,17 +1,21 @@
-'use client';
-import { Separator } from '@/components/ui/separator';
-import { useQueryAutomation } from '@/hooks/use-queries';
-import { BrainCircuit, CircleAlert, SendHorizontal } from 'lucide-react';
-import React from 'react';
-import PostButton from '../post';
-
+"use client";
+import { Separator } from "@/components/ui/separator";
+import { useQueryAutomation } from "@/hooks/use-queries";
+import {
+  BrainCircuit,
+  CircleAlert,
+  MessageSquareQuote,
+  SendHorizontal,
+} from "lucide-react";
+import React from "react";
+import PostButton from "../post";
 interface Props {
   id: string;
 }
 const ThenNode = (props: Props) => {
   const { data: automation } = useQueryAutomation(props.id);
   const commentTrigger = automation?.data?.triggers.find(
-    t => t.type === 'COMMENT',
+    (t) => t.type === "COMMENT"
   );
 
   const renderPosts = () => {
@@ -41,21 +45,32 @@ const ThenNode = (props: Props) => {
         </div>
         <div className="bg-muted p-3 rounded-xl flex flex-col gap-y-2">
           <div className="flex gap-x-2 items-center">
-            {automation?.data?.listener.listener === 'MESSAGE' ? (
+            {automation?.data?.listener.listener === "MESSAGE" ? (
               <SendHorizontal color="#3352cc" />
             ) : (
               <BrainCircuit color="#3352cc" />
             )}
             <p className="text-lg">
-              {automation.data.listener.listener === 'MESSAGE'
-                ? 'Send the user a message'
-                : 'Let Smart AI take over'}
+              {automation.data.listener.listener === "MESSAGE"
+                ? "Send the user a message"
+                : "Let Smart AI take over"}
             </p>
           </div>
           <p className="text-sm font-light">
             {automation.data.listener.prompt}
           </p>
         </div>
+        {automation.data.listener.commentReply && (
+          <div className="bg-muted p-3 rounded-xl flex flex-col gap-y-2">
+            <div className="flex gap-x-2 items-center">
+              <MessageSquareQuote color="#3352cc" />
+              <p className="text-lg">Comment reply to the user</p>
+            </div>
+            <p className="text-sm font-light">
+              {automation.data.listener.commentReply}
+            </p>
+          </div>
+        )}
         {renderPosts()}
       </div>
     </>

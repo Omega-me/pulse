@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   // if (messaging?.message?.is_echo) return jsonResponse('Skipping echo message');
 
   try {
-    const keyword = await matchKeyword(text);
+    const keyword = await matchKeyword(text, entry.id);
     const source = messaging ? "DM" : "COMMENT";
     const senderId = entry.id;
     const receiverId = messaging?.sender.id ?? comment?.value.from.id;

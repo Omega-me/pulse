@@ -1,6 +1,6 @@
-import React, { PropsWithChildren } from 'react';
-import PopOver from '../../popover';
-import { CirclePlus } from 'lucide-react';
+import React, { PropsWithChildren } from "react";
+import PopOver from "../../popover";
+import { CirclePlus } from "lucide-react";
 
 interface Props extends PropsWithChildren {
   label: string;

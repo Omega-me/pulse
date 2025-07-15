@@ -1,6 +1,32 @@
 import { client } from "@/lib/prisma.lib";
 
-export const matchKeyword = async (keyword: string) => {
+export const matchKeyword = async (keyword: string, postid?: string) => {
+  const test = await client.post.findFirst({
+    where: {
+      postid,
+    },
+    include: {
+      Automation: {
+        where: {
+          keywords: {
+            some: {
+              word: {
+                equals: keyword.trim(),
+                mode: "insensitive",
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  console.log(postid);
+  console.log(test);
+
   return await client.keyword.findFirst({
     where: {
       word: {
