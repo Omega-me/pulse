@@ -55,13 +55,17 @@ export async function POST(req: NextRequest) {
   const text = messaging?.message?.text ?? comment?.value?.text;
 
   if (!text) return jsonResponse("No message text found");
-  // if (messaging?.message?.is_echo) return jsonResponse('Skipping echo message');
+  if (messaging?.message?.is_echo) return jsonResponse("Skipping echo message");
 
   try {
-    const matchedResult = await matchKeyword(text, comment!.value.media.id);
+    const matchedResult = await matchKeyword(text, comment?.value?.media?.id);
+    console.log("matchedResult:", matchedResult);
     const source = messaging ? "DM" : "COMMENT";
+    console.log("source:", source);
     const senderId = entry.id;
+    console.log("senderId:", senderId);
     const receiverId = messaging?.sender.id ?? comment?.value.from.id;
+    console.log("receiverId:", receiverId);
     if (senderId === receiverId) {
       return jsonResponse("You are trying to send e message to yourself");
     }
@@ -77,7 +81,7 @@ export async function POST(req: NextRequest) {
       );
     return await handleFallback(entry, text, messaging);
   } catch (error) {
-    console.error("Webhook Error:", error);
+    console.error("Webhook Error ==>>:", error);
     return jsonResponse("Server error");
   }
 }
@@ -130,7 +134,7 @@ async function handleKeywordMatch(
   if (source === "COMMENT") {
     const postCheck = await getKeywordPost(
       automation.id,
-      comment!.value.media.id
+      comment?.value?.media?.id
     );
     if (!postCheck) return jsonResponse("Post not automated");
   }
