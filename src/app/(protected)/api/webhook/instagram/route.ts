@@ -9,9 +9,10 @@ import {
 } from "@/actions/webhook/queries";
 import { replyToInstagramComment, sendDM, sendPrivateDM } from "@/lib/fetch";
 import { NextRequest, NextResponse } from "next/server";
-import { IntegrationType, Keyword } from "@prisma/client";
+import { Automations, IntegrationType, Keyword } from "@prisma/client";
 import { client } from "@/lib/prisma.lib";
 import { findIntegration } from "@/lib/utils";
+import { Key } from "react";
 
 interface Changes {
   field: "comments" | "messages";
@@ -57,7 +58,8 @@ export async function POST(req: NextRequest) {
   // if (messaging?.message?.is_echo) return jsonResponse('Skipping echo message');
 
   try {
-    const keyword = await matchKeyword(text, comment!.value.media.id);
+    // const keyword = await matchKeyword(text, comment!.value.media.id);
+    const matchedResult = await matchKeyword(text, comment!.value.media.id);
     const source = messaging ? "DM" : "COMMENT";
     const senderId = entry.id;
     const receiverId = messaging?.sender.id ?? comment?.value.from.id;
@@ -65,9 +67,9 @@ export async function POST(req: NextRequest) {
       return jsonResponse("You are trying to send e message to yourself");
     }
 
-    if (keyword)
+    if (matchedResult)
       return await handleKeywordMatch(
-        keyword,
+        matchedResult,
         text,
         source,
         senderId,
@@ -87,14 +89,18 @@ function jsonResponse(message: string) {
 }
 
 async function handleKeywordMatch(
-  keyword: Keyword,
+  matchedResult: {
+    automation: any;
+    keyword: any;
+  },
   text: string,
   source: "DM" | "COMMENT",
   senderId: string,
   receiverId: string,
   comment?: Changes
 ) {
-  const automation = await getKeywordAutomation(keyword.automationId);
+  const keyword = matchedResult.keyword as Keyword;
+  const automation = await getKeywordAutomation(matchedResult.automation.id);
   if (
     !automation ||
     !automation.active ||

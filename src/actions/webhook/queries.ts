@@ -1,7 +1,7 @@
 import { client } from "@/lib/prisma.lib";
 
 export const matchKeyword = async (keyword: string, postid: string) => {
-  const test = await client.post.findFirst({
+  const post = await client.post.findFirst({
     where: {
       postid,
     },
@@ -19,22 +19,29 @@ export const matchKeyword = async (keyword: string, postid: string) => {
         },
         select: {
           id: true,
+          keywords: true,
         },
       },
     },
   });
 
-  console.log("postid", postid);
-  console.log("post", test);
+  // return await client.keyword.findFirst({
+  //   where: {
+  //     word: {
+  //       equals: keyword.trim(),
+  //       mode: "insensitive",
+  //     },
+  //   },
+  // });
 
-  return await client.keyword.findFirst({
-    where: {
-      word: {
-        equals: keyword.trim(),
-        mode: "insensitive",
-      },
-    },
-  });
+  const matchedKeyword = post?.Automation?.keywords.find(
+    (k) => k.word === keyword.trim()
+  );
+
+  return {
+    automation: post.Automation,
+    keyword: matchedKeyword,
+  };
 };
 
 export const getKeywordAutomation = async (automationId: string) => {
