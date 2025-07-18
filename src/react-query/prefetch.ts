@@ -1,11 +1,11 @@
-import { onGetAllAutomations, onGetAutomationInfo } from '@/actions/automation';
-import { onUserInfo } from '@/actions/user';
-import { QueryClient, QueryFunction } from '@tanstack/react-query';
+import { onGetAllAutomations, onGetAutomationInfo } from "@/actions/automation";
+import { onUserInfo } from "@/actions/user";
+import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 const prefetch = async (
   client: QueryClient,
   action: QueryFunction,
-  key: string,
+  key: string
 ) => {
   return await client.prefetchQuery({
     queryKey: [key],
@@ -14,21 +14,21 @@ const prefetch = async (
   });
 };
 
-export const PrefetchUserProfile = async (client: QueryClient) => {
-  return await prefetch(client, onUserInfo, 'user-profile');
+export const prefetchUserProfile = async (client: QueryClient) => {
+  return await prefetch(client, onUserInfo, "user-profile");
 };
 
-export const PrefetchAutomations = async (client: QueryClient) => {
-  return await prefetch(client, onGetAllAutomations, 'user-automations');
+export const prefetchAutomations = async (client: QueryClient) => {
+  return await prefetch(client, onGetAllAutomations, "user-automations");
 };
 
-export const PrefetchUserAutomation = async (
+export const prefetchUserAutomation = async (
   client: QueryClient,
-  automationId: string,
+  automationId: string
 ) => {
   return await prefetch(
     client,
     () => onGetAutomationInfo(automationId),
-    'automation-info',
+    "automation-info"
   );
 };

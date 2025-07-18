@@ -4,6 +4,7 @@ import { CirclePlus } from "lucide-react";
 
 interface Props extends PropsWithChildren {
   label: string;
+  onClick?: () => void;
 }
 
 const TriggerButton = (props: Props) => {
@@ -12,6 +13,7 @@ const TriggerButton = (props: Props) => {
       className="w-[400px]"
       trigger={
         <div
+          onClick={props.onClick}
           className="border-2 border-dashed w-full border-[#3352cc] 
         hover:opacity-80 cursor-pointer 
         transition duration-100 rounded-xl 

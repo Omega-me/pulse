@@ -1,7 +1,7 @@
-'use server';
+"use server";
 
-import { client } from '@/lib/prisma.lib';
-import { Post } from '@prisma/client';
+import { client } from "@/lib/prisma.lib";
+import { Post } from "@prisma/client";
 
 export const getAllAutomations = async (clerkId: string) => {
   return await client.user.findUnique({
@@ -11,7 +11,7 @@ export const getAllAutomations = async (clerkId: string) => {
     select: {
       automations: {
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
         include: {
           keywords: true,
@@ -76,7 +76,12 @@ export const deleteAutomation = async (id: string) => {
   });
 };
 
-export const addListener = async (automationId: string, listener: 'SMARTAI' | 'MESSAGE', prompt: string, reply?: string) => {
+export const addListener = async (
+  automationId: string,
+  listener: "SMARTAI" | "MESSAGE",
+  prompt: string,
+  reply?: string
+) => {
   return await client.automations.update({
     where: {
       id: automationId,
@@ -138,7 +143,18 @@ export const getKeywords = async (clerkId: string) => {
   });
 };
 
-export const addKeyword = async (clerkId: string, automationId: string, keyword: string) => {
+export const getKeywordsByAutomation = async (automationId: string) => {
+  return await prisma.keyword.findMany({
+    where: { automationId },
+    select: { word: true },
+  });
+};
+
+export const addKeyword = async (
+  clerkId: string,
+  automationId: string,
+  keyword: string
+) => {
   const trimmedKeyword = keyword.trim();
 
   return await client.automations.update({
@@ -155,6 +171,43 @@ export const deleteKeyword = async (id: string) => {
   return await client.keyword.delete({
     where: {
       id,
+    },
+  });
+};
+
+export const getConflictingPosts = async (
+  automationId: string,
+  instagramPostIds: string[],
+  keywords: string[]
+) => {
+  return await prisma.post.findMany({
+    where: {
+      automationId: { not: automationId },
+      postid: { in: instagramPostIds },
+      Automation: {
+        keywords: {
+          some: {
+            word: {
+              in: keywords,
+              mode: "insensitive", // case-insensitive match
+            },
+          },
+        },
+      },
+    },
+    select: {
+      postid: true,
+      automationId: true,
+      media: true,
+      Automation: {
+        select: {
+          keywords: {
+            select: {
+              word: true,
+            },
+          },
+        },
+      },
     },
   });
 };
@@ -179,7 +232,7 @@ export const addPosts = async (automationId: string, posts: Post[]) => {
   });
 };
 
-export const removePosts = async (postId: string) => {
+export const removePost = async (postId: string) => {
   return await client.post.delete({
     where: {
       id: postId,

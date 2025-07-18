@@ -1,13 +1,17 @@
-import { onGetAutomationInfo } from '@/actions/automation';
-import AutomationAlert from '@/components/global/automation/automation-alert';
-import PostNode from '@/components/global/automation/post/post-node';
-import ThenNode from '@/components/global/automation/then/then-node';
-import AutomationTrigger from '@/components/global/automation/trigger/automation-trigger';
-import AutomationBreadCrumb from '@/components/global/bread-crumbs/automation-bread-crumb';
-import { PrefetchUserAutomation } from '@/react-query/prefetch';
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import { CircleAlert } from 'lucide-react';
-import React from 'react';
+import { onGetAutomationInfo } from "@/actions/automation";
+import AutomationAlert from "@/components/global/automation/automation-alert";
+import PostNode from "@/components/global/automation/post/post-node";
+import ThenNode from "@/components/global/automation/then/then-node";
+import AutomationTrigger from "@/components/global/automation/trigger/automation-trigger";
+import AutomationBreadCrumb from "@/components/global/bread-crumbs/automation-bread-crumb";
+import { prefetchUserAutomation } from "@/react-query/prefetch";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { CircleAlert } from "lucide-react";
+import React from "react";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -18,19 +22,19 @@ export async function generateMetadata({ params }: Props) {
   try {
     const info = await onGetAutomationInfo(id);
 
-    const title = info?.data?.name || 'Automation';
+    const title = info?.data?.name || "Automation";
 
     return { title };
   } catch (error) {
-    console.error('generateMetadata error:', error);
-    return { title: 'Automation Not Found' };
+    console.error("generateMetadata error:", error);
+    return { title: "Automation Not Found" };
   }
 }
 
 const Page = async (props: Props) => {
   const { id } = await props.params;
   const query = new QueryClient();
-  await PrefetchUserAutomation(query, id);
+  await prefetchUserAutomation(query, id);
 
   return (
     <HydrationBoundary state={dehydrate(query)}>

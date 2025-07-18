@@ -12,15 +12,17 @@ import {
   deleteKeyword,
   findAutomation,
   getAllAutomations,
-  getKeywords,
-  removePosts,
+  getConflictingPosts,
+  getKeywordsByAutomation,
+  removePost,
   updateAutomation,
 } from "./query";
 import {
   deleteUploadedFiles,
   uploadInstagramImages,
 } from "@/lib/uploadthing.lib";
-import { findIntegration, Integration } from "@/lib/utils";
+import { findIntegration } from "@/lib/utils";
+import { InstagrPostProps } from "@/types/posts.type";
 
 export const onCreateAutomation = async () => {
   const user = await onCurrentUser();
@@ -109,14 +111,6 @@ export const onSaveTrigger = async (
 export const onSaveKeyword = async (automationId: string, keyword: string) => {
   const user = await onCurrentUser();
   try {
-    const myKeywords = await getKeywords(user.id);
-    const keywords = myKeywords.map((k) => k.word.trim().toLowerCase());
-    if (keywords.includes(keyword.trim().toLowerCase())) {
-      return {
-        status: 400,
-        data: "Keyword already exists, please use a different keyword name",
-      };
-    }
     const created = await addKeyword(user.id, automationId, keyword);
     if (created) return { status: 200, data: "Keyword added successfully" };
     return { status: 404, data: "Cant add this keyword" };
@@ -168,6 +162,73 @@ export const onGetProfilePosts = async () => {
   }
 };
 
+export const onMarkUsedPosts = async (
+  instagramPosts: InstagrPostProps[],
+  currentAutomationId: string
+) => {
+  // 1. Get keywords of current automation
+  const currentKeywords = await getKeywordsByAutomation(currentAutomationId);
+  const keywords = currentKeywords.map((k) => k.word.toLowerCase());
+
+  // 2. Get conflicting posts used in other automations that have at least one of the keywords
+  const instagramPostIds = instagramPosts.map((p) => p.id);
+  const conflictingPosts = await getConflictingPosts(
+    currentAutomationId,
+    instagramPostIds,
+    keywords
+  );
+
+  // 3. Create a map for quick lookup with extra info
+  const conflictMap = new Map<
+    string,
+    {
+      automationId: string | null;
+      postUrl: string;
+      matchedKeywords: string[];
+    }
+  >();
+
+  for (const post of conflictingPosts) {
+    // Filter matched keywords by those in currentKeywords
+    const matchedKeywords = post.Automation.keywords
+      .map((k) => k.word.toLowerCase())
+      .filter((k) => keywords.includes(k));
+
+    conflictMap.set(post.postid, {
+      automationId: post.automationId,
+      postUrl: post.media,
+      matchedKeywords,
+    });
+  }
+
+  // 4. Return instagram posts enriched with isUsed + conflict details
+  return instagramPosts.map((post) => {
+    const conflict = conflictMap.get(post.id);
+    if (conflict) {
+      return {
+        ...post,
+        extraInfo: {
+          isUsed: true,
+          automationId: conflict.automationId,
+          postUrl: conflict.postUrl,
+          matchedKeywords: conflict.matchedKeywords,
+          postid: post.id,
+        },
+      };
+    }
+    return {
+      ...post,
+      extraInfo: {
+        isUsed: false,
+        automationId: null,
+        postUrl: null,
+        matchedKeywords: [],
+        postid: null,
+      },
+    };
+  });
+};
+
 export const onSavePosts = async (automationId: string, posts: Post[]) => {
   await onCurrentUser();
   try {
@@ -190,12 +251,12 @@ export const onSavePosts = async (automationId: string, posts: Post[]) => {
   }
 };
 
-export const onRemovePosts = async (postId: string) => {
+export const onRemovePost = async (postId: string) => {
   await onCurrentUser();
   try {
-    const removed = await removePosts(postId);
+    const removed = await removePost(postId);
     await deleteUploadedFiles([removed.media]);
-    if (removed) return { status: 200, data: "Posts removed" };
+    if (removed) return { status: 200, data: "Post removed" };
     return { status: 404, data: "Post not found" };
   } catch (error) {
     return { status: 500, data: "Oops! Something went wrong" };
