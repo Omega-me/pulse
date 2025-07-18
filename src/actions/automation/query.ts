@@ -144,7 +144,7 @@ export const getKeywords = async (clerkId: string) => {
 };
 
 export const getKeywordsByAutomation = async (automationId: string) => {
-  return await prisma.keyword.findMany({
+  return await client.keyword.findMany({
     where: { automationId },
     select: { word: true },
   });
@@ -180,7 +180,7 @@ export const getConflictingPosts = async (
   instagramPostIds: string[],
   keywords: string[]
 ) => {
-  return await prisma.post.findMany({
+  return await client.post.findMany({
     where: {
       automationId: { not: automationId },
       postid: { in: instagramPostIds },
