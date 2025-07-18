@@ -8,11 +8,11 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import {
-  PrefetchAutomations,
-  PrefetchUserProfile,
-} from "@/react-query/prefetch";
 import AppFooter from "@/components/global/app-footer";
+import {
+  prefetchUserProfile,
+  prefetchAutomations,
+} from "@/react-query/prefetch";
 
 interface Props extends PropsWithChildren {}
 
@@ -25,14 +25,15 @@ const Layout = async (props: Props) => {
     };
   };
 
+  // TODO: handle this in other ways because when the onBoarduser fails it goes to an infinite loop
   if (user.status === 500) return redirect("/sign-in");
   let userName = `${user.data?.firstname || ""}  ${user.data?.lastname || ""}`;
   if (userName.trim() === "") userName = "Anonymous Ally";
 
   // prefetch data
   const client = new QueryClient();
-  await PrefetchUserProfile(client);
-  await PrefetchAutomations(client);
+  await prefetchUserProfile(client);
+  await prefetchAutomations(client);
 
   return (
     <HydrationBoundary state={dehydrate(client)}>

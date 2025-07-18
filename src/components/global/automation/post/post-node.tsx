@@ -1,13 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
-'use client';
-import { Separator } from '@/components/ui/separator';
-import useAutomationPosts from '@/hooks/use-automation-posts';
-import { useQueryAutomation } from '@/hooks/use-queries';
-import { CircleAlert, Trash2, X } from 'lucide-react';
-import React from 'react';
-import { FaInstagram } from 'react-icons/fa';
-import AppDialog from '../../app-dialog';
-import Loader from '../../loader';
+"use client";
+import { Separator } from "@/components/ui/separator";
+import useAutomationPosts from "@/hooks/use-automation-posts";
+import { useQueryAutomation } from "@/hooks/use-queries";
+import { CircleAlert, Trash2, X } from "lucide-react";
+import React from "react";
+import { FaInstagram } from "react-icons/fa";
+import AppDialog from "../../app-dialog";
+import Loader from "../../loader";
 
 interface Props {
   id: string;
@@ -40,12 +40,22 @@ const PostNode = (props: Props) => {
                 <FaInstagram color="#3352cc" size={25} />
                 <p className="font-bold text-lg">These posts</p>
               </div>
-              <div className="relative flex gap-2 flex-wrap mt-3">
+              <div className="grid grid-cols-3 gap-3 mt-3 max-h-[400px]  overflow-auto">
                 {automation?.data?.posts?.map((post) => (
-                  <div key={post.id} className="relative w-[32%] aspect-square rounded-lg cursor-pointer overflow-hidden">
+                  <div
+                    key={post.id}
+                    className="relative aspect-square rounded-lg cursor-pointer"
+                  >
                     <AppDialog
-                      trigger={<X size={12} className="absolute right-0 m-1 cursor-pointer" />}
-                      onConfirm={() => remove({ id: post?.id } as unknown as any)}
+                      trigger={
+                        <X
+                          size={12}
+                          className="absolute right-0 m-1 cursor-pointer"
+                        />
+                      }
+                      onConfirm={() =>
+                        remove({ id: post?.id } as unknown as any)
+                      }
                       actionText={
                         <span className="flex items-center gap-x-2">
                           <Loader state={isRemovePending}>
@@ -54,10 +64,16 @@ const PostNode = (props: Props) => {
                           Remove
                         </span>
                       }
-                      title={'Remove'}
-                      description={'Do you want to remove this post?'}
+                      title="Remove"
+                      description="Do you want to remove this post?"
                     />
-                    <img src={post.media} alt="Instagram post" width={300} height={300} className="w-full h-full object-cover" />
+                    <img
+                      src={post.media}
+                      alt="Instagram post"
+                      width={300}
+                      height={300}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
                   </div>
                 ))}
               </div>

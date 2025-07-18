@@ -59,13 +59,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const matchedResult = await matchKeyword(text, comment?.value?.media?.id);
-    console.log("matchedResult:", matchedResult);
     const source = messaging ? "DM" : "COMMENT";
-    console.log("source:", source);
     const senderId = entry.id;
-    console.log("senderId:", senderId);
     const receiverId = messaging?.sender.id ?? comment?.value.from.id;
-    console.log("receiverId:", receiverId);
     if (senderId === receiverId) {
       return jsonResponse("You are trying to send e message to yourself");
     }
