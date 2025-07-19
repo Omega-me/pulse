@@ -100,6 +100,7 @@ const handleInstagramAndFacebookTokenRefresh = async (
 
     if (type === IntegrationType.FACEBOOK) {
       refresh = await refreshFacebookToken(integration.token);
+      // await getFacebookAdAccounts(integration.token);
     }
   }
 };

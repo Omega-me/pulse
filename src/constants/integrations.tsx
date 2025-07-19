@@ -11,6 +11,8 @@ export interface IntegrationCardProps {
   descriptions: string;
   icon: React.ReactNode;
   strategy: IntegrationType;
+  collapsable: boolean;
+  hasIntegrationBtn?: boolean;
 }
 
 export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
@@ -21,6 +23,8 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
       "Connect your Instagram account to automate messages, track comments, and manage interactions directly from your dashboard.",
     icon: <FaInstagram color="#3352cc" size={35} />,
     strategy: IntegrationType.INSTAGRAM,
+    collapsable: false,
+    hasIntegrationBtn: true,
   },
   {
     id: uuid(),
@@ -29,6 +33,8 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
       "Connect your Facebook account to automate messages, track comments, and manage interactions directly from your dashboard.",
     icon: <FaFacebook color="#3352cc" size={35} />,
     strategy: IntegrationType.FACEBOOK,
+    collapsable: true,
+    hasIntegrationBtn: true,
   },
   {
     id: uuid(),
@@ -37,6 +43,7 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
       "Sync your Shopify store with Pulse to import products, manage messages, track post comments, and place orders — all from one smart dashboard.",
     icon: <FaShopify color="#3352cc" size={35} />,
     strategy: IntegrationType.SHOPIFY,
+    collapsable: true,
   },
   {
     id: uuid(),
@@ -45,5 +52,6 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
       "Connect your WooCommerce store with Pulse to import products, manage messages, track post comments, and place orders — all from one smart dashboard.",
     icon: <SiWoo color="#3352cc" size={35} />,
     strategy: IntegrationType.WOOCOMMERCE,
+    collapsable: true,
   },
 ];

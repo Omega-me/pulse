@@ -1,12 +1,10 @@
 import IntegrationCard from "@/components/global/integration-card";
 import { INTEGRATIONS_CARDS } from "@/constants/integrations";
 import React from "react";
-import { toast } from "sonner";
 
 interface Props {
   searchParams: Promise<{
     message?: string;
-    error?: string;
   }>;
 }
 

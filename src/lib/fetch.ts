@@ -255,6 +255,9 @@ const checkPermissions = async (accessToken: string) => {
   const REQUIRED_PERMISSIONS = [
     "pages_show_list",
     "ads_management",
+    // "ads_read",
+    // "business_management",
+    // "pages_read_engagement",
     "instagram_basic",
     "instagram_manage_comments",
     "instagram_content_publish",
@@ -321,4 +324,14 @@ export const getFacebookId = async (access_token: string) => {
     );
     return null;
   }
+};
+
+export const getFacebookAdAccounts = async (access_token: string) => {
+  const res = await fetch(
+    `${process.env
+      .FACEBOOK_BASE_URL!}/v23.0/me/adaccounts?access_token=${access_token}`
+  );
+  const data = await res.json();
+
+  console.log(data, "facebook ad accounts");
 };

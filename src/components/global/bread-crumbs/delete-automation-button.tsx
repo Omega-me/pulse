@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
-import React from 'react';
-import Loader from '../loader';
-import { Trash2, X } from 'lucide-react';
-import { useDeleteAutomation } from '@/hooks/use-mutations';
-import AppDialog from '../app-dialog';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from "@/components/ui/button";
+import React from "react";
+import Loader from "../loader";
+import { Trash2, X } from "lucide-react";
+import { useDeleteAutomation } from "@/hooks/use-mutations";
+import AppDialog from "../app-dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Props {
   id: string;
@@ -12,7 +12,6 @@ interface Props {
 
 const DeleteAutomationButton = (props: Props) => {
   const { mutate: remove, isPending } = useDeleteAutomation();
-  const isMobile = useIsMobile();
 
   return (
     <AppDialog
@@ -32,8 +31,8 @@ const DeleteAutomationButton = (props: Props) => {
           Remove
         </span>
       }
-      title={'Remove'}
-      description={'Do you want to remove this automation?'}
+      title={"Remove"}
+      description={"Do you want to remove this automation?"}
     />
   );
 };

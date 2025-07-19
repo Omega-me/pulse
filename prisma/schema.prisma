@@ -21,6 +21,7 @@ model User {
   lastname  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  metadata  Json?
 
   subscription Subscription?
   automations  Automations[]
@@ -33,6 +34,7 @@ model Subscription {
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @default(now())
   customerId String?          @unique
+  metadata   Json?
 
   User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique @db.Uuid
@@ -46,6 +48,7 @@ model Integrations {
   expiresAt     DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @default(now())
+  metadata      Json?
 
   User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
@@ -60,8 +63,9 @@ model Automations {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @db.Uuid
+  User     User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String @db.Uuid
+  metadata Json?
 
   triggers Trigger[]
   listener Listener?
@@ -75,6 +79,7 @@ model Trigger {
   type      String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  metadata  Json?
 
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
   automationId String?      @db.Uuid
@@ -86,6 +91,7 @@ model Keyword {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   userId    String
+  metadata  Json?
 
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
   automationId String?      @db.Uuid
@@ -103,6 +109,7 @@ model Listener {
   commentCount Int
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now())
+  metadata     Json?
 
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
   automationId String?      @unique @db.Uuid
@@ -118,6 +125,7 @@ model Dms {
   updatedAt   DateTime @default(now())
   system_dm   Boolean
   usedSmartAI Boolean
+  metadata    Json?
 
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
   automationId String?      @db.Uuid
@@ -134,6 +142,7 @@ model Post {
   mediaType MediaType @default(IMAGE)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
+  metadata  Json?
 
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
   automationId String?      @db.Uuid

@@ -13,14 +13,13 @@ const Page = async (props: Props) => {
     const user = await onIntegrateFacebook(code);
     if (user.status === 200) {
       return redirect(
-        "/dashboard/integrations?message=Facebook%20Integration%20successful"
+        "/dashboard/integrations?message=Facebook Integration successful"
       );
     }
   }
 
   return redirect(
-    "/dashboard/integrations?message=Facebook%20Integration%20failed&code=" +
-      code
+    "/dashboard/integrations?message=Facebook Integration failed"
   );
 };
 

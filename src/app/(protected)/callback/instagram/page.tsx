@@ -13,13 +13,13 @@ const Page = async (props: Props) => {
     const user = await onIntegrateInstagram(code);
     if (user.status === 200) {
       return redirect(
-        "/dashboard/integrations?message=Instagram%20Integration%20successful"
+        "/dashboard/integrations?message=Instagram Integration successful"
       );
     }
   }
 
   return redirect(
-    "/dashboard/integrations?message=Instagram%20Integration%20failed"
+    "/dashboard/integrations?message=Instagram Integration failed"
   );
 };
 

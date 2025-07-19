@@ -1,11 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { onCurrentUser } from "../user";
+import { onCurrentUser, onUserInfo } from "../user";
 import {
   createIntegration,
   getFacebookIntegration,
   getInstagramIntegration,
+  removeIntegration,
 } from "./query";
 import {
   generateFacebookToken,
@@ -90,6 +91,51 @@ export const onIntegrateFacebook = async (code: string) => {
     }
     console.log(404);
     return { status: 404, data: "Integration not found" };
+  } catch (error) {
+    console.log(500, error);
+    return { status: 500, data: "Internal server error" };
+  }
+};
+
+export const onDisconnectIntegration = async (strategy: IntegrationType) => {
+  switch (strategy) {
+    case IntegrationType.INSTAGRAM:
+      return onDisconnectInstagram();
+    case IntegrationType.FACEBOOK:
+      return onDisconnectFacebook();
+    default:
+      console.log("Unsupported integration type");
+  }
+};
+
+const onDisconnectInstagram = async () => {
+  const user = await onCurrentUser();
+  try {
+    const userIntegration = await getInstagramIntegration(user.id);
+
+    if (!userIntegration || userIntegration.integrations.length === 0) {
+      return { status: 404, data: "Integration not found" };
+    }
+
+    await removeIntegration(userIntegration.integrations[0].id);
+    return { status: 200, data: "Instagram disconnected successfully" };
+  } catch (error) {
+    console.log(500, error);
+    return { status: 500, data: "Internal server error" };
+  }
+};
+
+const onDisconnectFacebook = async () => {
+  const user = await onCurrentUser();
+  try {
+    const userIntegration = await getFacebookIntegration(user.id);
+
+    if (!userIntegration || userIntegration.integrations.length === 0) {
+      return { status: 404, data: "Integration not found" };
+    }
+
+    await removeIntegration(userIntegration.integrations[0].id);
+    return { status: 200, data: "Facebook disconnected successfully" };
   } catch (error) {
     console.log(500, error);
     return { status: 500, data: "Internal server error" };

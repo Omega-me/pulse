@@ -44,6 +44,7 @@ const PostButton = (props: Props) => {
                       updatedAt: new Date(),
                       automationId: props?.id,
                       id: post.id,
+                      metadata: null,
                     },
                     post.extraInfo
                   );

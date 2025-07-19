@@ -1,15 +1,22 @@
-'use client';
-import { onActivateAutomation, onCreateAutomation, onDeleteAutomation, onUpdateAutomationName } from '@/actions/automation';
-import { useMutationData } from './use-mutation-data';
-import { useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+import {
+  onActivateAutomation,
+  onCreateAutomation,
+  onDeleteAutomation,
+  onUpdateAutomationName,
+} from "@/actions/automation";
+import { useMutationData } from "./use-mutation-data";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { IntegrationType } from "@prisma/client";
+import { onDisconnectIntegration } from "@/actions/integrations";
 
 export const useCreateAutomation = () => {
   const router = useRouter();
   const { isPending, mutate, variables } = useMutationData(
-    ['create-automation'],
+    ["create-automation"],
     () => onCreateAutomation(),
-    ['user-automations'],
+    ["user-automations"],
     (data: { id: string }) => {
       router.push(`/dashboard/automations/${data.id}`);
     }
@@ -25,14 +32,14 @@ export const useEditAutomation = (id: string) => {
   const disableEdit = () => setIsEdit(false);
 
   const { isPending, mutate, variables } = useMutationData(
-    ['update-automation'],
+    ["update-automation"],
     async (data) => {
       const { name } = data as unknown as { name: string };
       return await onUpdateAutomationName(id, {
         name,
       });
     },
-    ['automation-info']
+    ["automation-info"]
   );
 
   const handleUpdate = () => {
@@ -58,12 +65,12 @@ export const useEditAutomation = (id: string) => {
 
 export const useActivateAutomation = (id: string) => {
   const { mutate, isPending, variables } = useMutationData(
-    ['activate'],
+    ["activate"],
     async (data) => {
       const { state } = data as unknown as { state: boolean };
       return await onActivateAutomation(id, state);
     },
-    ['automation-info']
+    ["automation-info"]
   );
 
   return { mutate, isPending, variables };
@@ -72,15 +79,25 @@ export const useActivateAutomation = (id: string) => {
 export const useDeleteAutomation = () => {
   const router = useRouter();
   const { mutate, isPending, variables } = useMutationData(
-    ['delete-automation'],
+    ["delete-automation"],
     async (data) => {
       const { id } = data as unknown as { id: string };
       return await onDeleteAutomation(id);
     },
-    ['user-automations'],
+    ["user-automations"],
     () => {
-      router.push('/dashboard/automations');
+      router.push("/dashboard/automations");
     }
+  );
+
+  return { mutate, isPending, variables };
+};
+
+export const useDisconnectIntegration = (strategy: IntegrationType) => {
+  const { mutate, isPending, variables } = useMutationData(
+    ["disconnect-integration"],
+    () => onDisconnectIntegration(strategy),
+    ["user-profile"]
   );
 
   return { mutate, isPending, variables };

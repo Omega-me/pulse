@@ -43,6 +43,12 @@ export const getFacebookIntegration = async (clerkId: string) => {
   });
 };
 
+export const removeIntegration = async (id: string) => {
+  return await client.integrations.delete({
+    where: { id },
+  });
+};
+
 export const createIntegration = async (
   clerkId: string,
   token: string,
