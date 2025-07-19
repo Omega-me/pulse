@@ -3,7 +3,9 @@ import {
   onGetAutomationInfo,
   onGetProfilePosts,
 } from "@/actions/automation";
+import { onGetFacebookAdAccounts } from "@/actions/integrations";
 import { onUserInfo } from "@/actions/user";
+import { getFacebookAdAccounts } from "@/lib/fetch";
 import { useQuery } from "@tanstack/react-query";
 
 export const useQueryAutomations = () => {
@@ -32,5 +34,13 @@ export const useQueryAutomationPosts = () => {
   return useQuery({
     queryKey: ["instagram-media"],
     queryFn: fetchPosts,
+  });
+};
+
+export const useQueryFacebookAdAccounts = () => {
+  const fetchAdAccounts = async () => await onGetFacebookAdAccounts();
+  return useQuery({
+    queryKey: ["facebook-ad-accounts"],
+    queryFn: fetchAdAccounts,
   });
 };

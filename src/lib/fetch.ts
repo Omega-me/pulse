@@ -1,3 +1,4 @@
+import { AdAccountProps } from "@/types/ads.types";
 import axios from "axios";
 
 interface InstagramShortToken {
@@ -326,12 +327,24 @@ export const getFacebookId = async (access_token: string) => {
   }
 };
 
-export const getFacebookAdAccounts = async (access_token: string) => {
-  const res = await fetch(
-    `${process.env
-      .FACEBOOK_BASE_URL!}/v23.0/me/adaccounts?access_token=${access_token}`
-  );
-  const data = await res.json();
+export const getFacebookAdAccounts = async (
+  access_token: string
+): Promise<AdAccountProps[] | null> => {
+  try {
+    const res = await fetch(
+      `${process.env
+        .FACEBOOK_BASE_URL!}/v23.0/me/adaccounts?fields=id,account_id,name,account_status,currency,timezone_name,spend_cap,amount_spent&access_token=${access_token}`
+    );
+    const data = await res.json();
 
-  console.log(data, "facebook ad accounts");
+    return data.data.filter(
+      (acc: AdAccountProps) => acc.account_status === 1
+    ) as AdAccountProps[]; // Filter active accounts
+  } catch (error) {
+    console.error(
+      "Error fetching Facebook ad accounts:",
+      error?.response?.data || error.message
+    );
+    return null;
+  }
 };

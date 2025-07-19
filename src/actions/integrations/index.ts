@@ -11,6 +11,7 @@ import {
 import {
   generateFacebookToken,
   generateInstagramToken,
+  getFacebookAdAccounts,
   getFacebookId,
   getInstagramId,
 } from "@/lib/fetch";
@@ -136,6 +137,30 @@ const onDisconnectFacebook = async () => {
 
     await removeIntegration(userIntegration.integrations[0].id);
     return { status: 200, data: "Facebook disconnected successfully" };
+  } catch (error) {
+    console.log(500, error);
+    return { status: 500, data: "Internal server error" };
+  }
+};
+
+export const onGetFacebookAdAccounts = async () => {
+  const user = await onCurrentUser();
+  try {
+    const integration = await getFacebookIntegration(user.id);
+
+    if (!integration || integration.integrations.length === 0) {
+      return { status: 404, data: "Integration not found" };
+    }
+
+    const adAccounts = await getFacebookAdAccounts(
+      integration.integrations[0].token
+    );
+
+    if (!adAccounts) {
+      return { status: 404, data: "No ad accounts found" };
+    }
+
+    return { status: 200, data: adAccounts };
   } catch (error) {
     console.log(500, error);
     return { status: 500, data: "Internal server error" };
