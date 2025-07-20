@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
-import { ChevronsUpDown, LoaderCircle, Plus, X } from "lucide-react";
+import { ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 import { FaAd } from "react-icons/fa";
 import { useQueryFacebookAdAccounts } from "@/hooks/use-queries";
 import Loader from "../../loader";
@@ -10,6 +10,8 @@ import { AdAccountProps } from "@/types/ads.types";
 import AppDialog from "../../app-dialog";
 import { useFacebookAds } from "@/hooks/use-facebook-ads";
 import { Integration } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   integrated: Integration;
@@ -25,6 +27,10 @@ const FacebookConfig = (props: Props) => {
     handleSaveAdAccount,
     isRemoveAccountPending,
     filterOutUsedAdAccounts,
+    handleSetDefaultAdAccount,
+    isSetDefaultAccountPending,
+    handleSetClickedAdAccountId,
+    clickedAdAccountId,
   } = useFacebookAds();
 
   const filteredAdAccounts = filterOutUsedAdAccounts(
@@ -65,15 +71,38 @@ const FacebookConfig = (props: Props) => {
                   key={account.id}
                   title="Select Ad Account"
                   trigger={
-                    <div className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer  hover:bg-muted hover:opacity-70">
+                    <div className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer">
                       <span>{account.name}</span>
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSetClickedAdAccountId(account.id);
+                        }}
+                        className="flex items-center space-x-2"
+                      >
+                        <Loader
+                          state={
+                            isSetDefaultAccountPending &&
+                            clickedAdAccountId === account.id
+                          }
+                        >
+                          <Label htmlFor="default_account">Default</Label>
+                        </Loader>
+                        <Switch
+                          checked={account.isDefault}
+                          id="default_account"
+                          onCheckedChange={() =>
+                            handleSetDefaultAdAccount(account.id)
+                          }
+                        />
+                      </div>
                     </div>
                   }
                   description="Are you sure you want to remove this ad account?"
                   actionText={
                     <span className="flex items-center gap-x-2">
                       <Loader state={isRemoveAccountPending}>
-                        <X />
+                        <Trash2 />
                       </Loader>
                       <span>Remove</span>
                     </span>
@@ -98,7 +127,9 @@ const FacebookConfig = (props: Props) => {
                   >
                     <span>{account.name}</span>
                     <Button
-                      onClick={() => handleSaveAdAccount(account)}
+                      onClick={() =>
+                        handleSaveAdAccount({ ...account, isDefault: false })
+                      }
                       variant="ghost"
                       size="icon"
                       className="size-8"
@@ -115,30 +146,6 @@ const FacebookConfig = (props: Props) => {
                 <p>No Ad Accounts found</p>
               </div>
             )}
-            {/* {adAccounts?.status === 200 ? (
-            filteredAdAccounts.map((account) => (
-              <div
-                key={account.id}
-                className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer"
-              >
-                <span>{account.name}</span>
-                <Button
-                  onClick={() => handleSaveAdAccount(account)}
-                  variant="ghost"
-                  size="icon"
-                  className="size-8"
-                >
-                  <Loader state={isAddAccountPending}>
-                    <Plus />
-                  </Loader>
-                </Button>
-              </div>
-            ))
-          ) : (
-            <div className="rounded-md border px-4 py-5 font-mono text-sm flex items-center justify-center gap-2">
-              <p>No Ad Accounts found</p>
-            </div>
-          )} */}
           </CollapsibleContent>
         </Collapsible>
       )}

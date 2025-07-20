@@ -7,4 +7,5 @@ export interface AdAccountProps {
   timezone_name: string;
   spend_cap: string;
   amount_spent: string;
+  isDefault: boolean;
 }

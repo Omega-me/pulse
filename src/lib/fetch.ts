@@ -337,9 +337,18 @@ export const getFacebookAdAccounts = async (
     );
     const data = await res.json();
 
-    return data.data.filter(
-      (acc: AdAccountProps) => acc.account_status === 1
-    ) as AdAccountProps[]; // Filter active accounts
+    if (data.error) {
+      console.error("Error fetching Facebook ad accounts:", data.error);
+      return null;
+    }
+
+    if (data.data) {
+      return data?.data?.filter(
+        (acc: AdAccountProps) => acc.account_status === 1
+      ) as AdAccountProps[]; // Filter active accounts
+    }
+
+    return null;
   } catch (error) {
     console.error(
       "Error fetching Facebook ad accounts:",

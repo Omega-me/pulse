@@ -140,6 +140,7 @@ model Post {
   caption   String?
   media     String
   mediaType MediaType @default(IMAGE)
+  postType  PostType  @default(POST)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   metadata  Json?
@@ -196,6 +197,11 @@ enum MediaType {
   IMAGE
   VIDEO
   CAROUSEL_ALBUM
+}
+
+enum PostType {
+  POST
+  AD
 }
 
 enum ListenerType {

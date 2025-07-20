@@ -5,9 +5,12 @@ import useAutomationPosts from "@/hooks/use-automation-posts";
 import { useQueryAutomation } from "@/hooks/use-queries";
 import { CircleAlert, Trash2, X } from "lucide-react";
 import React from "react";
-import { FaInstagram } from "react-icons/fa";
+import { FaAd, FaInstagram } from "react-icons/fa";
 import AppDialog from "../../app-dialog";
 import Loader from "../../loader";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { PostType } from "@prisma/client";
+import AppTooltip from "../../app-tooltip";
 
 interface Props {
   id: string;
@@ -40,43 +43,50 @@ const PostNode = (props: Props) => {
                 <FaInstagram color="#3352cc" size={25} />
                 <p className="font-bold text-lg">These posts</p>
               </div>
-              <div className="grid grid-cols-3 gap-3 mt-3 max-h-[400px]  overflow-auto">
-                {automation?.data?.posts?.map((post) => (
-                  <div
-                    key={post.id}
-                    className="relative aspect-square rounded-lg cursor-pointer"
-                  >
-                    <AppDialog
-                      trigger={
-                        <X
-                          size={12}
-                          className="absolute right-0 m-1 cursor-pointer"
-                        />
-                      }
-                      onConfirm={() =>
-                        remove({ id: post?.id } as unknown as any)
-                      }
-                      actionText={
-                        <span className="flex items-center gap-x-2">
-                          <Loader state={isRemovePending}>
-                            <Trash2 />
-                          </Loader>
-                          Remove
-                        </span>
-                      }
-                      title="Remove"
-                      description="Do you want to remove this post?"
-                    />
-                    <img
-                      src={post.media}
-                      alt="Instagram post"
-                      width={300}
-                      height={300}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                ))}
-              </div>
+              <ScrollArea className="h-[250px] w-full rounded-md border p-3">
+                <div className="grid grid-cols-3 gap-3 mt-3 overflow-auto">
+                  {automation?.data?.posts?.map((post) => (
+                    <div
+                      key={post?.id}
+                      className="relative aspect-square rounded-lg cursor-pointer"
+                    >
+                      <AppDialog
+                        trigger={
+                          <X
+                            size={12}
+                            className="absolute right-0 m-1 cursor-pointer"
+                          />
+                        }
+                        onConfirm={() =>
+                          remove({ id: post?.id } as unknown as any)
+                        }
+                        actionText={
+                          <span className="flex items-center gap-x-2">
+                            <Loader state={isRemovePending}>
+                              <Trash2 />
+                            </Loader>
+                            Remove
+                          </span>
+                        }
+                        title="Remove"
+                        description="Do you want to remove this post?"
+                      />
+                      {post.postType === PostType.AD && (
+                        <AppTooltip text="This post is an Ad">
+                          <FaAd className="absolute top-[75%] left-[75%] z-[90]" />
+                        </AppTooltip>
+                      )}
+                      <img
+                        src={post.media}
+                        alt="Instagram post"
+                        width={300}
+                        height={300}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
           </div>
         </div>
