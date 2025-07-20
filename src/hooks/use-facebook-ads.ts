@@ -31,6 +31,7 @@ export const useFacebookAds = () => {
     }
     const updatedAccounts = [...adAccounts, adAccount];
     addAdAccount({ integration, adAccounts: updatedAccounts } as any);
+    handleSetClickedAdAccountId(adAccount.id);
   };
 
   const handleRemoveAdAccount = async (adAccountId: string) => {

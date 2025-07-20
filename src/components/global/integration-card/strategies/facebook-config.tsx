@@ -127,14 +127,19 @@ const FacebookConfig = (props: Props) => {
                   >
                     <span>{account.name}</span>
                     <Button
-                      onClick={() =>
-                        handleSaveAdAccount({ ...account, isDefault: false })
-                      }
+                      onClick={() => {
+                        handleSaveAdAccount({ ...account, isDefault: false });
+                      }}
                       variant="ghost"
                       size="icon"
                       className="size-8"
                     >
-                      <Loader state={isAddAccountPending}>
+                      <Loader
+                        state={
+                          isAddAccountPending &&
+                          clickedAdAccountId === account.id
+                        }
+                      >
                         <Plus />
                       </Loader>
                     </Button>
