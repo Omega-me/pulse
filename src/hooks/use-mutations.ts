@@ -9,7 +9,12 @@ import { useMutationData } from "./use-mutation-data";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IntegrationType } from "@prisma/client";
-import { onDisconnectIntegration } from "@/actions/integrations";
+import {
+  onDisconnectIntegration,
+  onUpdateFacebookAdAccounts,
+} from "@/actions/integrations";
+import { Integration } from "@/lib/utils";
+import { AdAccountProps } from "@/types/ads.types";
 
 export const useCreateAutomation = () => {
   const router = useRouter();
@@ -97,6 +102,22 @@ export const useDisconnectIntegration = (strategy: IntegrationType) => {
   const { mutate, isPending, variables } = useMutationData(
     ["disconnect-integration"],
     () => onDisconnectIntegration(strategy),
+    ["user-profile"]
+  );
+
+  return { mutate, isPending, variables };
+};
+
+export const useAddFacebookAdAccount = () => {
+  const { mutate, isPending, variables } = useMutationData(
+    ["add-facebook-ad-account"],
+    async (data) => {
+      const { integration, adAccounts } = data as unknown as {
+        integration: Integration;
+        adAccounts: AdAccountProps[];
+      };
+      return await onUpdateFacebookAdAccounts(integration, adAccounts);
+    },
     ["user-profile"]
   );
 

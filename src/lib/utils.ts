@@ -1,4 +1,5 @@
 import { $Enums, IntegrationType } from "@prisma/client";
+import { JsonValue } from "@prisma/client/runtime/library";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -11,6 +12,7 @@ export type Integration = {
   id: string;
   token: string;
   expiresAt: Date;
+  metadata: JsonValue;
 };
 
 export const dublicateValidation = (arr: string[], el: string) => {

@@ -1,4 +1,4 @@
-import { client } from '@/lib/prisma.lib';
+import { client } from "@/lib/prisma.lib";
 
 export const findUser = async (clerkId: string) => {
   return await client.user.findUnique({
@@ -13,6 +13,7 @@ export const findUser = async (clerkId: string) => {
           token: true,
           expiresAt: true,
           name: true,
+          metadata: true,
         },
       },
     },
@@ -42,7 +43,7 @@ export const createUser = async (data: {
 
 export const updateSubscription = async (
   clerkId: string,
-  props: { customerId?: string; plan?: 'PRO' | 'FREE' },
+  props: { customerId?: string; plan?: "PRO" | "FREE" }
 ) => {
   return await client.user.update({
     where: {

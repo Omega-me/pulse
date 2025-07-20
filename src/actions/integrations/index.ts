@@ -7,6 +7,7 @@ import {
   getFacebookIntegration,
   getInstagramIntegration,
   removeIntegration,
+  updateFacebookAdAccounts,
 } from "./query";
 import {
   generateFacebookToken,
@@ -16,6 +17,8 @@ import {
   getInstagramId,
 } from "@/lib/fetch";
 import { IntegrationType } from "@prisma/client";
+import { AdAccountProps } from "@/types/ads.types";
+import { Integration } from "@/lib/utils";
 
 export const onOAuthIntegration = async (strategy: IntegrationType) => {
   if (strategy === IntegrationType.INSTAGRAM) {
@@ -161,6 +164,28 @@ export const onGetFacebookAdAccounts = async () => {
     }
 
     return { status: 200, data: adAccounts };
+  } catch (error) {
+    console.log(500, error);
+    return { status: 500, data: "Internal server error" };
+  }
+};
+
+export const onUpdateFacebookAdAccounts = async (
+  integration: Integration,
+  adAccounts: AdAccountProps[]
+) => {
+  await onCurrentUser();
+  try {
+    const updatedIntegration = await updateFacebookAdAccounts(
+      integration,
+      adAccounts
+    );
+
+    if (!updatedIntegration) {
+      return { status: 404, data: "Integration not found" };
+    }
+
+    return { status: 200, data: "Facebook ad accounts updated successfully" };
   } catch (error) {
     console.log(500, error);
     return { status: 500, data: "Internal server error" };

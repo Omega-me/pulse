@@ -132,7 +132,10 @@ const IntegrationCard = (props: Props) => {
                 <Bolt /> <span>Configurations</span>
               </h4>
               <Separator className="my-2" />
-              <IntegrationConfigs strategy={props.strategy} />
+              <IntegrationConfigs
+                integrated={integrated}
+                strategy={props.strategy}
+              />
             </div>
           </ScrollArea>
         </AccordionContent>

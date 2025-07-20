@@ -3,11 +3,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createUser, findUser, updateSubscription } from "./queries";
-import {
-  getFacebookAdAccounts,
-  refreshFacebookToken,
-  refreshInstagramToken,
-} from "@/lib/fetch";
+import { refreshFacebookToken, refreshInstagramToken } from "@/lib/fetch";
 import { updateIntegration } from "../integrations/query";
 import { stripe } from "@/lib/stripe.lib";
 import { IntegrationType } from "@prisma/client";

@@ -8,70 +8,140 @@ import { useQueryFacebookAdAccounts } from "@/hooks/use-queries";
 import Loader from "../../loader";
 import { AdAccountProps } from "@/types/ads.types";
 import AppDialog from "../../app-dialog";
+import { useFacebookAds } from "@/hooks/use-facebook-ads";
+import { Integration } from "@/lib/utils";
 
-const FacebookConfig = () => {
+interface Props {
+  integrated: Integration;
+}
+
+const FacebookConfig = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: adAccounts, isPending } = useQueryFacebookAdAccounts();
+  const { data: adAccounts } = useQueryFacebookAdAccounts();
+  const {
+    adAccounts: facebookAdAccounts,
+    handleRemoveAdAccount,
+    isAddAccountPending,
+    handleSaveAdAccount,
+    isRemoveAccountPending,
+    filterOutUsedAdAccounts,
+  } = useFacebookAds();
+
+  const filteredAdAccounts = filterOutUsedAdAccounts(
+    adAccounts as { data: AdAccountProps[]; status: number }
+  );
 
   return (
     <div>
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        className="flex w-full flex-col gap-2"
-      >
-        <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between gap-4 px-4 cursor-pointer">
-            <div className="flex items-center gap-2">
-              <FaAd size={18} />
-              <h4 className="text-sm font-semibold">
-                Your connected Ad accounts
-              </h4>
+      {!props.integrated ? (
+        <>
+          <div>Facebook is not connected</div>
+        </>
+      ) : (
+        <Collapsible
+          open={isOpen}
+          onOpenChange={setIsOpen}
+          className="flex w-full flex-col gap-2"
+        >
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between gap-4 px-4 cursor-pointer">
+              <div className="flex items-center gap-2">
+                <FaAd size={18} />
+                <h4 className="text-sm font-semibold">
+                  Your connected Ad accounts
+                </h4>
+              </div>
+              <Button variant="ghost" size="icon" className="size-8">
+                <ChevronsUpDown />
+                <span className="sr-only"></span>
+              </Button>
             </div>
-            <Button variant="ghost" size="icon" className="size-8">
-              <ChevronsUpDown />
-              <span className="sr-only"></span>
-            </Button>
-          </div>
-        </CollapsibleTrigger>
+          </CollapsibleTrigger>
 
-        <AppDialog
-          title="Select Ad Account"
-          trigger={
-            <div className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer  hover:bg-muted hover:opacity-70">
-              <span>Selected Ad Account 1 name</span>
+          {facebookAdAccounts.length > 0 ? (
+            <>
+              {facebookAdAccounts.map((account) => (
+                <AppDialog
+                  key={account.id}
+                  title="Select Ad Account"
+                  trigger={
+                    <div className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer  hover:bg-muted hover:opacity-70">
+                      <span>{account.name}</span>
+                    </div>
+                  }
+                  description="Are you sure you want to remove this ad account?"
+                  actionText={
+                    <span className="flex items-center gap-x-2">
+                      <Loader state={isRemoveAccountPending}>
+                        <X />
+                      </Loader>
+                      <span>Remove</span>
+                    </span>
+                  }
+                  onConfirm={() => handleRemoveAdAccount(account.id)}
+                />
+              ))}
+            </>
+          ) : (
+            <div className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer">
+              <span>No ad account is selected</span>
             </div>
-          }
-          description="Are you sure you want to remove this ad account?"
-          actionText={
-            <span className="flex items-center gap-x-2">
-              <Loader state={false}>
-                <X />
-              </Loader>
-              <span>Remove</span>
-            </span>
-          }
-          onConfirm={() => console.log("test")}
-        />
+          )}
 
-        <CollapsibleContent className="flex flex-col gap-2">
-          {adAccounts?.status === 200 && adAccounts?.data.length > 0 ? (
-            (adAccounts?.data as AdAccountProps[]).map((account) => (
+          <CollapsibleContent className="flex flex-col gap-2">
+            {filteredAdAccounts.length > 0 ? (
+              <>
+                {filteredAdAccounts.map((account) => (
+                  <div
+                    key={account.id}
+                    className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer"
+                  >
+                    <span>{account.name}</span>
+                    <Button
+                      onClick={() => handleSaveAdAccount(account)}
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                    >
+                      <Loader state={isAddAccountPending}>
+                        <Plus />
+                      </Loader>
+                    </Button>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="rounded-md border px-4 py-5 font-mono text-sm flex items-center justify-center gap-2">
+                <p>No Ad Accounts found</p>
+              </div>
+            )}
+            {/* {adAccounts?.status === 200 ? (
+            filteredAdAccounts.map((account) => (
               <div
                 key={account.id}
-                className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer hover:bg-muted hover:opacity-70"
+                className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer"
               >
                 <span>{account.name}</span>
-                <LoaderCircle className="animate-spin" />
+                <Button
+                  onClick={() => handleSaveAdAccount(account)}
+                  variant="ghost"
+                  size="icon"
+                  className="size-8"
+                >
+                  <Loader state={isAddAccountPending}>
+                    <Plus />
+                  </Loader>
+                </Button>
               </div>
             ))
           ) : (
             <div className="rounded-md border px-4 py-5 font-mono text-sm flex items-center justify-center gap-2">
               <p>No Ad Accounts found</p>
             </div>
-          )}
-        </CollapsibleContent>
-      </Collapsible>
+          )} */}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
     </div>
   );
 };
