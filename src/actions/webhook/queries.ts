@@ -1,4 +1,5 @@
 import { client } from "@/lib/prisma.lib";
+import { TriggerType } from "@prisma/client";
 
 export const matchKeyword = async (keyword: string, postid?: string) => {
   if (!postid) {
@@ -68,14 +69,11 @@ export const getKeywordAutomation = async (automationId: string) => {
   return automation;
 };
 
-export const trackResponses = async (
-  automationId: string,
-  type: "COMMENT" | "DM"
-) => {
-  if (type === "COMMENT") {
+export const trackResponses = async (listenerId: string, type: TriggerType) => {
+  if (type === TriggerType.COMMENT) {
     return await client.listener.update({
       where: {
-        automationId,
+        id: listenerId,
       },
       data: {
         commentCount: {
@@ -85,10 +83,10 @@ export const trackResponses = async (
     });
   }
 
-  if (type === "DM") {
+  if (type === TriggerType.DM) {
     return await client.listener.update({
       where: {
-        automationId,
+        id: listenerId,
       },
       data: {
         dmCount: {
