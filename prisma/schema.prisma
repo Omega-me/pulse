@@ -107,6 +107,7 @@ model Keyword {
 model Listener {
   id           String       @id @default(uuid()) @db.Uuid
   listener     ListenerType @default(MESSAGE)
+  // isActive     Boolean      @default(false)    TODO: Implement this feature
   prompt       String
   commentReply String?
   dmCount      Int
