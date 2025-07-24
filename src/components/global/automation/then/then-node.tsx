@@ -45,29 +45,29 @@ const ThenNode = (props: Props) => {
         </div>
         <div className="bg-muted p-3 rounded-xl flex flex-col gap-y-2">
           <div className="flex gap-x-2 items-center">
-            {automation?.data?.listener.listener === "MESSAGE" ? (
+            {automation?.data?.listener[0].listener === "MESSAGE" ? (
               <SendHorizontal color="#3352cc" />
             ) : (
               <BrainCircuit color="#3352cc" />
             )}
             <p className="text-lg">
-              {automation.data.listener.listener === "MESSAGE"
+              {automation.data.listener[0].listener === "MESSAGE"
                 ? "Send the user a message"
                 : "Let Smart AI take over"}
             </p>
           </div>
           <p className="text-sm font-light">
-            {automation.data.listener.prompt}
+            {automation.data.listener[0].prompt}
           </p>
         </div>
-        {automation.data.listener.commentReply && (
+        {automation.data.listener[0].commentReply && (
           <div className="bg-muted p-3 rounded-xl flex flex-col gap-y-2">
             <div className="flex gap-x-2 items-center">
               <MessageSquareQuote color="#3352cc" />
               <p className="text-lg">Comment reply to the user</p>
             </div>
             <p className="text-sm font-light">
-              {automation.data.listener.commentReply}
+              {automation.data.listener[0].commentReply}
             </p>
           </div>
         )}

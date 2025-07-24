@@ -1,15 +1,19 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import NProgress from 'nprogress';
-import 'nprogress/nprogress.css';
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import NProgress from "nprogress";
+import "./loading.css";
 
 export default function LoadingIndicator() {
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
   const previousPath = useRef(pathname);
-  NProgress.configure({ showSpinner: false });
+  NProgress.configure({
+    showSpinner: false,
+    easing: "ease",
+    speed: 500,
+  });
 
   useEffect(() => {
     if (previousPath.current !== pathname) {

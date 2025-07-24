@@ -1,10 +1,17 @@
 "use server";
-import { IntegrationType, Post } from "@prisma/client";
+import {
+  IntegrationType,
+  ListenerType,
+  Post,
+  Trigger,
+  TriggerType,
+} from "@prisma/client";
 import { onCurrentUser } from "../user";
 import { findUser } from "../user/queries";
 import {
   addKeyword,
   addListener,
+  addListener2,
   addPosts,
   addTrigger,
   createAutomation,
@@ -94,9 +101,32 @@ export const onSaveListener = async (
   }
 };
 
+export const onSaveListener2 = async (
+  automationId: string,
+  listener: ListenerType,
+  keywordIds: string[],
+  prompt: string,
+  reply?: string
+) => {
+  await onCurrentUser();
+  try {
+    const created = await addListener2(
+      automationId,
+      listener,
+      keywordIds,
+      prompt,
+      reply
+    );
+    if (created) return { status: 200, data: "Listener created" };
+    return { status: 404, data: "Cant save listener" };
+  } catch (error) {
+    return { status: 500, data: "Oops! Something went wrong" };
+  }
+};
+
 export const onSaveTrigger = async (
   automationId: string,
-  trigger: string[]
+  trigger: TriggerType[]
 ) => {
   await onCurrentUser();
   try {

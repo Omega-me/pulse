@@ -1,7 +1,7 @@
 "use server";
 
 import { client } from "@/lib/prisma.lib";
-import { Post } from "@prisma/client";
+import { Post, TriggerType } from "@prisma/client";
 
 export const getAllAutomations = async (clerkId: string) => {
   return await client.user.findUnique({
@@ -16,6 +16,7 @@ export const getAllAutomations = async (clerkId: string) => {
         include: {
           keywords: true,
           listener: true,
+          triggers: true,
         },
       },
     },
@@ -100,7 +101,38 @@ export const addListener = async (
   });
 };
 
-export const addTrigger = async (automationId: string, trigger: string[]) => {
+export const addListener2 = async (
+  automationId: string,
+  listener: "SMARTAI" | "MESSAGE",
+  keywordIds: string[],
+  prompt: string,
+  reply?: string
+) => {
+  return await client.automations.update({
+    where: {
+      id: automationId,
+    },
+    data: {
+      listener: {
+        create: {
+          listener,
+          prompt,
+          commentReply: reply,
+          commentCount: 0,
+          dmCount: 0,
+          Keywords: {
+            connect: keywordIds.map((id) => ({ id })),
+          },
+        },
+      },
+    },
+  });
+};
+
+export const addTrigger = async (
+  automationId: string,
+  trigger: TriggerType[]
+) => {
   if (trigger.length === 2) {
     return await client.automations.update({
       where: {

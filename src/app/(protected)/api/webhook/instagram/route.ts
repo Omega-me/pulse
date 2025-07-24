@@ -9,10 +9,9 @@ import {
 } from "@/actions/webhook/queries";
 import { replyToInstagramComment, sendDM, sendPrivateDM } from "@/lib/fetch";
 import { NextRequest, NextResponse } from "next/server";
-import { Automations, IntegrationType, Keyword } from "@prisma/client";
+import { IntegrationType, Keyword } from "@prisma/client";
 import { client } from "@/lib/prisma.lib";
 import { findIntegration } from "@/lib/utils";
-import { Key } from "react";
 
 interface Changes {
   field: "comments" | "messages";
@@ -121,11 +120,15 @@ async function handleKeywordMatch(
 
   if (!instagramToken) return jsonResponse("Missing Instagram token");
 
-  const isPro = automation.User.subscription?.plan === "PRO";
-  const listenerType = automation.listener?.listener;
-  const prompt = automation.listener?.prompt;
+  // TODO: fix it to handle multiple listeners
+  if (automation.listener.length === 0)
+    return jsonResponse("No listener attached to this automation");
+  const listener = automation.listener[0];
+  const listenerType = listener?.listener;
+  const prompt = listener?.prompt;
   const triggers = automation.triggers.map((t) => t.type);
-  const commentReply = automation.listener?.commentReply;
+  const commentReply = listener?.commentReply;
+  const isPro = automation.User.subscription?.plan === "PRO";
 
   if (source === "COMMENT") {
     const postCheck = await getKeywordPost(

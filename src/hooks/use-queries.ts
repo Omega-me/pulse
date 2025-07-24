@@ -5,7 +5,6 @@ import {
 } from "@/actions/automation";
 import { onGetFacebookAdAccounts } from "@/actions/integrations";
 import { onUserInfo } from "@/actions/user";
-import { getFacebookAdAccounts } from "@/lib/fetch";
 import { useQuery } from "@tanstack/react-query";
 
 export const useQueryAutomations = () => {

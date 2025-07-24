@@ -29,6 +29,11 @@ export const SIDEBAR_MENU: SidebarProps[] = [
   },
   {
     id: uuid(),
+    label: "automations2",
+    icon: <Activity />,
+  },
+  {
+    id: uuid(),
     label: "integrations",
     icon: <Rocket />,
   },

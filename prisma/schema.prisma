@@ -68,17 +68,17 @@ model Automations {
   metadata Json?
 
   triggers Trigger[]
-  listener Listener?
+  listener Listener[]
   posts    Post[]
   keywords Keyword[]
   dms      Dms[]
 }
 
 model Trigger {
-  id        String   @id @default(uuid()) @db.Uuid
-  type      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id        String      @id @default(uuid()) @db.Uuid
+  type      TriggerType
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now())
   metadata  Json?
 
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
@@ -93,9 +93,13 @@ model Keyword {
   userId    String
   metadata  Json?
 
-  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
   automationId String?      @db.Uuid
-  Dms          Dms[]
+  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+
+  listenerId String?   @db.Uuid
+  Listener   Listener? @relation(fields: [listenerId], references: [id], onDelete: Cascade)
+
+  Dms Dms[]
 
   @@unique([automationId, word])
 }
@@ -110,9 +114,12 @@ model Listener {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now())
   metadata     Json?
+  priority     Int          @default(0)
 
+  automationId String?      @db.Uuid
   Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
-  automationId String?      @unique @db.Uuid
+
+  Keywords Keyword[]
 }
 
 model Dms {
@@ -207,4 +214,9 @@ enum PostType {
 enum ListenerType {
   SMARTAI
   MESSAGE
+}
+
+enum TriggerType {
+  COMMENT
+  DM
 }
