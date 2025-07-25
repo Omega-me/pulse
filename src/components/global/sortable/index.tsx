@@ -30,7 +30,6 @@ const Sortable = ({ id, className, showHandle = true, children }: Props) => {
     boxShadow: isDragging
       ? "0 8px 16px rgba(0, 0, 0, 0.25)" // stronger shadow when dragging
       : "none",
-    touchAction: "none",
   };
 
   return (

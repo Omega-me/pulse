@@ -138,13 +138,7 @@ const AutomationList2 = () => {
           borderWidth={2}
           containerClassName="bg-[#1d1d1d] rounded-xl p-2 w-[99%] mx-auto"
         >
-          <AccordionItem
-            style={{
-              touchAction: "none",
-            }}
-            value={automation.id}
-            className="border-none group"
-          >
+          <AccordionItem value={automation.id} className="border-none group">
             <AccordionTrigger className="hover:no-underline px-5">
               <AutomationHeader
                 automation={automation}
@@ -156,10 +150,7 @@ const AutomationList2 = () => {
               />
             </AccordionTrigger>
 
-            <AccordionContent
-              style={{ touchAction: "none" }}
-              className="p-5 flex flex-col gap-y-3"
-            >
+            <AccordionContent className="p-5 flex flex-col gap-y-3">
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
