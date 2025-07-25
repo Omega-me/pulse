@@ -68,6 +68,7 @@ const FacebookConfig = (props: Props) => {
             <>
               {facebookAdAccounts.map((account) => (
                 <AppDialog
+                  className="!w-[400px]"
                   key={account.id}
                   title="Select Ad Account"
                   trigger={
