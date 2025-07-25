@@ -30,19 +30,15 @@ const Sortable = ({ id, className, showHandle = true, children }: Props) => {
     boxShadow: isDragging
       ? "0 8px 16px rgba(0, 0, 0, 0.25)" // stronger shadow when dragging
       : "none",
+    touchAction: "none",
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(className)}
-      {...attributes}
-      // {...listeners}
-    >
+    <div ref={setNodeRef} style={style} className={cn(className)}>
       {showHandle ? (
         <Button
           ref={setActivatorNodeRef}
+          {...attributes}
           {...listeners}
           variant="ghost"
           className="!cursor-grab m-1 w-[16px] group-hover/listener:text-white text-muted-foreground transition duration-300 active:!cursor-grabbing"
