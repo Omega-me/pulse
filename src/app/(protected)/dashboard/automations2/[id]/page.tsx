@@ -1,6 +1,7 @@
 import { onGetAutomationInfo } from "@/actions/automation";
 import AutomationAlert from "@/components/global/automation/automation-alert";
 import DuplicateButton from "@/components/global/automation/dublicate-button";
+import NodeTitle from "@/components/global/automation/node/node-title";
 import PostNode2 from "@/components/global/automation/post/post-node2";
 import ThenNode2 from "@/components/global/automation/then/then-node2";
 import AutomationTrigger2 from "@/components/global/automation/trigger/automation-trigger2";
@@ -51,16 +52,17 @@ const Page = async (props: Props) => {
         >
           <div className="group  p-5 rounded-xl flex flex-col bg-[#1d1d1d] gap-y-3">
             <div className="flex gap-x-2 items-center justify-between">
-              <div className="flex gap-x-2">
-                <CircleAlert color="#3352cc" />
-                When...
-              </div>
+              <NodeTitle
+                title="When..."
+                icon={<CircleAlert size={18} />}
+                className="text-purple-500 font-semibold"
+              />
               {/* TODO: handle duplicate automation settings */}
               <DuplicateButton
                 trigger={
                   <CopyPlus
                     size={16}
-                    className="scale-0 transition-transform duration-300 group-hover:scale-100 text-muted-foreground cursor-pointer"
+                    className="text-purple-500 scale-0 transition-transform duration-300 group-hover:scale-100 text-muted-foreground cursor-pointer"
                   />
                 }
               >
