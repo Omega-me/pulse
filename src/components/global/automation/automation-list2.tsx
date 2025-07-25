@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import {
+  BadgeCheckIcon,
   CircleAlert,
   Ellipsis,
   MessageCircleHeart,
@@ -40,7 +41,6 @@ import {
 import {
   DndContext,
   closestCenter,
-  PointerSensor,
   useSensor,
   useSensors,
   TouchSensor,
@@ -56,7 +56,16 @@ import {
   restrictToParentElement,
   restrictToVerticalAxis,
 } from "@dnd-kit/modifiers";
-import { Automations, Keyword, Listener } from "@prisma/client";
+import {
+  Automations,
+  Keyword,
+  Listener,
+  ListenerType,
+  Trigger,
+  TriggerType,
+} from "@prisma/client";
+import TriggerButton2 from "./trigger-button-2";
+import { Badge } from "@/components/ui/badge";
 
 const AutomationList2 = () => {
   const { pathname, handleGoToRoute } = usePaths();
@@ -64,29 +73,6 @@ const AutomationList2 = () => {
     useQueryAutomations();
   const { mutate: remove, isPending } = useDeleteAutomation();
   const [items, setItems] = useState([]);
-
-  // const detectSensor = JSON.parse(
-  //   sessionStorage.getItem("isWebEntry") ?? "true"
-  // )
-  //   ? PointerSensor
-  //   : TouchSensor;
-
-  // const pointerSensor = useSensor(detectSensor, {
-  //   // Additional sensor options
-  //   activationConstraint: {
-  //     distance: 8,
-  //   },
-  // });
-  // const sensors = useSensors(
-  //   // pointerSensor
-  //   useSensor(PointerSensor),
-  //   useSensor(TouchSensor, {
-  //     activationConstraint: {
-  //       delay: 150,
-  //       tolerance: 5,
-  //     },
-  //   })
-  // );
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -136,7 +122,7 @@ const AutomationList2 = () => {
           proximity={64}
           inactiveZone={0.01}
           borderWidth={2}
-          containerClassName="bg-[#1d1d1d] rounded-xl p-2 w-[99%] mx-auto"
+          containerClassName="bg-[#1d1d1d] rounded-xl w-[99%] mx-auto h-auto"
         >
           <AccordionItem value={automation.id} className="border-none group">
             <AccordionTrigger className="hover:no-underline px-5">
@@ -149,7 +135,6 @@ const AutomationList2 = () => {
                 isPending={isPending}
               />
             </AccordionTrigger>
-
             <AccordionContent className="p-5 flex flex-col gap-y-3">
               <DndContext
                 sensors={sensors}
@@ -172,7 +157,7 @@ const AutomationList2 = () => {
                         key={listener.id}
                         id={listener.id}
                         showHandle={items.length > 1}
-                        className="bg-[#1d1d1d] py-5 pr-5 gap-y-5 group/listener border-muted-foreground/20 rounded-lg border flex justify-between items-center"
+                        className="bg-[#1d1d1d] pr-5 group/listener border border-muted-foreground/20 rounded-md flex justify-between items-center"
                       >
                         <ListenerItem
                           automation={automation}
@@ -194,71 +179,94 @@ const AutomationList2 = () => {
 
 export default AutomationList2;
 
-const AutomationHeader = ({ automation, onDelete, onNavigate, isPending }) => (
-  <div className="w-full flex items-center justify-between">
+interface AutomationHeaderProps {
+  automation: Automations & { keywords: Keyword[]; triggers: Trigger[] };
+  onDelete: () => void;
+  onNavigate: () => void;
+  isPending: boolean;
+}
+
+const AutomationHeader = ({
+  automation,
+  onDelete,
+  onNavigate,
+  isPending,
+}: AutomationHeaderProps) => (
+  <div className="w-full flex gap-x-2 justify-between">
+    <div className="w-3 h-3">
+      <AppTooltip side="top" text={automation.active ? "Active" : "Disabled"}>
+        {automation.active ? (
+          <Badge
+            className="w-full h-full rounded-full px-1 bg-green-500/30 border-green-500 hover:bg-green-500/30"
+            variant="default"
+          />
+        ) : (
+          <Badge
+            className="w-full h-full rounded-full px-1 bg-gray-500/30 border-gray-500 hover:bg-gray-500/30"
+            variant="default"
+          />
+        )}
+      </AppTooltip>
+    </div>
     <div className="flex flex-col flex-1 items-start">
-      <div className="flex items-center gap-x-2">
-        <AppTooltip side="top" text={automation.active ? "Active" : "Disabled"}>
-          {automation.active ? (
-            <Zap color="#3352cc" size={20} />
-          ) : (
-            <ZapOff size={20} />
-          )}
-        </AppTooltip>
-        <h2 className="text-sm md:text-xl font-semibold">{automation.name}</h2>
-        <p className="capitalize text-sm font-light text-[#9b9ca0] whitespace-nowrap">
-          {moment(automation.updatedAt).fromNow()}
-        </p>
-      </div>
-      <div>
-        {automation.triggers.map((trigger) => (
+      <p className="text-sm md:text-md font-semibold">{automation.name}</p>
+      <div className="flex flex-col mt-3 gap-y-1">
+        {automation.triggers.map((trigger: Trigger) => (
           <div key={trigger.id} className="flex items-center gap-x-2">
-            {trigger.type === "COMMENT" ? (
-              <FaInstagram size={16} className="text-muted-foreground" />
+            {trigger.type === TriggerType.COMMENT ? (
+              <FaInstagram size={16} className="text-pink-400" />
             ) : (
-              <SendHorizontal size={16} className="text-muted-foreground" />
+              <SendHorizontal size={16} className="text-blue-400" />
             )}
-            <p className="text-muted-foreground text-sm font-light my-2">
-              {trigger.type === "COMMENT"
+            <p className="text-muted-foreground text-sm font-light">
+              {trigger.type === TriggerType.COMMENT
                 ? "User comments on my post."
                 : "User sends me a direct message."}
             </p>
           </div>
         ))}
-        {automation.triggers.length === 1 && <br />}
       </div>
     </div>
-    <div className="h-[100px] flex flex-col justify-between items-end">
-      <AppDialog
-        className="!w-[400px]"
-        trigger={
-          <Button
-            variant="ghost"
-            className="scale-0 transition duration-300 group-hover:scale-100 rounded-full p-3 text-[#9b9ca0]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <X />
-          </Button>
-        }
-        onConfirm={onDelete}
-        title="Remove"
-        description="Do you want to remove this automation?"
-        actionText={
-          <span className="flex items-center gap-x-2">
-            <Loader state={isPending}>
-              <Trash2 />
-            </Loader>
-            Remove
-          </span>
-        }
-      />
+
+    <div className="flex flex-col justify-between items-end min-h-fit">
+      <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0">
+        <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-[11px] font-light transition-all duration-300 opacity-0 group-hover:opacity-100 hidden sm:block">
+          {moment(automation.updatedAt).fromNow()}
+        </p>
+        <AppDialog
+          className="!w-[400px]"
+          trigger={
+            <Button
+              variant="ghost"
+              size="sm"
+              className="opacity-0 transition-all group-hover:opacity-100 rounded-full h-6 w-6 sm:h-7 sm:w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 duration-300"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <X size={12} className="sm:hidden" />
+              <X size={14} className="hidden sm:block" />
+            </Button>
+          }
+          onConfirm={onDelete}
+          title="Remove"
+          description="Do you want to remove this automation?"
+          actionText={
+            <span className="flex items-center gap-x-2">
+              <Loader state={isPending}>
+                <Trash2 />
+              </Loader>
+              Remove
+            </span>
+          }
+        />
+      </div>
+
       <Button
         onClick={(e) => {
           e.stopPropagation();
           onNavigate();
         }}
         variant="ghost"
-        className="rounded-full p-3 text-[#9b9ca0] transition group-hover:px-5 group-hover:bg-muted duration-300"
+        className="rounded-full p-3 text-[#9b9ca0] transition group-hover:px-5 group-hover:bg-muted duration-300 mt-auto"
       >
         <span className="transition-transform group-hover:-translate-x-1 duration-300">
           Go to
@@ -268,10 +276,9 @@ const AutomationHeader = ({ automation, onDelete, onNavigate, isPending }) => (
     </div>
   </div>
 );
-
 interface ListenerItemProps {
   listener: Listener;
-  automation: Automations & { keywords: Keyword[] };
+  automation: Automations & { keywords: Keyword[]; triggers: Trigger[] };
   onDelete: () => void;
 }
 
@@ -283,6 +290,9 @@ const ListenerItem = ({
   const keywords: Keyword[] = automation.keywords.filter(
     (k: Keyword) => k.listenerId === listener.id
   );
+  const hasCommentTrigger = automation.triggers.find(
+    (t) => t.type === TriggerType.COMMENT
+  );
   const showKeywords: Keyword[] = keywords.slice(0, 3);
   const keywordColors = [
     "bg-green-500/15 border-green-800",
@@ -292,53 +302,25 @@ const ListenerItem = ({
   ];
 
   return (
-    <div className="flex flex-1 justify-between items-center gap-x-3">
-      <div className="flex flex-col gap-y-2">
-        <p className="flex items-center gap-x-2 text-muted-foreground text-sm font-light">
-          <SendHorizontal size={16} />
-          <span className="truncate  max-w-[120px] md:max-w-[150px] lg:max-w-[200px] xl:max-w-[400px]">
-            {listener.prompt}
-          </span>
-        </p>
-        {listener.commentReply && (
-          <p className="flex items-center gap-x-2 text-muted-foreground text-sm font-light">
-            <MessageCircleHeart size={16} />
-            <span className="truncate max-w-[120px] md:max-w-[150px] lg:max-w-[200px] xl:max-w-[400px]">
-              {listener.commentReply}
-            </span>
-          </p>
-        )}
-
-        <div className="flex flex-wrap gap-2 mt-3">
-          {showKeywords.map((keyword, i) => (
-            <div
-              key={keyword.id}
-              className={cn(
-                "rounded-full px-4 py-1 capitalize border-2 max-w-[150px]",
-                keywordColors[i % keywordColors.length]
-              )}
-            >
-              <span className="truncate block">{keyword.word}</span>
+    <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 w-full">
+      {/* Header with AI type and actions */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex-shrink-0">
+          {listener.listener === ListenerType.SMARTAI ? (
+            <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-full px-2 sm:px-3 py-1 border-[1px] bg-purple-500/15 border-purple-800">
+              <Sparkles size={10} className="text-purple-500 mr-1" />
+              <span className="text-purple-500 font-medium">Smart AI</span>
             </div>
-          ))}
-
-          {keywords.length > 3 && (
-            <div className="rounded-full px-4 py-1 border-2 bg-red-500/15 border-red-700 flex items-center">
-              <Ellipsis />
-            </div>
-          )}
-
-          {keywords.length === 0 && (
-            <div className="rounded-full border-2 border-dashed border-white/60 px-3 py-1">
-              <p className="text-sm text-[#bfc0c3]">No Keywords</p>
+          ) : (
+            <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-full px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">
+              <CircleAlert size={10} className="text-gray-400 mr-1" />
+              <span className="text-gray-400 font-medium">Standard</span>
             </div>
           )}
         </div>
-      </div>
 
-      <div className="flex flex-col h-[100px] justify-between items-end">
-        <div className="flex items-center gap-x-2">
-          <p className="text-muted-foreground whitespace-nowrap text-sm font-light transition-transform duration-300 translate-x-10 group-hover/listener:translate-x-0">
+        <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0">
+          <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-[11px] font-light transition-all duration-300 opacity-0 group-hover/listener:opacity-100 hidden sm:block">
             {moment(listener.createdAt).fromNow()}
           </p>
           <AppDialog
@@ -346,10 +328,12 @@ const ListenerItem = ({
             trigger={
               <Button
                 variant="ghost"
-                className="scale-0 transition group-hover/listener:scale-100 rounded-full p-3 text-[#9b9ca0] duration-300 "
+                size="sm"
+                className="opacity-0 transition-all group-hover/listener:opacity-100 rounded-full h-6 w-6 sm:h-7 sm:w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 duration-300"
                 onClick={(e) => e.stopPropagation()}
               >
-                <X />
+                <X size={12} className="sm:hidden" />
+                <X size={14} className="hidden sm:block" />
               </Button>
             }
             onConfirm={onDelete}
@@ -365,20 +349,114 @@ const ListenerItem = ({
             }
           />
         </div>
-        <div>
-          {listener.listener === "SMARTAI" ? (
-            <GradientButton
-              type="BUTTON"
-              className="w-full bg-muted text-white hover:bg-muted"
-            >
-              <Sparkles className="text-purple-500" />
-              <span className="text-purple-500">Smart AI</span>
-            </GradientButton>
+      </div>
+
+      {/* Main content area */}
+      <div className="space-y-2">
+        {/* DM Response */}
+        <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
+          {listener.listener === ListenerType.SMARTAI ? (
+            <Sparkles
+              size={14}
+              className="text-purple-500 flex-shrink-0 sm:size-4"
+            />
           ) : (
-            <Button className="bg-muted hover:bg-muted">
-              <CircleAlert className="text-white" />
-              <span className="text-white">Standard</span>
-            </Button>
+            <SendHorizontal
+              size={14}
+              className="text-blue-400 flex-shrink-0 sm:size-4"
+            />
+          )}
+
+          <div className="flex-1 min-w-0">
+            <p
+              className={cn("text-[10px] sm:text-[11px] font-medium mb-0.5", {
+                "text-purple-500": listener.listener === ListenerType.SMARTAI,
+                "text-blue-400": listener.listener === ListenerType.MESSAGE,
+              })}
+            >
+              {listener.listener === ListenerType.SMARTAI
+                ? "AI prompt"
+                : "DM Response"}
+            </p>
+            <p className="text-xs sm:text-sm text-gray-400 leading-snug line-clamp-3">
+              {listener.prompt}
+            </p>
+          </div>
+        </div>
+
+        {/* Comment Reply */}
+        {hasCommentTrigger && (
+          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
+            <MessageCircleHeart
+              size={14}
+              className="text-pink-400 flex-shrink-0 sm:size-4"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] sm:text-[11px] text-pink-400 font-medium mb-0.5">
+                Comment Reply
+              </p>
+              <p className="text-xs sm:text-sm text-gray-400 leading-snug line-clamp-3">
+                {listener.commentReply || "No comment reply set"}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Keywords section */}
+      <div className="space-y-2">
+        <p className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-wide">
+          Keywords {keywords.length > 0 && `(${keywords.length})`}
+        </p>
+        <div className="flex flex-wrap gap-1 sm:gap-2">
+          {showKeywords.map((keyword, i) => (
+            <div
+              key={keyword.id}
+              className={cn(
+                "flex items-center justify-center text-[10px] sm:text-[11px] rounded-full px-2 sm:px-3 py-1 border-[1px] font-medium",
+                keywordColors[i % keywordColors.length]
+              )}
+            >
+              <p className="truncate max-w-[80px] sm:max-w-[120px]">
+                {keyword.word}
+              </p>
+            </div>
+          ))}
+
+          {keywords.length > 3 && (
+            <TriggerButton2
+              trigger={
+                <div className="flex items-center justify-center rounded-full px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500 hover:bg-gray-500/30 cursor-pointer text-[10px] sm:text-[11px] font-medium">
+                  <span className="text-gray-300 mr-1">
+                    +{keywords.length - 3}
+                  </span>
+                  <Ellipsis size={10} className="text-gray-300 sm:size-3" />
+                </div>
+              }
+              title="All keywords"
+            >
+              <div className="flex flex-wrap gap-2 mt-5">
+                {keywords.map((keyword, i) => (
+                  <div
+                    key={keyword.id}
+                    className={cn(
+                      "flex items-center justify-center text-[11px] sm:text-[12px] rounded-full py-2 px-3 border-[1px] font-medium",
+                      keywordColors[i % keywordColors.length]
+                    )}
+                  >
+                    <p>{keyword.word}</p>
+                  </div>
+                ))}
+              </div>
+            </TriggerButton2>
+          )}
+
+          {keywords.length === 0 && (
+            <div className="flex items-center justify-center rounded-full border-[1px] bg-muted/50 border-dashed border-muted-foreground/40 py-1 px-2 sm:px-3">
+              <p className="text-[10px] sm:text-[11px] text-muted-foreground font-medium italic">
+                No keywords configured
+              </p>
+            </div>
           )}
         </div>
       </div>

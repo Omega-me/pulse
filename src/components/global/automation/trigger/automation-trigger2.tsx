@@ -23,7 +23,6 @@ const AutomationTrigger2 = ({ id }: Props) => {
   const { onSetTrigger, onSaveTrigger, types, isPending } = useTriggers(id);
 
   const triggers = automation?.data?.triggers ?? [];
-  const listener = automation?.data?.listener ?? [];
 
   const shouldShowPostButton = () => {
     if (triggers.length === 2) return true;
