@@ -15,6 +15,7 @@ const DeleteAutomationButton = (props: Props) => {
 
   return (
     <AppDialog
+      className="!w-[400px]"
       trigger={
         <Button className="bg-gradient-to-br hover:opacity-80 text-white rounded-full from-[#3352cc] font-medium to-[#1c2d70]">
           <Loader state={isPending}>

@@ -14,13 +14,13 @@ const TriggerButton = (props: Props) => {
       trigger={
         <div
           onClick={props.onClick}
-          className="border-2 border-dashed w-full border-[#3352cc] 
+          className="border-2 border-dashed w-full border-purple-500 
         hover:opacity-80 cursor-pointer 
         transition duration-100 rounded-xl 
         flex gap-x-2 justify-center items-center p-5"
         >
-          <CirclePlus color="#7688dd" />
-          <p className="text-[#7688dd] font-bold">{props.label}</p>
+          <CirclePlus className="text-purple-500" />
+          <p className="text-purple-500 font-bold">{props.label}</p>
         </div>
       }
     >

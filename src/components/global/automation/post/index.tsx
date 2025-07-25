@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import TriggerButton2 from "../trigger-button-2";
+import { cn } from "@/lib/utils";
 
 interface Props {
   id: string;
@@ -57,14 +58,21 @@ const PostButton = (props: Props) => {
           trigger={
             <div
               onClick={async () => handleInstagramPosts(postsData)}
-              className="border-2 border-dashed w-full border-[#3352cc]
-        hover:opacity-80 cursor-pointer
-        transition duration-100 rounded-xl
-        flex gap-x-2 justify-center items-center p-5"
+              className={cn(
+                "border-2 border-dashed w-full  border-purple-500 cursor-pointer transition duration-100 rounded-xl flex gap-x-2 justify-center items-center p-5",
+                {
+                  "bg-gray-500/15 border-gray-500 hover:bg-gray-500/30":
+                    props.isOnSelectedPosts,
+                }
+              )}
             >
-              <CirclePlus color="#7688dd" />
+              <CirclePlus
+                className={cn("text-purple-500", {
+                  "text-gray-500": props.isOnSelectedPosts,
+                })}
+              />
               {props.isOnSelectedPosts ? null : (
-                <p className="text-[#7688dd] font-bold">Attach posts</p>
+                <p className="text-purple-500 font-bold">Attach posts</p>
               )}
             </div>
           }

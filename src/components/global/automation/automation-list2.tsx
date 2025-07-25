@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import {
-  BadgeCheckIcon,
   CircleAlert,
   Ellipsis,
   MessageCircleHeart,
@@ -10,8 +9,6 @@ import {
   Sparkles,
   Trash2,
   X,
-  Zap,
-  ZapOff,
 } from "lucide-react";
 import { FaInstagram } from "react-icons/fa";
 import moment from "moment";
@@ -23,7 +20,6 @@ import AppDialog from "../app-dialog";
 import Loader from "../loader";
 import { AppSkeleton } from "../app-skeleton";
 import GlowCard from "../glow-card";
-import GradientButton from "../gradient-button";
 import Sortable from "../sortable";
 
 import usePaths from "@/hooks/use-navs";
@@ -176,7 +172,6 @@ const AutomationList2 = () => {
     </Accordion>
   );
 };
-
 export default AutomationList2;
 
 interface AutomationHeaderProps {
@@ -185,7 +180,6 @@ interface AutomationHeaderProps {
   onNavigate: () => void;
   isPending: boolean;
 }
-
 const AutomationHeader = ({
   automation,
   onDelete,
@@ -281,7 +275,6 @@ interface ListenerItemProps {
   automation: Automations & { keywords: Keyword[]; triggers: Trigger[] };
   onDelete: () => void;
 }
-
 const ListenerItem = ({
   listener,
   automation,
@@ -303,13 +296,17 @@ const ListenerItem = ({
 
   return (
     <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 w-full">
-      {/* Header with AI type and actions */}
+      {/* Header with listener type and actions */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex-shrink-0">
           {listener.listener === ListenerType.SMARTAI ? (
-            <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-full px-2 sm:px-3 py-1 border-[1px] bg-purple-500/15 border-purple-800">
-              <Sparkles size={10} className="text-purple-500 mr-1" />
-              <span className="text-purple-500 font-medium">Smart AI</span>
+            <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full p-[1px]">
+              <div className="w-full bg-muted text-white hover:bg-muted flex items-center justify-center rounded-full px-3 py-1">
+                <Sparkles size={10} className="text-purple-500 mr-1" />
+                <span className="text-purple-500 font-medium text-[12px]">
+                  Smart AI
+                </span>
+              </div>
             </div>
           ) : (
             <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-full px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">

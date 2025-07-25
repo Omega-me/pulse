@@ -4,13 +4,17 @@ import React from "react";
 
 const MetricsCard = () => {
   // TODO: fix it with different listeners or the one with more comments
-  const { data: automations } = useQueryAutomations();
-  const comments = automations?.data.reduce((current, next) => {
-    return current + next?.listener?.[0].commentCount!;
-  }, 0);
-  const dms = automations?.data.reduce((current, next) => {
-    return current + next?.listener?.[0].dmCount!;
-  }, 0);
+  // const { data: automations } = useQueryAutomations();
+
+  // TODO: fix the analytics
+  const comments = 20;
+  const dms = 30;
+  // const comments = automations?.data.reduce((current, next) => {
+  //   return current + next?.listener?.[0].commentCount!;
+  // }, 0);
+  // const dms = automations?.data.reduce((current, next) => {
+  //   return current + next?.listener?.[0].dmCount!;
+  // }, 0);
 
   return (
     <div className="flex flex-col md:flex-row h-full gap-5">
