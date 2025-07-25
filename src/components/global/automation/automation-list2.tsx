@@ -62,6 +62,7 @@ import {
 } from "@prisma/client";
 import TriggerButton2 from "./trigger-button-2";
 import { Badge } from "@/components/ui/badge";
+import NodeTitle from "./node/node-title";
 
 const AutomationList2 = () => {
   const { pathname, handleGoToRoute } = usePaths();
@@ -352,29 +353,25 @@ const ListenerItem = ({
       <div className="space-y-2">
         {/* DM Response */}
         <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
-          {listener.listener === ListenerType.SMARTAI ? (
-            <Sparkles
-              size={14}
-              className="text-purple-500 flex-shrink-0 sm:size-4"
-            />
-          ) : (
-            <SendHorizontal
-              size={14}
-              className="text-blue-400 flex-shrink-0 sm:size-4"
-            />
-          )}
-
           <div className="flex-1 min-w-0">
-            <p
+            <NodeTitle
+              title={
+                listener.listener === ListenerType.SMARTAI
+                  ? "AI Prompt"
+                  : "DM Response"
+              }
+              icon={
+                listener.listener === ListenerType.SMARTAI ? (
+                  <Sparkles size={14} />
+                ) : (
+                  <SendHorizontal size={14} />
+                )
+              }
               className={cn("text-[10px] sm:text-[11px] font-medium mb-0.5", {
                 "text-purple-500": listener.listener === ListenerType.SMARTAI,
                 "text-blue-400": listener.listener === ListenerType.MESSAGE,
               })}
-            >
-              {listener.listener === ListenerType.SMARTAI
-                ? "AI prompt"
-                : "DM Response"}
-            </p>
+            />
             <p className="text-xs sm:text-sm text-gray-400 leading-snug line-clamp-3">
               {listener.prompt}
             </p>
@@ -384,14 +381,12 @@ const ListenerItem = ({
         {/* Comment Reply */}
         {hasCommentTrigger && (
           <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
-            <MessageCircleHeart
-              size={14}
-              className="text-pink-400 flex-shrink-0 sm:size-4"
-            />
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] sm:text-[11px] text-pink-400 font-medium mb-0.5">
-                Comment Reply
-              </p>
+              <NodeTitle
+                title="Comment Reply"
+                icon={<MessageCircleHeart size={14} />}
+                className="text-[10px] sm:text-[11px] text-pink-400 font-medium mb-0.5"
+              />
               <p className="text-xs sm:text-sm text-gray-400 leading-snug line-clamp-3">
                 {listener.commentReply || "No comment reply set"}
               </p>
