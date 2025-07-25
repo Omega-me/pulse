@@ -37,7 +37,7 @@ const Navbar = ({ userName }: Props) => {
         {isCurrentPage ? (
           <div className="flex justify-end gap-x-3 flex-1">
             <Search />
-            <CreateAutomation hideLabelOnSmallScreen />
+            <CreateAutomation hideLabelOnSmallScreen isNav />
             <Notifications />
           </div>
         ) : null}

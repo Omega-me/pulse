@@ -1,28 +1,34 @@
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import React, { PropsWithChildren } from 'react';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import React, { PropsWithChildren } from "react";
 
 interface Props extends PropsWithChildren {
-  type: 'BUTTON' | 'LINK';
+  type: "BUTTON" | "LINK";
   href?: string;
   className?: string;
 }
 
 const GradientButton = (props: Props) => {
-  const gradients = 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-[2px]';
+  const gradients =
+    "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-sm p-[2px]";
 
   switch (props.type) {
-    case 'BUTTON':
+    case "BUTTON":
       return (
         <div className={gradients}>
-          <Button className={cn(props.className, 'rounded-xl')}>{props.children}</Button>
+          <Button className={cn(props.className, "rounded-sm")}>
+            {props.children}
+          </Button>
         </div>
       );
-    case 'LINK':
+    case "LINK":
       return (
         <div className={gradients}>
-          <Link href={props.href!} className={cn(props.className, 'rounded-xl')}>
+          <Link
+            href={props.href!}
+            className={cn(props.className, "rounded-sm")}
+          >
             {props.children}
           </Link>
         </div>
