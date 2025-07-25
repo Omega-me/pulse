@@ -44,6 +44,8 @@ import {
   useSensor,
   useSensors,
   TouchSensor,
+  MouseSensor,
+  KeyboardSensor,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -63,14 +65,33 @@ const AutomationList2 = () => {
   const { mutate: remove, isPending } = useDeleteAutomation();
   const [items, setItems] = useState([]);
 
+  // const detectSensor = JSON.parse(
+  //   sessionStorage.getItem("isWebEntry") ?? "true"
+  // )
+  //   ? PointerSensor
+  //   : TouchSensor;
+
+  // const pointerSensor = useSensor(detectSensor, {
+  //   // Additional sensor options
+  //   activationConstraint: {
+  //     distance: 8,
+  //   },
+  // });
+  // const sensors = useSensors(
+  //   // pointerSensor
+  //   useSensor(PointerSensor),
+  //   useSensor(TouchSensor, {
+  //     activationConstraint: {
+  //       delay: 150,
+  //       tolerance: 5,
+  //     },
+  //   })
+  // );
+
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 150,
-        tolerance: 5,
-      },
-    })
+    useSensor(MouseSensor),
+    useSensor(TouchSensor),
+    useSensor(KeyboardSensor)
   );
 
   const handleDragEnd = (event) => {
@@ -117,7 +138,13 @@ const AutomationList2 = () => {
           borderWidth={2}
           containerClassName="bg-[#1d1d1d] rounded-xl p-2 w-[99%] mx-auto"
         >
-          <AccordionItem value={automation.id} className="border-none group">
+          <AccordionItem
+            style={{
+              touchAction: "none",
+            }}
+            value={automation.id}
+            className="border-none group"
+          >
             <AccordionTrigger className="hover:no-underline px-5">
               <AutomationHeader
                 automation={automation}
@@ -129,7 +156,10 @@ const AutomationList2 = () => {
               />
             </AccordionTrigger>
 
-            <AccordionContent className="p-5 flex flex-col gap-y-3">
+            <AccordionContent
+              style={{ touchAction: "none" }}
+              className="p-5 flex flex-col gap-y-3"
+            >
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
