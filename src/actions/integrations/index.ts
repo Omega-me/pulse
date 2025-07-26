@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { onCurrentUser, onUserInfo } from "../user";
+import { onCurrentUser } from "../user";
 import {
   createIntegration,
   getFacebookIntegration,

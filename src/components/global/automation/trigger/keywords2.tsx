@@ -7,13 +7,15 @@ import Loader from "../../loader";
 import { Button } from "@/components/ui/button";
 import AppTooltip from "../../app-tooltip";
 import useKeywords2 from "@/hooks/use-keywords2";
+import { Keyword } from "@prisma/client";
 
 interface Props {
   id: string;
+  listenerId?: string;
 }
 const Keywords2 = (props: Props) => {
   const {
-    deleteMuatation,
+    removeKeyword,
     keyword,
     onKeyPress,
     onValueChange,
@@ -34,7 +36,7 @@ const Keywords2 = (props: Props) => {
           automation?.data?.keywords.length > 0 &&
           automation?.data?.keywords
             .filter((k) => k.listenerId === null)
-            .map((keyword) => (
+            .map((keyword: Keyword) => (
               <div
                 key={keyword.id}
                 className="bg-[#141414] flex items-center gap-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-full"
@@ -43,7 +45,7 @@ const Keywords2 = (props: Props) => {
                 <X
                   size={20}
                   className="cursor-pointer"
-                  onClick={() => deleteMuatation({ id: keyword.id } as any)}
+                  onClick={() => removeKeyword({ id: keyword.id } as any)}
                 />
               </div>
             ))}
@@ -60,12 +62,12 @@ const Keywords2 = (props: Props) => {
           value={keyword}
           className="bg-transparent ring-0 border-none outline-none"
           onChange={onValueChange}
-          onKeyUp={onKeyPress}
+          onKeyUp={(e) => onKeyPress(e, props.listenerId)}
         />
         <AppTooltip text="Add keyword">
           <Button
             className="bg-gradient-to-br from-[#3352cc] to-[#1c2d70] text-white"
-            onClick={onClickAddKeyword}
+            onClick={() => onClickAddKeyword(props.listenerId)}
           >
             <Loader state={isPendingAdd}>
               <Send size={20} />

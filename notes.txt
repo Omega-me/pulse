@@ -1,0 +1,33 @@
+const Component = () => {
+
+  const formContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (formContainerRef.current) {
+        formContainerRef.current.style.setProperty('bottom', `env(safe-area-inset-bottom)`);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize);
+      handleResize(); // Initial call in case the keyboard is already open
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
+
+
+  return (
+     ....
+    <DrawerContent ref={formContainerRef} className="min-h-[70vh]">
+      <Form .... />
+    </DrawerContent>
+    .....
+  );
+};
+https://github.com/emilkowalski/vaul/issues/294#issuecomment-2000432704

@@ -22,19 +22,25 @@ import Loader from "../loader";
 import GlowCard from "../glow-card";
 import { cn } from "@/lib/utils";
 import NodeTitle from "../automation/node/node-title";
+import useKeywords2 from "@/hooks/use-keywords2";
+import Keywords2 from "../automation/trigger/keywords2";
 
 interface Props {
+  id: string;
   listeners: Listener[];
   keywords: Keyword[];
 }
 
+const keywordColors = [
+  "bg-green-500/15 border-green-800",
+  "bg-purple-500/15 border-purple-800",
+  "bg-yellow-500/15 border-yellow-800",
+  "bg-red-500/15 border-red-800",
+];
+
 export function ListenerCarousel(props: Props) {
-  const keywordColors = [
-    "bg-green-500/15 border-green-800",
-    "bg-purple-500/15 border-purple-800",
-    "bg-yellow-500/15 border-yellow-800",
-    "bg-red-500/15 border-red-800",
-  ];
+  const { removeKeyword, isPendingDelete } = useKeywords2(props.id);
+
   return (
     <Carousel className="-mt-7 w-full md:w-11/12 lg:w-10/12 xl:w-6/12">
       <CarouselContent>
@@ -115,13 +121,13 @@ export function ListenerCarousel(props: Props) {
                                 />
                               }
                               onConfirm={() =>
-                                // TODO: fix remove keyword logic
-                                // remove({ id: post?.id } as unknown as any)
-                                console.log(keyword)
+                                removeKeyword({
+                                  id: keyword.id,
+                                } as unknown as any)
                               }
                               actionText={
                                 <span className="flex items-center gap-x-2">
-                                  <Loader state={false}>
+                                  <Loader state={isPendingDelete}>
                                     <Trash2 />
                                   </Loader>
                                   Remove
@@ -143,30 +149,14 @@ export function ListenerCarousel(props: Props) {
                       </div>
                     )}
 
-                    {/* TODO: handle add keyword logic */}
                     <TriggerButton2
                       trigger={
                         <div className="flex items-center justify-center rounded-full p-2 border-dashed border-[1px] bg-gray-500/15 border-gray-500 hover:bg-gray-500/30 cursor-pointer text-[10px] sm:text-[11px] font-medium">
                           <Plus size={10} className="text-gray-300 sm:size-3" />
                         </div>
                       }
-                      title="Add Keywords"
                     >
-                      <div className="flex flex-wrap gap-2 mt-5">
-                        {props.keywords
-                          ?.filter((k) => k.listenerId === listener.id)
-                          .map((keyword, i) => (
-                            <div
-                              key={keyword.id}
-                              className={cn(
-                                "flex items-center justify-center text-[11px] sm:text-[12px] rounded-full py-2 px-3 border-[1px] font-medium",
-                                keywordColors[i % keywordColors.length]
-                              )}
-                            >
-                              <p>{keyword.word}</p>
-                            </div>
-                          ))}
-                      </div>
+                      <Keywords2 id={props.id} listenerId={listener.id} />
                     </TriggerButton2>
                   </div>
                 </div>
@@ -217,7 +207,7 @@ export function ListenerCarousel(props: Props) {
                             </Button>
                           }
                         >
-                          {/* TODO: handle message or prompt reply */}
+                          {/* TODO: handle message or prompt reply edit*/}
                           <ScrollArea className="h-[60vh] w-full p-3">
                             <p className="text-sm font-light">
                               {listener.prompt}

@@ -22,7 +22,7 @@ const CreateAutomation = (props: Props) => {
     >
       <Button
         onClick={() => mutate()}
-        className="lg:px-10 py-6 bg-gradient-to-br hover:opacity-80 text-white rounded-full from-[#3352cc] font-medium to-[#1c2d70]"
+        className="lg:px-10 py-6 bg-gradient-to-br hover:bg-[#4F46E5] hover:opacity-[80%] text-white rounded-full bg-[#4F46E5] transition-opacity duration-300"
       >
         <Loader state={isPending}>
           <Activity />
@@ -36,8 +36,9 @@ const CreateAutomation = (props: Props) => {
     </AppTooltip>
   ) : (
     <Button
+      variant="ghost"
       onClick={() => mutate()}
-      className="lg:px-10 py-6 bg-gradient-to-br hover:opacity-80 text-white rounded-md from-[#3352cc] font-medium to-[#1c2d70]"
+      className="lg:px-10 py-6 bg-gradient-to-br hover:bg-[#4F46E5] hover:opacity-[80%] text-white rounded-md bg-[#4F46E5] transition-opacity duration-300"
     >
       <Loader state={isPending}>
         <Activity />
