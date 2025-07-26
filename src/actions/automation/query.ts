@@ -1,18 +1,16 @@
 "use server";
 
 import { client } from "@/lib/prisma.lib";
-import { Post, TriggerType } from "@prisma/client";
+import { ListenerType, Post, TriggerType } from "@prisma/client";
+
+// ─── Automations ─────────────────────────────────────────────
 
 export const getAllAutomations = async (clerkId: string) => {
   return await client.user.findUnique({
-    where: {
-      clerkId,
-    },
+    where: { clerkId },
     select: {
       automations: {
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: { createdAt: "desc" },
         include: {
           keywords: true,
           listener: true,
@@ -25,17 +23,13 @@ export const getAllAutomations = async (clerkId: string) => {
 
 export const createAutomation = async (userId: string) => {
   return await client.automations.create({
-    data: {
-      userId,
-    },
+    data: { userId },
   });
 };
 
 export const findAutomation = async (id: string) => {
   return await client.automations.findUnique({
-    where: {
-      id,
-    },
+    where: { id },
     include: {
       keywords: true,
       triggers: true,
@@ -53,15 +47,10 @@ export const findAutomation = async (id: string) => {
 
 export const updateAutomation = async (
   id: string,
-  data: {
-    name?: string;
-    active?: boolean;
-  }
+  data: { name?: string; active?: boolean }
 ) => {
   return await client.automations.update({
-    where: {
-      id,
-    },
+    where: { id },
     data: {
       name: data.name,
       active: data.active,
@@ -71,11 +60,11 @@ export const updateAutomation = async (
 
 export const deleteAutomation = async (id: string) => {
   return await client.automations.delete({
-    where: {
-      id,
-    },
+    where: { id },
   });
 };
+
+// ─── Listeners ────────────────────────────────────────────────
 
 export const addListener = async (
   automationId: string,
@@ -84,9 +73,7 @@ export const addListener = async (
   reply?: string
 ) => {
   return await client.automations.update({
-    where: {
-      id: automationId,
-    },
+    where: { id: automationId },
     data: {
       listener: {
         create: {
@@ -103,71 +90,102 @@ export const addListener = async (
 
 export const addListener2 = async (
   automationId: string,
-  listener: "SMARTAI" | "MESSAGE",
+  listener: ListenerType,
   keywordIds: string[],
   prompt: string,
   reply?: string
 ) => {
-  return await client.automations.update({
-    where: {
-      id: automationId,
-    },
-    data: {
-      listener: {
-        create: {
-          listener,
-          prompt,
-          commentReply: reply,
-          commentCount: 0,
-          dmCount: 0,
-          Keywords: {
-            connect: keywordIds.map((id) => ({ id })),
+  return await client.$transaction(async (tx) => {
+    // 1. Get the latest listener priority for the automation
+    const latest = await tx.listener.findFirst({
+      where: { automationId },
+      orderBy: { priority: "desc" },
+      select: { priority: true },
+    });
+
+    const nextPriority = (latest?.priority ?? -1) + 1;
+
+    // 2. Create the new listener with connected keywords
+    const updatedAutomation = await tx.automations.update({
+      where: { id: automationId },
+      data: {
+        listener: {
+          create: {
+            listener,
+            prompt,
+            commentReply: reply,
+            commentCount: 0,
+            dmCount: 0,
+            priority: nextPriority,
+            Keywords: {
+              connect: keywordIds.map((id) => ({ id })),
+            },
           },
         },
+      },
+    });
+
+    return updatedAutomation;
+  });
+};
+
+export const changeListenerPriority = async (
+  automationId: string,
+  activeListenerId: string,
+  swapedListenerId: string
+) => {
+  const [activeListener, swapedListener] = await Promise.all([
+    client.listener.findUnique({ where: { id: activeListenerId } }),
+    client.listener.findUnique({ where: { id: swapedListenerId } }),
+  ]);
+  if (!activeListener || !swapedListener) {
+    throw new Error("One or both listeners not found");
+  }
+  return await client.automations.update({
+    where: { id: automationId },
+    data: {
+      listener: {
+        update: [
+          {
+            where: { id: activeListenerId },
+            data: { priority: swapedListener.priority },
+          },
+          {
+            where: { id: swapedListenerId },
+            data: { priority: activeListener.priority },
+          },
+        ],
       },
     },
   });
 };
+
+// ─── Triggers ─────────────────────────────────────────────────
 
 export const addTrigger = async (
   automationId: string,
   trigger: TriggerType[]
 ) => {
-  if (trigger.length === 2) {
-    return await client.automations.update({
-      where: {
-        id: automationId,
-      },
-      data: {
-        triggers: {
+  const createData =
+    trigger.length === 2
+      ? {
           createMany: {
-            data: [
-              {
-                type: trigger[0],
-              },
-              {
-                type: trigger[1],
-              },
-            ],
+            data: [{ type: trigger[0] }, { type: trigger[1] }],
           },
-        },
-      },
-    });
-  }
+        }
+      : {
+          create: { type: trigger[0] },
+        };
 
   return await client.automations.update({
-    where: {
-      id: automationId,
-    },
+    where: { id: automationId },
     data: {
-      triggers: {
-        create: {
-          type: trigger[0],
-        },
-      },
+      triggers: createData,
     },
   });
 };
+
+// ─── Keywords ─────────────────────────────────────────────────
 
 export const getKeywords = async (clerkId: string) => {
   return await client.keyword.findMany({
@@ -185,15 +203,15 @@ export const getKeywordsByAutomation = async (automationId: string) => {
 export const addKeyword = async (
   clerkId: string,
   automationId: string,
-  keyword: string
+  keyword: string,
+  listenerId?: string
 ) => {
   const trimmedKeyword = keyword.trim();
-
   return await client.automations.update({
     where: { id: automationId },
     data: {
       keywords: {
-        create: { word: trimmedKeyword, userId: clerkId },
+        create: { word: trimmedKeyword, userId: clerkId, listenerId },
       },
     },
   });
@@ -201,11 +219,11 @@ export const addKeyword = async (
 
 export const deleteKeyword = async (id: string) => {
   return await client.keyword.delete({
-    where: {
-      id,
-    },
+    where: { id },
   });
 };
+
+// ─── Posts ────────────────────────────────────────────────────
 
 export const getConflictingPosts = async (
   automationId: string,
@@ -221,7 +239,7 @@ export const getConflictingPosts = async (
           some: {
             word: {
               in: keywords,
-              mode: "insensitive", // case-insensitive match
+              mode: "insensitive",
             },
           },
         },
@@ -234,9 +252,7 @@ export const getConflictingPosts = async (
       Automation: {
         select: {
           keywords: {
-            select: {
-              word: true,
-            },
+            select: { word: true },
           },
         },
       },
@@ -246,28 +262,22 @@ export const getConflictingPosts = async (
 
 export const addPosts = async (automationId: string, posts: Post[]) => {
   await client.post.createMany({
-    data: posts.map((post) => {
-      return {
-        postid: post.postid,
-        media: post.media,
-        mediaType: post.mediaType,
-        caption: post.caption,
-        automationId: post.automationId,
-      };
-    }),
+    data: posts.map((post) => ({
+      postid: post.postid,
+      media: post.media,
+      mediaType: post.mediaType,
+      caption: post.caption,
+      automationId: post.automationId,
+    })),
   });
 
   return await client.post.findMany({
-    where: {
-      automationId,
-    },
+    where: { automationId },
   });
 };
 
 export const removePost = async (postId: string) => {
   return await client.post.delete({
-    where: {
-      id: postId,
-    },
+    where: { id: postId },
   });
 };

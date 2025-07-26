@@ -21,6 +21,7 @@ const ThenNode2 = (props: Props) => {
         <ArrowDown color="#27272A" className="-mt-2" />
       </div>
       <ListenerCarousel
+        id={props.id}
         listeners={automation?.data?.listener}
         keywords={automation?.data?.keywords}
       />

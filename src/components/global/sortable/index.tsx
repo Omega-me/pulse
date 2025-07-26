@@ -39,13 +39,14 @@ const Sortable = ({ id, className, showHandle = true, children }: Props) => {
           ref={setActivatorNodeRef}
           {...attributes}
           {...listeners}
+          size="sm"
           variant="ghost"
-          className="!cursor-grab m-1 w-[16px] group-hover/listener:text-white text-muted-foreground transition duration-300 active:!cursor-grabbing"
+          className="!cursor-grab m-1 mr-0 pr-0 w-[16px] group-hover/listener:text-white text-muted-foreground transition duration-300 active:!cursor-grabbing"
         >
           <GripVertical />
         </Button>
       ) : (
-        <div className="m-1 w-[16px]" />
+        <div className="m-1 ml-0 w-[16px]" />
       )}
 
       {children}

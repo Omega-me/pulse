@@ -14,43 +14,48 @@ const useKeywords2 = (id: string) => {
   } = useMutationData(
     ["add-keyword"],
     async (data) => {
-      const { keyword } = data as unknown as { keyword: string };
-      return await onSaveKeyword(id, keyword);
+      const { keyword, listenerId } = data as unknown as {
+        keyword: string;
+        listenerId?: string;
+      };
+      return await onSaveKeyword(id, keyword, listenerId);
     },
     ["automation-info"],
     () => setKeyword("")
   );
 
-  const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const onKeyPress = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    listenerId?: string
+  ) => {
     if (e.key === "Enter") {
       if (keyword.trim() === "") return;
-      addKeyword({ keyword } as any);
+      addKeyword({ keyword, listenerId } as any);
       setKeyword("");
     }
   };
 
-  const onClickAddKeyword = () => {
+  const onClickAddKeyword = (listenerId?: string) => {
     if (keyword.trim() === "") return;
-    addKeyword({ keyword } as any);
+    addKeyword({ keyword, listenerId } as any);
     setKeyword("");
   };
 
-  const { mutate: deleteMuatation, isPending: isPendingDelete } =
-    useMutationData(
-      ["delete-keyword"],
-      async (data) => {
-        const { id } = data as unknown as { id: string };
-        return await onDeleteKeyword(id);
-      },
-      ["automation-info"]
-    );
+  const { mutate: removeKeyword, isPending: isPendingDelete } = useMutationData(
+    ["delete-keyword"],
+    async (data) => {
+      const { id } = data as unknown as { id: string };
+      return await onDeleteKeyword(id);
+    },
+    ["automation-info"]
+  );
 
   return {
     keyword,
     onValueChange,
     onKeyPress,
     onClickAddKeyword,
-    deleteMuatation,
+    removeKeyword,
     variables,
     isPendingAdd,
     isPendingDelete,

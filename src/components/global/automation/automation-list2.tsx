@@ -63,6 +63,7 @@ import {
 import TriggerButton2 from "./trigger-button-2";
 import { Badge } from "@/components/ui/badge";
 import NodeTitle from "./node/node-title";
+import { onChangeListenerPriority } from "@/actions/automation";
 
 const AutomationList2 = () => {
   const { pathname, handleGoToRoute } = usePaths();
@@ -77,7 +78,7 @@ const AutomationList2 = () => {
     useSensor(KeyboardSensor)
   );
 
-  const handleDragEnd = (event) => {
+  const handleDragEnd = async (event, automationId: string) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
       const oldIndex = items.findIndex((i) => i.id === active.id);
@@ -85,7 +86,7 @@ const AutomationList2 = () => {
       if (oldIndex !== -1 && newIndex !== -1) {
         setItems(arrayMove(items, oldIndex, newIndex));
         console.log(`Swapped: ${active.id} ↔ ${over.id}`);
-        // TODO: handle listener order update here
+        await onChangeListenerPriority(automationId, active.id, over.id);
       }
     }
   };
@@ -111,65 +112,69 @@ const AutomationList2 = () => {
         setItems(selected?.listener || []);
       }}
     >
-      {automations.data.map((automation) => (
-        <GlowCard
-          key={automation.id}
-          spread={50}
-          glow
-          proximity={64}
-          inactiveZone={0.01}
-          borderWidth={2}
-          containerClassName="bg-[#1d1d1d] rounded-xl w-[99%] mx-auto h-auto"
-        >
-          <AccordionItem value={automation.id} className="border-none group">
-            <AccordionTrigger className="hover:no-underline px-5">
-              <AutomationHeader
-                automation={automation}
-                onDelete={() => remove({ id: automation.id } as any)}
-                onNavigate={() =>
-                  handleGoToRoute(`${pathname}/${automation.id}`)
-                }
-                isPending={isPending}
-              />
-            </AccordionTrigger>
-            <AccordionContent className="p-5 flex flex-col gap-y-3">
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                modifiers={[restrictToParentElement, restrictToVerticalAxis]}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  disabled={items.length <= 1}
-                  items={items.map((i) => i.id)}
-                  strategy={verticalListSortingStrategy}
+      {automations.data.map(
+        (
+          automation: Automations & { keywords: Keyword[]; triggers: Trigger[] }
+        ) => (
+          <GlowCard
+            key={automation.id}
+            spread={50}
+            glow
+            proximity={64}
+            inactiveZone={0.01}
+            borderWidth={2}
+            containerClassName="bg-[#1d1d1d] rounded-xl w-[99%] mx-auto h-auto"
+          >
+            <AccordionItem value={automation.id} className="border-none group">
+              <AccordionTrigger className="hover:no-underline px-5">
+                <AutomationHeader
+                  automation={automation}
+                  onDelete={() => remove({ id: automation.id } as any)}
+                  onNavigate={() =>
+                    handleGoToRoute(`${pathname}/${automation.id}`)
+                  }
+                  isPending={isPending}
+                />
+              </AccordionTrigger>
+              <AccordionContent className="p-5 flex flex-col gap-y-3">
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  modifiers={[restrictToParentElement, restrictToVerticalAxis]}
+                  onDragEnd={(event) => handleDragEnd(event, automation.id)}
                 >
-                  {items.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">
-                      No listeners found for this automation.
-                    </p>
-                  ) : (
-                    items.map((listener) => (
-                      <Sortable
-                        key={listener.id}
-                        id={listener.id}
-                        showHandle={items.length > 1}
-                        className="bg-[#1d1d1d] pr-5 group/listener border border-muted-foreground/20 rounded-md flex justify-between items-center"
-                      >
-                        <ListenerItem
-                          automation={automation}
-                          listener={listener}
-                          onDelete={() => console.log(listener)}
-                        />
-                      </Sortable>
-                    ))
-                  )}
-                </SortableContext>
-              </DndContext>
-            </AccordionContent>
-          </AccordionItem>
-        </GlowCard>
-      ))}
+                  <SortableContext
+                    disabled={items.length <= 1}
+                    items={items.map((i) => i.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {items.length === 0 ? (
+                      <p className="text-muted-foreground text-sm">
+                        No listeners found for this automation.
+                      </p>
+                    ) : (
+                      items.map((listener) => (
+                        <Sortable
+                          key={listener.id}
+                          id={listener.id}
+                          showHandle={items.length > 1}
+                          className="bg-[#1d1d1d] pr-5 group/listener border border-muted-foreground/20 rounded-md flex justify-between items-center"
+                        >
+                          <ListenerItem
+                            automation={automation}
+                            listener={listener}
+                            onDelete={() => console.log(listener)}
+                          />
+                        </Sortable>
+                      ))
+                    )}
+                  </SortableContext>
+                </DndContext>
+              </AccordionContent>
+            </AccordionItem>
+          </GlowCard>
+        )
+      )}
     </Accordion>
   );
 };
@@ -187,7 +192,7 @@ const AutomationHeader = ({
   onNavigate,
   isPending,
 }: AutomationHeaderProps) => (
-  <div className="w-full flex gap-x-2 justify-between">
+  <div className="relative w-full flex gap-x-2 justify-between">
     <div className="w-3 h-3">
       <AppTooltip side="top" text={automation.active ? "Active" : "Disabled"}>
         {automation.active ? (
@@ -203,71 +208,77 @@ const AutomationHeader = ({
         )}
       </AppTooltip>
     </div>
+
     <div className="flex flex-col flex-1 items-start">
-      <p className="text-sm md:text-md font-semibold">{automation.name}</p>
+      <div className="flex items-center gap-x-2">
+        <p className="text-sm md:text-md font-semibold">{automation.name}</p>
+        <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-[11px] font-light">
+          {moment(automation.updatedAt).fromNow()}
+        </p>
+      </div>
       <div className="flex flex-col mt-3 gap-y-1">
         {automation.triggers.map((trigger: Trigger) => (
-          <div key={trigger.id} className="flex items-center gap-x-2">
-            {trigger.type === TriggerType.COMMENT ? (
-              <FaInstagram size={16} className="text-pink-400" />
-            ) : (
-              <SendHorizontal size={16} className="text-blue-400" />
-            )}
-            <p className="text-muted-foreground text-sm font-light">
-              {trigger.type === TriggerType.COMMENT
-                ? "User comments on my post."
-                : "User sends me a direct message."}
-            </p>
-          </div>
+          <NodeTitle
+            key={trigger.id}
+            title={
+              trigger.type === TriggerType.COMMENT
+                ? "User comments on my post"
+                : "User sends me a direct message"
+            }
+            icon={
+              trigger.type === TriggerType.COMMENT ? (
+                <FaInstagram size={16} className="text-pink-400" />
+              ) : (
+                <SendHorizontal size={16} className="text-blue-400" />
+              )
+            }
+            className="text-muted-foreground text-sm font-light"
+          />
         ))}
       </div>
     </div>
 
-    <div className="flex flex-col justify-between items-end min-h-fit">
-      <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0">
-        <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-[11px] font-light transition-all duration-300 opacity-0 group-hover:opacity-100 hidden sm:block">
-          {moment(automation.updatedAt).fromNow()}
-        </p>
-        <AppDialog
-          className="!w-[400px]"
-          trigger={
-            <Button
-              variant="ghost"
-              size="sm"
-              className="opacity-0 transition-all group-hover:opacity-100 rounded-full h-6 w-6 sm:h-7 sm:w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 duration-300"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <X size={12} className="sm:hidden" />
-              <X size={14} className="hidden sm:block" />
-            </Button>
-          }
-          onConfirm={onDelete}
-          title="Remove"
-          description="Do you want to remove this automation?"
-          actionText={
-            <span className="flex items-center gap-x-2">
-              <Loader state={isPending}>
-                <Trash2 />
-              </Loader>
-              Remove
-            </span>
-          }
-        />
-      </div>
-
+    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-0 pointer-events-none flex items-center gap-x-2 flex-shrink-0 transition group-hover:pointer-events-auto group-hover:opacity-100 duration-300">
       <Button
         onClick={(e) => {
           e.stopPropagation();
           onNavigate();
         }}
         variant="ghost"
-        className="rounded-full p-3 text-[#9b9ca0] transition group-hover:px-5 group-hover:bg-muted duration-300 mt-auto"
+        className="group/btn flex items-center justify-center text-[10px] sm:text-[11px] rounded-full px-3 border-[1px] bg-gray-500/15 border-gray-500 hover:bg-blue-500/15 hover:border-blue-500 group-hover:shadow-lg transition-colors duration-300"
       >
-        <span className="transition-transform group-hover:-translate-x-1 duration-300">
+        <span className="text-gray-400 group-hover/btn:text-blue-500 transition-colors duration-300">
           Go to
         </span>
-        <MoveRight className="transition-transform group-hover:translate-x-1 duration-300" />
+        <MoveRight className="text-gray-400 group-hover/btn:text-blue-500 transition-colors duration-300" />
       </Button>
+      <AppDialog
+        className="!w-[400px]"
+        trigger={
+          <Button
+            variant="ghost"
+            size="icon"
+            className="group/btn flex items-center justify-center text-[10px] sm:text-[11px] rounded-full px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500 hover:bg-red-500/15 hover:border-red-500 group-hover:shadow-lg transition-colors duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <X
+              size={12}
+              className="text-gray-400 transition-colors duration-300 group-hover/btn:text-red-500"
+            />
+          </Button>
+        }
+        onConfirm={onDelete}
+        title="Remove"
+        description="Do you want to remove this automation?"
+        actionText={
+          <span className="flex items-center gap-x-2">
+            <Loader state={isPending}>
+              <Trash2 />
+            </Loader>
+            Remove
+          </span>
+        }
+      />
     </div>
   </div>
 );
@@ -276,6 +287,12 @@ interface ListenerItemProps {
   automation: Automations & { keywords: Keyword[]; triggers: Trigger[] };
   onDelete: () => void;
 }
+const keywordColors = [
+  "bg-green-500/15 border-green-800",
+  "bg-purple-500/15 border-purple-800",
+  "bg-yellow-500/15 border-yellow-800",
+  "bg-red-500/15 border-red-800",
+];
 const ListenerItem = ({
   listener,
   automation,
@@ -288,12 +305,6 @@ const ListenerItem = ({
     (t) => t.type === TriggerType.COMMENT
   );
   const showKeywords: Keyword[] = keywords.slice(0, 3);
-  const keywordColors = [
-    "bg-green-500/15 border-green-800",
-    "bg-purple-500/15 border-purple-800",
-    "bg-yellow-500/15 border-yellow-800",
-    "bg-red-500/15 border-red-800",
-  ];
 
   return (
     <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 w-full">
@@ -326,12 +337,14 @@ const ListenerItem = ({
             trigger={
               <Button
                 variant="ghost"
-                size="sm"
-                className="opacity-0 transition-all group-hover/listener:opacity-100 rounded-full h-6 w-6 sm:h-7 sm:w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 duration-300"
+                size="icon"
+                className="group/btnlistener opacity-0 transition-all group-hover/listener:opacity-100 rounded-full h-6 w-6 sm:h-7 sm:w-7 p-0 bg-gray-500/15 border-gray-500 hover:bg-red-500/15 hover:border-red-500 duration-300"
                 onClick={(e) => e.stopPropagation()}
               >
-                <X size={12} className="sm:hidden" />
-                <X size={14} className="hidden sm:block" />
+                <X
+                  className="text-gray-400 transition-colors duration-300 group-hover/btnlistener:text-red-500"
+                  size={12}
+                />
               </Button>
             }
             onConfirm={onDelete}
