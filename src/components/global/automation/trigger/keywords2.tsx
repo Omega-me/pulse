@@ -1,6 +1,6 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { useQueryAutomation } from "@/hooks/use-queries";
+import { useAutomationQuery } from "@/hooks/use-queries";
 import { Send, X } from "lucide-react";
 import React from "react";
 import Loader from "../../loader";
@@ -24,10 +24,10 @@ const Keywords2 = (props: Props) => {
     onClickAddKeyword,
   } = useKeywords2(props.id);
   const latestVariables = variables as unknown as { keyword: string };
-  const { data: automation } = useQueryAutomation(props.id);
+  const { data: automation } = useAutomationQuery(props.id);
 
   return (
-    <div className="bg-muted flex flex-col gap-y-3 p-3 rounded-xl">
+    <div className="bg-muted flex flex-col gap-y-3 p-3 rounded-md w-full">
       <p className="text-sm text-muted-foreground">
         Add words that trigger automations
       </p>
@@ -39,7 +39,7 @@ const Keywords2 = (props: Props) => {
             .map((keyword: Keyword) => (
               <div
                 key={keyword.id}
-                className="bg-[#141414] flex items-center gap-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-full"
+                className="bg-[#141414] flex items-center gap-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-md"
               >
                 <p>{keyword.word}</p>
                 <X
@@ -51,7 +51,7 @@ const Keywords2 = (props: Props) => {
             ))}
 
         {latestVariables && latestVariables.keyword && isPendingAdd && (
-          <div className="bg-[#141414] flex items-center gap-x-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-full">
+          <div className="bg-[#141414] flex items-center gap-x-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-md">
             {latestVariables.keyword}
           </div>
         )}
@@ -66,7 +66,7 @@ const Keywords2 = (props: Props) => {
         />
         <AppTooltip text="Add keyword">
           <Button
-            className="bg-gradient-to-br from-[#3352cc] to-[#1c2d70] text-white"
+            className="bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 text-white rounded-md"
             onClick={() => onClickAddKeyword(props.listenerId)}
           >
             <Loader state={isPendingAdd}>

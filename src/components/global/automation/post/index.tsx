@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import useAutomationPosts from "@/hooks/use-automation-posts";
 import {
-  useQueryAutomation,
-  useQueryAutomationPosts,
+  useAutomationQuery,
+  useAutomationPostsQuery,
 } from "@/hooks/use-queries";
 import React from "react";
 import TriggerButton from "../trigger-button";
@@ -14,7 +14,6 @@ import AppTooltip from "../../app-tooltip";
 import { PostType } from "@prisma/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FaAd } from "react-icons/fa";
 import { useFacebookAds } from "@/hooks/use-facebook-ads";
 import {
   Select,
@@ -34,7 +33,7 @@ interface Props {
 }
 const PostButton = (props: Props) => {
   const [tabsValue, setTabsValue] = React.useState("posts");
-  const { data: postsData } = useQueryAutomationPosts();
+  const { data: postsData } = useAutomationPostsQuery();
   const {
     onSelectPost,
     posts,
@@ -43,7 +42,7 @@ const PostButton = (props: Props) => {
     instagramPosts,
     handleInstagramPosts,
   } = useAutomationPosts(props.id);
-  const { data: automation } = useQueryAutomation(props.id);
+  const { data: automation } = useAutomationQuery(props.id);
   const { adAccounts, getDefaultAdAccount } = useFacebookAds();
   const defaultAdAccount = getDefaultAdAccount();
   const hasSavedPosts =
@@ -59,7 +58,7 @@ const PostButton = (props: Props) => {
             <div
               onClick={async () => handleInstagramPosts(postsData)}
               className={cn(
-                "border-2 border-dashed w-full  border-purple-500 cursor-pointer transition duration-100 rounded-xl flex gap-x-2 justify-center items-center p-5",
+                "border-2 border-dashed w-full  border-purple-500 cursor-pointer transition duration-100 rounded-md flex gap-x-2 justify-center items-center p-5",
                 {
                   "bg-gray-500/15 border-gray-500 hover:bg-gray-500/30":
                     props.isOnSelectedPosts,
@@ -148,7 +147,7 @@ const PostButton = (props: Props) => {
                               post.extraInfo
                             );
                           }}
-                          className="relative w-[30%] aspect-square rounded-lg cursor-pointer overflow-hidden"
+                          className="relative w-[30%] aspect-square rounded-md cursor-pointer overflow-hidden"
                         >
                           {post.extraInfo.isUsed && (
                             <AppTooltip text="Used in another automation">

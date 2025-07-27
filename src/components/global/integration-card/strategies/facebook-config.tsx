@@ -4,7 +4,7 @@ import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import { ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 import { FaAd } from "react-icons/fa";
-import { useQueryFacebookAdAccounts } from "@/hooks/use-queries";
+import { useFacebookAdAccountsQuery } from "@/hooks/use-queries";
 import Loader from "../../loader";
 import { AdAccountProps } from "@/types/ads.types";
 import AppDialog from "../../app-dialog";
@@ -19,7 +19,7 @@ interface Props {
 
 const FacebookConfig = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: adAccounts } = useQueryFacebookAdAccounts();
+  const { data: adAccounts } = useFacebookAdAccountsQuery();
   const {
     adAccounts: facebookAdAccounts,
     handleRemoveAdAccount,

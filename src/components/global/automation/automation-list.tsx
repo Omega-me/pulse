@@ -4,12 +4,12 @@ import React from "react";
 import GradientButton from "../gradient-button";
 import { CircleAlert, Ellipsis, Trash2, X, Zap, ZapOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useQueryAutomations } from "@/hooks/use-queries";
+import { useAutomationsQuery } from "@/hooks/use-queries";
 import CreateAutomation from "./create-automation";
 import moment from "moment";
 import usePaths from "@/hooks/use-navs";
 import AppTooltip from "../app-tooltip";
-import { useDeleteAutomation } from "@/hooks/use-mutations";
+import { useDeleteAutomationMutation } from "@/hooks/use-mutations";
 import AppDialog from "../app-dialog";
 import Loader from "../loader";
 import { AppSkeleton } from "../app-skeleton";
@@ -17,8 +17,8 @@ import { AppSkeleton } from "../app-skeleton";
 const AutomationList = () => {
   const { pathname, handleGoToRoute } = usePaths();
   const { data: automations, isPending: automationsPending } =
-    useQueryAutomations();
-  const { mutate: remove, isPending } = useDeleteAutomation();
+    useAutomationsQuery();
+  const { mutate: remove, isPending } = useDeleteAutomationMutation();
 
   if (automationsPending) {
     return <AppSkeleton span={3} />;

@@ -1,15 +1,15 @@
-'use client';
-import { Button } from '@/components/ui/button';
-import { DashboardCardProps } from '@/constants/dashboard';
-import { useCreateAutomation } from '@/hooks/use-mutations';
-import { ArrowRight } from 'lucide-react';
-import React from 'react';
-import Loader from '../loader';
+"use client";
+import { Button } from "@/components/ui/button";
+import { DashboardCardProps } from "@/constants/dashboard";
+import { useCreateAutomationMutation } from "@/hooks/use-mutations";
+import { ArrowRight } from "lucide-react";
+import React from "react";
+import Loader from "../loader";
 
 interface Props extends DashboardCardProps {}
 
 const DoubleGradientCard = (props: Props) => {
-  const { isPending, mutate } = useCreateAutomation();
+  const { isPending, mutate } = useCreateAutomationMutation();
 
   return (
     <div className="relative border-[1px] border-in-active/50 p-5 rounded-xl flex flex-col gap-y-20 overflow-hidden lg:w-[600px]">

@@ -44,7 +44,7 @@ export function ListenerCarousel(props: Props) {
   return (
     <Carousel className="-mt-7 w-full md:w-11/12 lg:w-10/12 xl:w-6/12">
       <CarouselContent>
-        {props?.listeners.map((listener) => (
+        {props?.listeners?.map((listener) => (
           <CarouselItem key={listener?.id}>
             <GlowCard
               spread={50}
@@ -52,9 +52,9 @@ export function ListenerCarousel(props: Props) {
               proximity={64}
               inactiveZone={0.01}
               borderWidth={2}
-              containerClassName="rounded-xl m-1"
+              containerClassName="rounded-md m-1"
             >
-              <div className="h-auto p-5 rounded-xl flex flex-col bg-[#1d1d1d] gap-y-3">
+              <div className="h-auto p-5 rounded-md flex flex-col bg-[#1d1d1d] gap-y-3">
                 {/* Header with listener type */}
                 <div className="flex items-center justify-between">
                   <NodeTitle
@@ -64,8 +64,8 @@ export function ListenerCarousel(props: Props) {
                   />
                   <div>
                     {listener.listener === ListenerType.SMARTAI ? (
-                      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full p-[1px]">
-                        <div className="w-full bg-muted text-white hover:bg-muted flex items-center justify-center rounded-full px-3 py-1">
+                      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md p-[1px]">
+                        <div className="w-full bg-muted text-white hover:bg-muted flex items-center justify-center rounded-md px-3 py-1">
                           <Sparkles
                             size={10}
                             className="text-purple-500 mr-1"
@@ -76,7 +76,7 @@ export function ListenerCarousel(props: Props) {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-full px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">
+                      <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">
                         <CircleAlert size={10} className="text-gray-400 mr-1" />
                         <span className="text-gray-400 font-medium">
                           Standard
@@ -106,7 +106,7 @@ export function ListenerCarousel(props: Props) {
                         <div
                           key={keyword.id}
                           className={cn(
-                            "relative group cursor-pointer flex items-center justify-center text-[11px] rounded-full p-1 px-2 border-[1px] font-medium  hover:pr-8 transition-all duration-300",
+                            "relative group cursor-pointer flex items-center justify-center text-[11px] rounded-md p-1 px-2 border-[1px] font-medium  hover:pr-8 transition-all duration-300",
                             keywordColors[i % keywordColors.length]
                           )}
                         >
@@ -142,7 +142,7 @@ export function ListenerCarousel(props: Props) {
 
                     {props.keywords?.filter((k) => k.listenerId === listener.id)
                       .length === 0 && (
-                      <div className="flex items-center justify-center rounded-full border-[1px] bg-muted/50 border-dashed border-muted-foreground/40 py-1 px-2 sm:px-3">
+                      <div className="flex items-center justify-center rounded-md border-[1px] bg-muted/50 border-dashed border-muted-foreground/40 py-1 px-2 sm:px-3">
                         <p className="text-[10px] sm:text-[11px] text-muted-foreground font-medium italic">
                           No keywords configured
                         </p>
@@ -151,7 +151,7 @@ export function ListenerCarousel(props: Props) {
 
                     <TriggerButton2
                       trigger={
-                        <div className="flex items-center justify-center rounded-full p-2 border-dashed border-[1px] bg-gray-500/15 border-gray-500 hover:bg-gray-500/30 cursor-pointer text-[10px] sm:text-[11px] font-medium">
+                        <div className="flex items-center justify-center rounded-md p-2 border-dashed border-[1px] bg-gray-500/15 border-gray-500 hover:bg-gray-500/30 cursor-pointer text-[10px] sm:text-[11px] font-medium">
                           <Plus size={10} className="text-gray-300 sm:size-3" />
                         </div>
                       }
@@ -163,7 +163,7 @@ export function ListenerCarousel(props: Props) {
 
                 {/* message reply and prompt section */}
                 <>
-                  <div className="max-h-[250px] group bg-muted p-3 rounded-xl flex flex-col gap-y-2">
+                  <div className="max-h-[250px] group bg-muted p-3 rounded-md flex flex-col gap-y-2">
                     <div className="flex gap-x-2 items-center justify-between">
                       <div className="flex gap-x-2 items-center">
                         <NodeTitle
@@ -222,7 +222,7 @@ export function ListenerCarousel(props: Props) {
                     </p>
                   </div>
                   {listener.commentReply && (
-                    <div className="max-h-[150px] group bg-muted p-3 rounded-xl flex flex-col gap-y-2 mt-1">
+                    <div className="max-h-[150px] group bg-muted p-3 rounded-md flex flex-col gap-y-2 mt-1">
                       <div className="flex gap-x-2 items-center justify-between">
                         <div className="flex items-center gap-x-2">
                           <MessageCircleHeart

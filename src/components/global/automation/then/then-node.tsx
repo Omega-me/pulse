@@ -1,6 +1,6 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
-import { useQueryAutomation } from "@/hooks/use-queries";
+import { useAutomationQuery } from "@/hooks/use-queries";
 import {
   BrainCircuit,
   CircleAlert,
@@ -9,13 +9,14 @@ import {
 } from "lucide-react";
 import React from "react";
 import PostButton from "../post";
+import { TriggerType } from "@prisma/client";
 interface Props {
   id: string;
 }
 const ThenNode = (props: Props) => {
-  const { data: automation } = useQueryAutomation(props.id);
+  const { data: automation } = useAutomationQuery(props.id);
   const commentTrigger = automation?.data?.triggers.find(
-    (t) => t.type === "COMMENT"
+    (t) => t.type === TriggerType.COMMENT
   );
 
   const renderPosts = () => {

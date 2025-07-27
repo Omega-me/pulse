@@ -1,9 +1,14 @@
 "use server";
 
 import {
+  Automations,
   IntegrationType,
+  Keyword,
+  Listener,
   ListenerType,
   Post,
+  Prisma,
+  Trigger,
   TriggerType,
 } from "@prisma/client";
 import { onCurrentUser } from "../user";
@@ -22,28 +27,30 @@ import {
   getAllAutomations,
   getConflictingPosts,
   getKeywordsByAutomation,
+  removeListener,
   removePost,
   updateAutomation,
 } from "./query";
-import {
-  deleteUploadedFiles,
-  uploadInstagramImages,
-} from "@/lib/uploadthing.lib";
+import { uploadInstagramImages } from "@/lib/uploadthing.lib";
 import { findIntegration } from "@/lib/utils";
 import { InstagrPostProps } from "@/types/posts.type";
 
 // Utility wrapper for try/catch
-const handleRequest = async <T>(
+export const handleRequest = async <T, R>(
   fn: () => Promise<T>,
-  successHandler: (res: T) => any,
+  successHandler: (res: T) => R,
   errorStatus = 500,
   errorMsg = "Oops! Something went wrong"
-) => {
+): Promise<R | { status: number; data?: null; message?: string }> => {
   try {
     const res = await fn();
     return successHandler(res);
   } catch {
-    return { status: errorStatus, data: errorMsg };
+    return {
+      status: errorStatus,
+      data: null,
+      message: errorMsg,
+    };
   }
 };
 
@@ -55,17 +62,17 @@ export const onCreateAutomation = async () => {
     (create) =>
       create
         ? { status: 201, data: "Automation created", id: create.id }
-        : { status: 404, data: "Oops! Something went wrong" }
+        : { status: 400, data: "Oops! Could not create automation" }
   );
 };
 
 export const onGetAllAutomations = async () => {
   const user = await onCurrentUser();
   return handleRequest(
-    () => getAllAutomations(user.id),
-    (data) => ({
+    async () => getAllAutomations(user.id),
+    (automations) => ({
       status: 200,
-      data: data?.automations || [],
+      data: automations || [],
     }),
     500
   );
@@ -74,13 +81,15 @@ export const onGetAllAutomations = async () => {
 export const onGetAutomationInfo = async (id: string) => {
   await onCurrentUser();
   return handleRequest(
-    () => findAutomation(id),
+    async () => await findAutomation(id),
     (automation) =>
       automation ? { status: 200, data: automation } : { status: 404 },
+
     500
   );
 };
 
+// TODO: add name lenght validation and use the same methode for activating and changing the automation name
 export const onUpdateAutomationName = async (
   id: string,
   data: { name?: string; active?: boolean; automation?: string }
@@ -97,7 +106,7 @@ export const onUpdateAutomationName = async (
 
 export const onSaveListener = async (
   automationId: string,
-  listener: "SMARTAI" | "MESSAGE",
+  listener: ListenerType,
   prompt: string,
   reply?: string
 ) => {
@@ -107,7 +116,7 @@ export const onSaveListener = async (
     (created) =>
       created
         ? { status: 200, data: "Listener created" }
-        : { status: 404, data: "Cant save listener" }
+        : { status: 404, data: "Oops! Could not save listener" }
   );
 };
 
@@ -124,7 +133,18 @@ export const onSaveListener2 = async (
     (created) =>
       created
         ? { status: 200, data: "Listener created" }
-        : { status: 404, data: "Cant save listener" }
+        : { status: 404, data: "Oops! Could not save listener" }
+  );
+};
+
+export const onRemoveListener = async (id: string) => {
+  await onCurrentUser();
+  return handleRequest(
+    () => removeListener(id),
+    (removed) =>
+      removed
+        ? { status: 200, data: "Listener removed" }
+        : { status: 404, data: "Listener not found" }
   );
 };
 
@@ -137,10 +157,10 @@ export const onChangeListenerPriority = async (
   return handleRequest(
     () =>
       changeListenerPriority(automationId, activeListenerId, swapedListenerId),
-    (created) =>
-      created
+    (changed) =>
+      changed
         ? { status: 200, data: "Listener priority changed" }
-        : { status: 404, data: "Cant change listener priority" }
+        : { status: 404, data: "Oops! Could not change listener priority" }
   );
 };
 
@@ -154,7 +174,7 @@ export const onSaveTrigger = async (
     (created) =>
       created
         ? { status: 200, data: "Trigger created" }
-        : { status: 404, data: "Cant save trigger" }
+        : { status: 400, data: "Oops! Could not save trigger" }
   );
 };
 
@@ -169,7 +189,7 @@ export const onSaveKeyword = async (
     (created) =>
       created
         ? { status: 200, data: "Keyword added successfully" }
-        : { status: 404, data: "Cant add this keyword" }
+        : { status: 400, data: "Oops! Could not add this keyword" }
   );
 };
 
@@ -180,7 +200,7 @@ export const onDeleteKeyword = async (id: string) => {
     (deleted) =>
       deleted
         ? { status: 200, data: "Keyword deleted" }
-        : { status: 404, data: "Keyword not found" }
+        : { status: 404, data: "Oops! Keyword not found" }
   );
 };
 
@@ -273,18 +293,14 @@ export const onSavePosts = async (automationId: string, posts: Post[]) => {
     (created) =>
       created
         ? { status: 200, data: "Posts attached" }
-        : { status: 404, data: "Automation not found" }
+        : { status: 404, data: "Oops! Could not find automation" }
   );
 };
 
-export const onRemovePost = async (postId: string) => {
+export const onRemovePost = async (id: string) => {
   await onCurrentUser();
   return handleRequest(
-    async () => {
-      const removed = await removePost(postId);
-      await deleteUploadedFiles([removed.media]);
-      return removed;
-    },
+    async () => removePost(id),
     (removed) =>
       removed
         ? { status: 200, data: "Post removed" }
@@ -305,7 +321,7 @@ export const onActivateAutomation = async (
             status: 200,
             data: `Automation ${state ? "activated" : "disabled"}`,
           }
-        : { status: 404, data: "Automation not found" }
+        : { status: 404, data: "Oops! Could not find automation" }
   );
 };
 
@@ -313,19 +329,11 @@ export const onDeleteAutomation = async (automationId: string) => {
   await onCurrentUser();
   return handleRequest(
     async () => {
-      const automation = await findAutomation(automationId);
-      if (!automation) return null;
-
-      if (automation.posts.length > 0) {
-        const urls = automation.posts.map((post) => post.media);
-        await deleteUploadedFiles(urls);
-      }
-
       return await deleteAutomation(automationId);
     },
     (removed) =>
       removed
         ? { status: 200, data: "Automation removed" }
-        : { status: 404, data: "Automation not found" }
+        : { status: 404, data: "Oops! Could not find automation" }
   );
 };

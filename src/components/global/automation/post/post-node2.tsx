@@ -2,7 +2,7 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
 import useAutomationPosts from "@/hooks/use-automation-posts";
-import { useQueryAutomation } from "@/hooks/use-queries";
+import { useAutomationQuery } from "@/hooks/use-queries";
 import { CircleAlert, Trash2, X } from "lucide-react";
 import React from "react";
 import { FaAd, FaInstagram } from "react-icons/fa";
@@ -21,16 +21,16 @@ interface Props {
 }
 
 const PostNode2 = (props: Props) => {
-  const { data: automation } = useQueryAutomation(props.id);
+  const { data: automation } = useAutomationQuery(props.id);
   const { remove, isRemovePending } = useAutomationPosts(props.id);
   return (
     automation?.data &&
     automation?.data?.posts?.length > 0 && (
       <>
         <div className="flex flex-col justify-between items-center relative !-top-3 m-0">
-          <span className="w-2 h-2 rounded-full bg-muted"></span>
+          <span className="w-2 h-2 rounded-md bg-muted"></span>
           <Separator orientation="vertical" className="h-20 m-0" />
-          <span className="w-2 h-2 rounded-full bg-muted z-50"></span>
+          <span className="w-2 h-2 rounded-md bg-muted z-50"></span>
         </div>
         <GlowCard
           spread={50}
@@ -38,16 +38,16 @@ const PostNode2 = (props: Props) => {
           proximity={64}
           inactiveZone={0.01}
           borderWidth={2}
-          containerClassName="-mt-6 rounded-xl w-[99%] md:w-11/12 lg:w-10/12 xl:w-6/12"
+          containerClassName="-mt-6 rounded-md w-[99%] md:w-11/12 lg:w-10/12 xl:w-6/12"
         >
-          <div className="w-full p-5 rounded-xl flex flex-col bg-[#1d1d1d] gap-y-3">
+          <div className="w-full p-5 rounded-md flex flex-col bg-[#1d1d1d] gap-y-3">
             <NodeTitle
               title="If they comment on..."
               icon={<CircleAlert size={18} />}
               className="text-purple-500 font-semibold"
             />
-            <div className="bg-muted p-3 rounded-xl flex flex-col gap-y-2">
-              <div className="bg-muted p-3 rounded-xl flex flex-col gap-y-2">
+            <div className="bg-muted p-3 rounded-md flex flex-col gap-y-2">
+              <div className="bg-muted p-3 rounded-md flex flex-col gap-y-2">
                 <NodeTitle
                   title="These posts"
                   icon={<FaInstagram className="text-blue-500" size={18} />}
@@ -58,7 +58,7 @@ const PostNode2 = (props: Props) => {
                     {automation?.data?.posts?.map((post) => (
                       <div
                         key={post?.id}
-                        className="group relative aspect-square rounded-lg cursor-pointer"
+                        className="group relative aspect-square rounded-md cursor-pointer"
                       >
                         <AppDialog
                           className="!w-[400px]"
@@ -92,7 +92,7 @@ const PostNode2 = (props: Props) => {
                           alt="Instagram post"
                           width={300}
                           height={300}
-                          className="w-full h-full object-cover rounded-lg"
+                          className="w-full h-full object-cover rounded-md"
                         />
                       </div>
                     ))}

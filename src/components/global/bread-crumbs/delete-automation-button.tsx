@@ -1,23 +1,22 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 import Loader from "../loader";
-import { Trash2, X } from "lucide-react";
-import { useDeleteAutomation } from "@/hooks/use-mutations";
+import { Trash2 } from "lucide-react";
+import { useDeleteAutomationMutation } from "@/hooks/use-mutations";
 import AppDialog from "../app-dialog";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Props {
   id: string;
 }
 
 const DeleteAutomationButton = (props: Props) => {
-  const { mutate: remove, isPending } = useDeleteAutomation();
+  const { mutate: remove, isPending } = useDeleteAutomationMutation();
 
   return (
     <AppDialog
       className="!w-[400px]"
       trigger={
-        <Button className="bg-gradient-to-br hover:opacity-80 text-white rounded-full from-[#3352cc] font-medium to-[#1c2d70]">
+        <Button className="bg-gradient-to-br hover:opacity-80 text-white rounded-md  font-medium hover:bg-[#4F46E5] bg-[#4F46E5]">
           <Loader state={isPending}>
             <Trash2 />
           </Loader>

@@ -1,6 +1,6 @@
 "use client";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { useQueryAutomation } from "@/hooks/use-queries";
+import { useAutomationQuery } from "@/hooks/use-queries";
 import { TriangleAlert } from "lucide-react";
 import React from "react";
 
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const AutomationAlert = (props: Props) => {
-  const { data: automation } = useQueryAutomation(props.id);
+  const { data: automation } = useAutomationQuery(props.id);
 
   return (
     !automation?.data?.active && (

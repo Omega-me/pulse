@@ -1,11 +1,12 @@
-import { useQueryUser } from '@/hooks/use-queries';
-import { PropsWithChildren } from 'react';
+import { useUserQuery } from "@/hooks/use-queries";
+import { PropsWithChildren } from "react";
+import { SubscriptionPlan as SubscriptionType } from "@prisma/client";
 
 interface Props extends PropsWithChildren {
-  type: 'FREE' | 'PRO';
+  type: SubscriptionType;
 }
 const SubscriptionPlan = (props: Props) => {
-  const { data: user } = useQueryUser();
+  const { data: user } = useUserQuery();
   return user?.data?.subscription?.plan === props.type && props.children;
 };
 

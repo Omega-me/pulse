@@ -16,7 +16,7 @@ const useAutomationPosts = (id: string) => {
   const [instagramPosts, setInstagramPosts] = useState<InstagrPostProps[]>([]);
 
   const handleGoToAutomation = (automationId: string) => {
-    const url = `/dashboard/automations/${automationId}`;
+    const url = `/dashboard/automations2/${automationId}`;
     window.open(url, "_blank");
   };
 
