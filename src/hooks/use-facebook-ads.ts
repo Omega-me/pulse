@@ -2,21 +2,21 @@ import { findIntegration } from "@/lib/utils";
 import { AdAccountProps } from "@/types/ads.types";
 import { IntegrationMetadataProps } from "@/types/integrationMetadata.types";
 import { IntegrationType } from "@prisma/client";
-import { useQueryUser } from "./use-queries";
-import { useAddFacebookAdAccount } from "./use-mutations";
+import { useUserQuery } from "./use-queries";
+import { useAddFacebookAdAccountMutation } from "./use-mutations";
 import { useState } from "react";
 
 export const useFacebookAds = () => {
   const [clickedAdAccountId, setClickedAdAccountId] = useState<string | null>(
     null
   );
-  const { data: user } = useQueryUser();
+  const { data: user } = useUserQuery();
   const { mutate: addAdAccount, isPending: isAddAccountPending } =
-    useAddFacebookAdAccount();
+    useAddFacebookAdAccountMutation();
   const { mutate: removeAdAccount, isPending: isRemoveAccountPending } =
-    useAddFacebookAdAccount();
+    useAddFacebookAdAccountMutation();
   const { mutate: setDefaultAdAccount, isPending: isSetDefaultAccountPending } =
-    useAddFacebookAdAccount();
+    useAddFacebookAdAccountMutation();
   const integration = findIntegration(
     user?.data?.integrations,
     IntegrationType.FACEBOOK

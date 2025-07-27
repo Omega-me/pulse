@@ -9,7 +9,8 @@ import Loader from "../../loader";
 import Keywords2 from "../trigger/keywords2";
 import useListener2 from "@/hooks/use-listener2";
 import TriggerButton2 from "../trigger-button-2";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, List, Save } from "lucide-react";
+import { ListenerType } from "@prisma/client";
 
 interface Props {
   id: string;
@@ -29,7 +30,7 @@ const ThenAction2 = (props: Props) => {
         <div
           className="border-2 border-dashed w-full border-purple-500
         hover:opacity-80 cursor-pointer
-        transition duration-100 rounded-xl
+        transition duration-100 rounded-md
         flex gap-x-2 justify-center items-center p-5"
         >
           <CirclePlus className="text-purple-500" />
@@ -42,7 +43,7 @@ const ThenAction2 = (props: Props) => {
         </div>
       }
     >
-      <div className="flex flex-col gap-y-2">
+      <div className="flex flex-col gap-y-2 w-full">
         {AUTOMATION_LISTENER.map((listener) =>
           listener.type === "SMARTAI" ? (
             <SubscriptionPlan key={listener.id} type="PRO">
@@ -51,9 +52,9 @@ const ThenAction2 = (props: Props) => {
                 key={listener.id}
                 className={cn(
                   Listener === listener.type
-                    ? "bg-gradient-to-br from-[#3352cc] to-[#1c2d70] "
+                    ? "bg-gradient-to-br bg-[#4F46E5]"
                     : "bg-muted",
-                  "p-3 rounded-xl flex flex-col gap-y-2 cursor-pointer hover:opacity-80 transition duration-100"
+                  "p-3 rounded-md flex flex-col gap-y-2 cursor-pointer hover:opacity-80 transition duration-100"
                 )}
               >
                 <div className="flex gap-x-2 items-center">
@@ -70,9 +71,9 @@ const ThenAction2 = (props: Props) => {
               key={listener.id}
               className={cn(
                 Listener === listener.type
-                  ? "bg-gradient-to-br from-[#3352cc] to-[#1c2d70] "
+                  ? "bg-gradient-to-br bg-[#4F46E5]"
                   : "bg-muted",
-                "p-3 rounded-xl flex flex-col gap-y-2 cursor-pointer hover:opacity-80 transition duration-100"
+                "p-3 rounded-md flex flex-col gap-y-2 cursor-pointer hover:opacity-80 transition duration-100"
               )}
             >
               <div className="flex gap-x-2 items-center">
@@ -87,7 +88,7 @@ const ThenAction2 = (props: Props) => {
         <form onSubmit={onFormSubmit} className="flex flex-col gap-y-2">
           <Textarea
             placeholder={
-              Listener === "SMARTAI"
+              Listener === ListenerType.SMARTAI
                 ? "Add a prompt that your Smart AI can use..."
                 : "Add a message you want to sent to the customers"
             }
@@ -99,8 +100,11 @@ const ThenAction2 = (props: Props) => {
             placeholder="Add reply for comments (Optional)"
             className="bg-muted outline-none border-none ring-0 focus:ring-0"
           />
-          <Button className="bg-gradient-to-br w-full from-[#3352cc] font-medium text-white to-[#1c2d70]">
-            <Loader state={isPending}>Add listener</Loader>
+          <Button className="w-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 rounded-md font-medium text-white">
+            <Loader state={isPending}>
+              <Save />
+            </Loader>
+            Add listener
           </Button>
         </form>
       </div>

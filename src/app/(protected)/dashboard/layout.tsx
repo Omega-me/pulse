@@ -16,6 +16,8 @@ import {
 
 interface Props extends PropsWithChildren {}
 
+export const client = new QueryClient();
+
 const Layout = async (props: Props) => {
   const user = (await onBoardUser()) as {
     status: number;
@@ -31,7 +33,6 @@ const Layout = async (props: Props) => {
   if (userName.trim() === "") userName = "Anonymous Ally";
 
   // prefetch data
-  const client = new QueryClient();
   await prefetchUserProfile(client);
   await prefetchAutomations(client);
 

@@ -2,7 +2,7 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
 import useAutomationPosts from "@/hooks/use-automation-posts";
-import { useQueryAutomation } from "@/hooks/use-queries";
+import { useAutomationQuery } from "@/hooks/use-queries";
 import { CircleAlert, Trash2, X } from "lucide-react";
 import React from "react";
 import { FaAd, FaInstagram } from "react-icons/fa";
@@ -17,7 +17,7 @@ interface Props {
 }
 
 const PostNode = (props: Props) => {
-  const { data: automation } = useQueryAutomation(props.id);
+  const { data: automation } = useAutomationQuery(props.id);
   const { remove, isRemovePending } = useAutomationPosts(props.id);
   return (
     automation?.data &&

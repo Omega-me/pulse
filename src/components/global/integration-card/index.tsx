@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { IntegrationCardProps } from "@/constants/integrations";
-import { useQueryUser } from "@/hooks/use-queries";
+import { useUserQuery } from "@/hooks/use-queries";
 import { findIntegration } from "@/lib/utils";
 import React, { useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Bolt, Cable, Unplug } from "lucide-react";
 import IntegrationConfigs from "./integration-configs";
-import { useDisconnectIntegration } from "@/hooks/use-mutations";
+import { useDisconnectIntegrationMutation } from "@/hooks/use-mutations";
 import AppDialog from "../app-dialog";
 import Loader from "../loader";
 import { useRouter } from "next/navigation";
@@ -29,10 +29,10 @@ const IntegrationCard = (props: Props) => {
   const router = useRouter();
   const hasRun = useRef(false);
   const onOAuth = () => onOAuthIntegration(props.strategy);
-  const { mutate: disconnect, isPending } = useDisconnectIntegration(
+  const { mutate: disconnect, isPending } = useDisconnectIntegrationMutation(
     props.strategy
   );
-  const { data: user } = useQueryUser();
+  const { data: user } = useUserQuery();
   const integrated = findIntegration(user?.data?.integrations, props.strategy);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const IntegrationCard = (props: Props) => {
                 trigger={
                   <span
                     onClick={(e) => e.stopPropagation()}
-                    className="cursor-pointer flex justify-between items-center gap-2 px-4 py-2 bg-gradient-to-br text-white rounded-full text-sm from-[#3352cc] font-medium to-[#1c2d70] hover:opacity-70 transition-all duration-100"
+                    className="cursor-pointer flex justify-between items-center gap-2 px-4 py-2 text-white rounded-md text-sm bg-[#4F46E5] hover:opacity-70 transition-all duration-100"
                   >
                     <Unplug size={18} />
                     <span>Disconnect</span>
@@ -114,7 +114,7 @@ const IntegrationCard = (props: Props) => {
       defaultValue={
         integrated && props.collapsable ? props.strategy : undefined
       }
-      className="border-2 border-[#3352cc] rounded-2xl"
+      className="border-2 border-[#4F46E5] rounded-2xl"
     >
       <AccordionItem className="border-none" value={props.strategy}>
         {props.collapsable ? (

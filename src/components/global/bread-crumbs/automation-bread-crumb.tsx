@@ -2,8 +2,8 @@
 import { Activity, ChevronRight, Pencil } from "lucide-react";
 import React from "react";
 import ActivateAutomationButton from "./activate-automation-button";
-import { useQueryAutomation } from "@/hooks/use-queries";
-import { useEditAutomation } from "@/hooks/use-mutations";
+import { useAutomationQuery } from "@/hooks/use-queries";
+import { useEditAutomationMutation } from "@/hooks/use-mutations";
 import { Input } from "@/components/ui/input";
 import AppTooltip from "../app-tooltip";
 import DeleteAutomationButton from "./delete-automation-button";
@@ -18,9 +18,19 @@ interface Props {
 const AutomationBreadCrumb = (props: Props) => {
   const { handleGoToRoute } = usePaths();
   const isMobile = useIsMobile();
-  const { data: automationInfo } = useQueryAutomation(props.id);
+  const { data: automationInfo, error } = useAutomationQuery(props.id);
   const { edit, enableEdit, inputRef, handleUpdate, isPending, variables } =
-    useEditAutomation(props.id);
+    useEditAutomationMutation(props.id);
+
+  if (error) {
+    console.log(error);
+    // toast.error(error);
+    return (
+      <div className="w-full lg:mt-0 p-5 bg-[#18181b1a] rounded-xl border-[1px]">
+        <p className="text-red-500">Error loading automation</p>
+      </div>
+    );
+  }
 
   return (
     <div

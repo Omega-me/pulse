@@ -1,8 +1,10 @@
 "use client";
 import {
   onActivateAutomation,
+  onChangeListenerPriority,
   onCreateAutomation,
   onDeleteAutomation,
+  onRemoveListener,
   onUpdateAutomationName,
 } from "@/actions/automation";
 import { useMutationData } from "./use-mutation-data";
@@ -16,21 +18,21 @@ import {
 import { Integration } from "@/lib/utils";
 import { AdAccountProps } from "@/types/ads.types";
 
-export const useCreateAutomation = () => {
+export const useCreateAutomationMutation = () => {
   const router = useRouter();
   const { isPending, mutate, variables } = useMutationData(
     ["create-automation"],
-    () => onCreateAutomation(),
+    onCreateAutomation,
     ["user-automations"],
-    (data: { id: string }) => {
-      router.push(`/dashboard/automations/${data.id}`);
+    (data) => {
+      router.push(`/dashboard/automations2/${data.id}`);
     }
   );
 
   return { isPending, mutate, variables };
 };
 
-export const useEditAutomation = (id: string) => {
+export const useEditAutomationMutation = (id: string) => {
   const [edit, setIsEdit] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const enableEdit = () => setIsEdit(true);
@@ -68,7 +70,7 @@ export const useEditAutomation = (id: string) => {
   };
 };
 
-export const useActivateAutomation = (id: string) => {
+export const useActivateAutomationMutation = (id: string) => {
   const { mutate, isPending, variables } = useMutationData(
     ["activate"],
     async (data) => {
@@ -81,7 +83,7 @@ export const useActivateAutomation = (id: string) => {
   return { mutate, isPending, variables };
 };
 
-export const useDeleteAutomation = () => {
+export const useDeleteAutomationMutation = () => {
   const router = useRouter();
   const { mutate, isPending, variables } = useMutationData(
     ["delete-automation"],
@@ -91,14 +93,14 @@ export const useDeleteAutomation = () => {
     },
     ["user-automations"],
     () => {
-      router.push("/dashboard/automations");
+      router.push("/dashboard/automations2");
     }
   );
 
   return { mutate, isPending, variables };
 };
 
-export const useDisconnectIntegration = (strategy: IntegrationType) => {
+export const useDisconnectIntegrationMutation = (strategy: IntegrationType) => {
   const { mutate, isPending, variables } = useMutationData(
     ["disconnect-integration"],
     () => onDisconnectIntegration(strategy),
@@ -108,7 +110,7 @@ export const useDisconnectIntegration = (strategy: IntegrationType) => {
   return { mutate, isPending, variables };
 };
 
-export const useAddFacebookAdAccount = () => {
+export const useAddFacebookAdAccountMutation = () => {
   const { mutate, isPending, variables } = useMutationData(
     ["add-facebook-ad-account"],
     async (data) => {
@@ -119,6 +121,42 @@ export const useAddFacebookAdAccount = () => {
       return await onUpdateFacebookAdAccounts(integration, adAccounts);
     },
     ["user-profile"]
+  );
+
+  return { mutate, isPending, variables };
+};
+
+export const useRemoveListenerMutation = () => {
+  const { mutate, isPending, variables } = useMutationData(
+    ["remove-listener"],
+    async (data) => {
+      const { id } = data as unknown as { id: string };
+      return await onRemoveListener(id);
+    },
+    ["user-automations"]
+    // "automation-info", id
+  );
+
+  return { mutate, isPending, variables };
+};
+
+export const useChangeListenerPriorityMutation = () => {
+  const { mutate, isPending, variables } = useMutationData(
+    ["change-listener-priority"],
+    async (data) => {
+      const { automationId, activeListenerId, swapedListenerId } =
+        data as unknown as {
+          automationId: string;
+          activeListenerId: string;
+          swapedListenerId: string;
+        };
+      return await onChangeListenerPriority(
+        automationId,
+        activeListenerId,
+        swapedListenerId
+      );
+    },
+    ["user-automations"]
   );
 
   return { mutate, isPending, variables };

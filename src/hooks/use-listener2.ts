@@ -4,7 +4,8 @@ import { z } from "zod";
 import { useMutationData } from "./use-mutation-data";
 import { onSaveListener2 } from "@/actions/automation";
 import useZodForm from "./use-zod-form";
-import { useQueryAutomation } from "./use-queries";
+import { useAutomationQuery } from "./use-queries";
+import { ListenerType } from "@prisma/client";
 
 const promptSchema = z.object({
   prompt: z.string().min(1),
@@ -14,10 +15,10 @@ const promptSchema = z.object({
 interface Data extends z.infer<typeof promptSchema> {}
 
 const useListener2 = (id: string) => {
-  const { data: automation } = useQueryAutomation(id);
-  const [listener, setListener] = useState<"SMARTAI" | "MESSAGE">(null);
+  const { data: automation } = useAutomationQuery(id);
+  const [listener, setListener] = useState<ListenerType>(null);
 
-  const onSetListener = (type: "MESSAGE" | "SMARTAI") => setListener(type);
+  const onSetListener = (type: ListenerType) => setListener(type);
 
   const { isPending, mutate } = useMutationData(
     ["create-listener"],
@@ -25,7 +26,7 @@ const useListener2 = (id: string) => {
       const { prompt, reply } = data as unknown as Data;
       return await onSaveListener2(
         id,
-        listener || "MESSAGE",
+        listener || ListenerType.MESSAGE,
         automation?.data.keywords
           .filter((k) => k.listenerId === null)
           .map((k) => k.id) || [],

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useQueryAutomation } from "@/hooks/use-queries";
+import { useAutomationQuery } from "@/hooks/use-queries";
 import { Separator } from "@/components/ui/separator";
 import TriggerButton from "../trigger-button";
 import { AUTOMATION_TRIGGERS } from "@/constants/automation";
@@ -19,7 +19,7 @@ interface Props {
 }
 
 const AutomationTrigger2 = ({ id }: Props) => {
-  const { data: automation } = useQueryAutomation(id);
+  const { data: automation } = useAutomationQuery(id);
   const { onSetTrigger, onSaveTrigger, types, isPending } = useTriggers(id);
 
   const triggers = automation?.data?.triggers ?? [];

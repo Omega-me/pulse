@@ -21,7 +21,7 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
     title: "Connect Instagram",
     descriptions:
       "Connect your Instagram account to automate messages, track comments, and manage interactions directly from your dashboard.",
-    icon: <FaInstagram color="#3352cc" size={35} />,
+    icon: <FaInstagram color="#4F46E5" size={35} />,
     strategy: IntegrationType.INSTAGRAM,
     collapsable: false,
     hasIntegrationBtn: true,
@@ -31,7 +31,7 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
     title: "Connect Facebook",
     descriptions:
       "Connect your Facebook account to automate messages, track comments, and manage interactions directly from your dashboard.",
-    icon: <FaFacebook color="#3352cc" size={35} />,
+    icon: <FaFacebook color="#4F46E5" size={35} />,
     strategy: IntegrationType.FACEBOOK,
     collapsable: true,
     hasIntegrationBtn: true,
@@ -41,7 +41,7 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
     title: "Connect Shopify",
     descriptions:
       "Sync your Shopify store with Pulse to import products, manage messages, track post comments, and place orders — all from one smart dashboard.",
-    icon: <FaShopify color="#3352cc" size={35} />,
+    icon: <FaShopify color="#4F46E5" size={35} />,
     strategy: IntegrationType.SHOPIFY,
     collapsable: true,
   },
@@ -50,7 +50,7 @@ export const INTEGRATIONS_CARDS: IntegrationCardProps[] = [
     title: "Connect WooCommerce",
     descriptions:
       "Connect your WooCommerce store with Pulse to import products, manage messages, track post comments, and place orders — all from one smart dashboard.",
-    icon: <SiWoo color="#3352cc" size={35} />,
+    icon: <SiWoo color="#4F46E5" size={35} />,
     strategy: IntegrationType.WOOCOMMERCE,
     collapsable: true,
   },

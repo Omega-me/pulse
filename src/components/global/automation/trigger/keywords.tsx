@@ -1,12 +1,12 @@
-'use client';
-import { Input } from '@/components/ui/input';
-import useKeywords from '@/hooks/use-keywords';
-import { useQueryAutomation } from '@/hooks/use-queries';
-import { ArrowBigUp, Send, X } from 'lucide-react';
-import React from 'react';
-import Loader from '../../loader';
-import { Button } from '@/components/ui/button';
-import AppTooltip from '../../app-tooltip';
+"use client";
+import { Input } from "@/components/ui/input";
+import useKeywords from "@/hooks/use-keywords";
+import { useAutomationQuery } from "@/hooks/use-queries";
+import { Send, X } from "lucide-react";
+import React from "react";
+import Loader from "../../loader";
+import { Button } from "@/components/ui/button";
+import AppTooltip from "../../app-tooltip";
 
 interface Props {
   id: string;
@@ -22,7 +22,7 @@ const Keywords = (props: Props) => {
     onClickAddKeyword,
   } = useKeywords(props.id);
   const latestVariables = variables as unknown as { keyword: string };
-  const { data: automation } = useQueryAutomation(props.id);
+  const { data: automation } = useAutomationQuery(props.id);
 
   return (
     <div className="bg-muted flex flex-col gap-y-3 p-3 rounded-xl">
@@ -32,10 +32,11 @@ const Keywords = (props: Props) => {
       <div className="flex flex-wrap justify-start items-center gap-2">
         {automation?.data?.keywords &&
           automation?.data?.keywords.length > 0 &&
-          automation?.data?.keywords?.map(keyword => (
+          automation?.data?.keywords?.map((keyword) => (
             <div
               key={keyword.id}
-              className="bg-[#141414] flex items-center gap-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-full">
+              className="bg-[#141414] flex items-center gap-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-full"
+            >
               <p>{keyword.word}</p>
               <X
                 size={20}
@@ -62,7 +63,8 @@ const Keywords = (props: Props) => {
         <AppTooltip text="Add keyword">
           <Button
             className="bg-gradient-to-br from-[#3352cc] to-[#1c2d70] text-white"
-            onClick={onClickAddKeyword}>
+            onClick={onClickAddKeyword}
+          >
             <Loader state={isPendingAdd}>
               <Send size={20} />
             </Loader>

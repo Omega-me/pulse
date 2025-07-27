@@ -4,13 +4,13 @@ import React from "react";
 import PaymentButton from "../../payment-button";
 import CreateAutomation from "../create-automation";
 import SideCard from "./side-card";
-import { useQueryUser } from "@/hooks/use-queries";
+import { useUserQuery } from "@/hooks/use-queries";
 import { useFacebookAds } from "@/hooks/use-facebook-ads";
 import { findIntegration } from "@/lib/utils";
 import { IntegrationType } from "@prisma/client";
 
 const Aside = () => {
-  const { data: user } = useQueryUser();
+  const { data: user } = useUserQuery();
   const { adAccounts } = useFacebookAds();
   const facebookIntegration = findIntegration(
     user?.data?.integrations,

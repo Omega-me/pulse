@@ -48,9 +48,9 @@ const Page = async (props: Props) => {
           proximity={64}
           inactiveZone={0.01}
           borderWidth={2}
-          containerClassName="rounded-xl w-[99%] md:w-11/12 lg:w-10/12 xl:w-6/12"
+          containerClassName="rounded-md w-[99%] md:w-11/12 lg:w-10/12 xl:w-6/12"
         >
-          <div className="group  p-5 rounded-xl flex flex-col bg-[#1d1d1d] gap-y-3">
+          <div className="group  p-5 rounded-md flex flex-col bg-[#1d1d1d] gap-y-3">
             <div className="flex gap-x-2 items-center justify-between">
               <NodeTitle
                 title="When..."

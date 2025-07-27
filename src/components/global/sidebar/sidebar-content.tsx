@@ -1,13 +1,13 @@
-'use client';
-import LogoSmall from '@/svgs/logo-small';
-import React from 'react';
-import Items from './items';
-import { Separator } from '@/components/ui/separator';
-import ClerkAuthState from '../clerk-auth-state';
-import { Handshake, ShieldCheck } from 'lucide-react';
-import SubscriptionPlan from '../subscription-plan';
-import UpgardeCard from './upgarde-card';
-import usePaths from '@/hooks/use-navs';
+"use client";
+import LogoSmall from "@/svgs/logo-small";
+import React from "react";
+import Items from "./items";
+import { Separator } from "@/components/ui/separator";
+import ClerkAuthState from "../clerk-auth-state";
+import { Handshake, ShieldCheck } from "lucide-react";
+import SubscriptionPlan from "../subscription-plan";
+import UpgardeCard from "./upgarde-card";
+import usePaths from "@/hooks/use-navs";
 
 const SidebarContent = () => {
   const { handleGoToRoute } = usePaths();
@@ -29,11 +29,17 @@ const SidebarContent = () => {
             <ClerkAuthState />
             <p className="text-[#9b9ca0]">Profile</p>
           </div>
-          <div onClick={() => handleGoToRoute('/privacy-policy')} className="flex gap-x-3 cursor-pointer">
+          <div
+            onClick={() => handleGoToRoute("/privacy-policy")}
+            className="flex gap-x-3 cursor-pointer"
+          >
             <ShieldCheck className="text-[#9b9ca0]" />
             <p className="text-[#9b9ca0]">Privacy/Policy</p>
           </div>
-          <div onClick={() => handleGoToRoute('/terms-of-service')} className="flex gap-x-3 cursor-pointer">
+          <div
+            onClick={() => handleGoToRoute("/terms-of-service")}
+            className="flex gap-x-3 cursor-pointer"
+          >
             <Handshake className="text-[#9b9ca0]" />
             <p className="text-[#9b9ca0]">Terms of service</p>
           </div>

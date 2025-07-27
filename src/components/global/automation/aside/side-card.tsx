@@ -8,7 +8,7 @@ interface Props extends PropsWithChildren {
 
 const SideCard = (props: Props) => {
   return (
-    <div className="flex flex-col rounded-xl bg-[#1f1f1f] gap-y-6 p-5 border-[1px] overflow-hidden border-in-active">
+    <div className="flex flex-col rounded-md bg-[#1f1f1f] gap-y-6 p-5 border-[1px] overflow-hidden border-in-active">
       <div>
         <h2 className="text-xl">{props.title}</h2>
         <p className="text-muted-foreground text-sm">{props.description}</p>

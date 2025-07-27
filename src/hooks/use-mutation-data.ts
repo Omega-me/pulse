@@ -1,6 +1,12 @@
-'use client';
-import { MutateFunction, MutationKey, QueryKey, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+"use client";
+import {
+  MutateFunction,
+  MutationKey,
+  QueryKey,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useMutationData = (
   mutationKey: MutationKey,
@@ -14,7 +20,8 @@ export const useMutationData = (
     mutationFn,
     onSuccess: (data) => {
       if (onSuccess) onSuccess(data);
-      const headerTxt = data?.status === 200 || data?.status === 201 ? 'Success' : 'Error';
+      const headerTxt =
+        data?.status === 200 || data?.status === 201 ? "Success" : "Error";
       return toast(headerTxt, {
         description: data?.data,
       });
