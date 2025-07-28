@@ -19,13 +19,13 @@ const ActiveTrigger2 = (props: Props) => {
           title={
             props.type === TriggerType.COMMENT
               ? "User comments on my post"
-              : "User sends me a direct messsage."
+              : "User sends me a direct message."
           }
           icon={
             props.type === TriggerType.COMMENT ? (
-              <FaInstagram className="text-blue-500" size={18} />
+              <FaInstagram className="text-pink-500" size={18} />
             ) : (
-              <SendHorizontal className="text-pink-500" size={18} />
+              <SendHorizontal className="text-blue-500" size={18} />
             )
           }
           className="text-gray-200 font-semibold"
@@ -34,7 +34,7 @@ const ActiveTrigger2 = (props: Props) => {
       <p className="text-muted-foreground">
         {props.type === "COMMENT"
           ? "If a user comments on a post that is setup to listen for keywords, this automation will fire"
-          : "If the user sends you a meesage that contains a keyword, this automation will fire"}
+          : "If the user sends you a message that contains a keyword, this automation will fire"}
       </p>
     </div>
   );

@@ -15,6 +15,7 @@ import ThenAction2 from "../then/then-action2";
 import PostButton from ".";
 import GlowCard from "../../glow-card";
 import NodeTitle from "../node/node-title";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   id: string;
@@ -38,14 +39,28 @@ const PostNode2 = (props: Props) => {
           proximity={64}
           inactiveZone={0.01}
           borderWidth={2}
-          containerClassName="-mt-6 rounded-md w-[99%] md:w-11/12 lg:w-10/12 xl:w-6/12"
+          containerClassName="-mt-6 rounded-md w-[99%] md:w-11/12 lg:w-10/12 xl:w-6/12 group/posts"
         >
           <div className="w-full p-5 rounded-md flex flex-col bg-[#1d1d1d] gap-y-3">
-            <NodeTitle
-              title="If they comment on..."
-              icon={<CircleAlert size={18} />}
-              className="text-purple-500 font-semibold"
-            />
+            <div className="flex gap-x-2 items-center justify-between">
+              <NodeTitle
+                title="If they comment on..."
+                icon={<CircleAlert className="text-purple-500" size={18} />}
+                className="font-bold text-gray-400"
+              />
+              <AppDialog
+                className="!w-[400px]"
+                trigger={
+                  <Trash2
+                    size={18}
+                    className="text-purple-500 group-hover/posts:scale-100 scale-0 transition-transform duration-300 cursor-pointer"
+                  />
+                }
+                title={"Remove all posts"}
+              >
+                {/* TODO: handle delete all posts */}
+              </AppDialog>
+            </div>
             <div className="bg-muted p-3 rounded-md flex flex-col gap-y-2">
               <div className="bg-muted p-3 rounded-md flex flex-col gap-y-2">
                 <NodeTitle
@@ -55,6 +70,7 @@ const PostNode2 = (props: Props) => {
                 />
                 <ScrollArea className="h-[250px] w-full rounded-md border p-3">
                   <div className="grid grid-cols-3 lg:grid-cols-4 gap-3 mt-3 overflow-auto">
+                    {/* TODO: handle posts loading and empty state better */}
                     {automation?.data?.posts?.map((post) => (
                       <div
                         key={post?.id}

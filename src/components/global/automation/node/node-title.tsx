@@ -9,7 +9,7 @@ interface Props {
 
 const NodeTitle = ({ title, icon, className }: Props) => {
   return (
-    <div className={cn("flex gap-x-2 items-center", className)}>
+    <div className={cn("flex gap-x-1 items-center", className)}>
       {icon}
       {title}
     </div>

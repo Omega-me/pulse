@@ -5,7 +5,6 @@ import {
   useAutomationPostsQuery,
 } from "@/hooks/use-queries";
 import React from "react";
-import TriggerButton from "../trigger-button";
 import { InstagrPostProps } from "@/types/posts.type";
 import { CircleCheck, CirclePlus, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";

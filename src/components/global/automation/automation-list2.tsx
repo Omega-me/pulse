@@ -176,12 +176,15 @@ const AutomationHeader = ({
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <div
-      // className="relative w-full flex gap-x-2 justify-between"
       className={cn(
         "relative p-4 w-full flex gap-x-2 justify-between",
         isTouchDevice && "cursor-pointer"
       )}
-      onClick={() => isTouchDevice && setIsExpanded((prev) => !prev)}
+      onClick={() =>
+        isTouchDevice
+          ? setIsExpanded((prev) => !prev)
+          : setIsExpanded((prev) => prev)
+      }
     >
       <div className="w-3 h-3">
         <AppTooltip side="top" text={automation.active ? "Active" : "Disabled"}>
@@ -301,9 +304,6 @@ const ListenerItem = ({
   const keywords: Keyword[] = automation.keywords.filter(
     (k: Keyword) => k.listenerId === listener.id
   );
-  const hasCommentTrigger = automation.triggers.find(
-    (t) => t.type === TriggerType.COMMENT
-  );
   const showKeywords: Keyword[] = keywords.slice(0, 3);
 
   return (
@@ -314,22 +314,26 @@ const ListenerItem = ({
           {listener.listener === ListenerType.SMARTAI ? (
             <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md p-[1px]">
               <div className="w-full bg-muted text-white hover:bg-muted flex items-center justify-center rounded-md px-3 py-1">
-                <Sparkles size={10} className="text-purple-500 mr-1" />
-                <span className="text-purple-500 font-medium text-[12px]">
-                  Smart AI
-                </span>
+                <NodeTitle
+                  icon={<Sparkles size={10} />}
+                  title="Smart AI"
+                  className="text-purple-500 text-[11px]"
+                />
               </div>
             </div>
           ) : (
             <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">
-              <CircleAlert size={10} className="text-gray-400 mr-1" />
-              <span className="text-gray-400 font-medium">Standard</span>
+              <NodeTitle
+                icon={<CircleAlert size={10} />}
+                title="Standard"
+                className="text-gray-400 text-[11px]"
+              />
             </div>
           )}
         </div>
 
         <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0">
-          <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-[11px] font-light transition-all duration-300 opacity-0 group-hover/listener:opacity-100 hidden sm:block">
+          <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-[11px] font-light transition-all duration-300 opacity-0 group-hover/listener:opacity-100">
             {moment(listener.createdAt).fromNow()}
           </p>
           <AppDialog
@@ -390,7 +394,7 @@ const ListenerItem = ({
         </div>
 
         {/* Comment Reply */}
-        {hasCommentTrigger && (
+        {listener.commentReply && (
           <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
             <div className="flex-1 min-w-0">
               <NodeTitle
