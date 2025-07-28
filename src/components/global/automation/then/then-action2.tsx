@@ -11,6 +11,7 @@ import useListener2 from "@/hooks/use-listener2";
 import TriggerButton2 from "../trigger-button-2";
 import { CirclePlus, List, Save } from "lucide-react";
 import { ListenerType } from "@prisma/client";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Props {
   id: string;
@@ -43,10 +44,30 @@ const ThenAction2 = (props: Props) => {
         </div>
       }
     >
-      <div className="flex flex-col gap-y-2 w-full">
-        {AUTOMATION_LISTENER.map((listener) =>
-          listener.type === "SMARTAI" ? (
-            <SubscriptionPlan key={listener.id} type="PRO">
+      <ScrollArea className="h-auto md:h-[400px] pr-3">
+        <div className="flex flex-col gap-y-2 w-full">
+          {AUTOMATION_LISTENER.map((listener) =>
+            listener.type === "SMARTAI" ? (
+              <SubscriptionPlan key={listener.id} type="PRO">
+                <div
+                  onClick={() => onSetListener(listener.type)}
+                  key={listener.id}
+                  className={cn(
+                    Listener === listener.type
+                      ? "bg-gradient-to-br bg-[#4F46E5]"
+                      : "bg-muted",
+                    "p-3 rounded-md flex flex-col gap-y-2 cursor-pointer hover:opacity-80 transition duration-100"
+                  )}
+                >
+                  <div className="flex gap-x-2 items-center">
+                    {listener.icon}
+
+                    <p>{listener.label}</p>
+                  </div>
+                  <p>{listener.description}</p>
+                </div>
+              </SubscriptionPlan>
+            ) : (
               <div
                 onClick={() => onSetListener(listener.type)}
                 key={listener.id}
@@ -59,55 +80,37 @@ const ThenAction2 = (props: Props) => {
               >
                 <div className="flex gap-x-2 items-center">
                   {listener.icon}
-
                   <p>{listener.label}</p>
                 </div>
                 <p>{listener.description}</p>
               </div>
-            </SubscriptionPlan>
-          ) : (
-            <div
-              onClick={() => onSetListener(listener.type)}
-              key={listener.id}
-              className={cn(
-                Listener === listener.type
-                  ? "bg-gradient-to-br bg-[#4F46E5]"
-                  : "bg-muted",
-                "p-3 rounded-md flex flex-col gap-y-2 cursor-pointer hover:opacity-80 transition duration-100"
-              )}
-            >
-              <div className="flex gap-x-2 items-center">
-                {listener.icon}
-                <p>{listener.label}</p>
-              </div>
-              <p>{listener.description}</p>
-            </div>
-          )
-        )}
-        <Keywords2 id={props.id} />
-        <form onSubmit={onFormSubmit} className="flex flex-col gap-y-2">
-          <Textarea
-            placeholder={
-              Listener === ListenerType.SMARTAI
-                ? "Add a prompt that your Smart AI can use..."
-                : "Add a message you want to sent to the customers"
-            }
-            {...register("prompt")}
-            className="bg-muted outline-none border-none ring-0 focus:ring-0"
-          />
-          <Input
-            {...register("reply")}
-            placeholder="Add reply for comments (Optional)"
-            className="bg-muted outline-none border-none ring-0 focus:ring-0"
-          />
-          <Button className="w-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 rounded-md font-medium text-white">
-            <Loader state={isPending}>
-              <Save />
-            </Loader>
-            Add listener
-          </Button>
-        </form>
-      </div>
+            )
+          )}
+          <Keywords2 id={props.id} />
+          <form onSubmit={onFormSubmit} className="flex flex-col gap-y-2">
+            <Textarea
+              placeholder={
+                Listener === ListenerType.SMARTAI
+                  ? "Add a prompt that your Smart AI can use..."
+                  : "Add a message you want to sent to the customers"
+              }
+              {...register("prompt")}
+              className="bg-muted outline-none border-none ring-0 focus:ring-0 !ring-[#4F46E5]"
+            />
+            <Input
+              {...register("reply")}
+              placeholder="Add reply for comments (Optional)"
+              className="bg-muted outline-none border-none ring-0 focus:ring-0 !ring-[#4F46E5]"
+            />
+            <Button className="w-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 rounded-md font-medium text-white">
+              <Loader state={isPending}>
+                <Save />
+              </Loader>
+              Add listener
+            </Button>
+          </form>
+        </div>
+      </ScrollArea>
     </TriggerButton2>
   );
 };

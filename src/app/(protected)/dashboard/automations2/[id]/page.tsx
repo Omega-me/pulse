@@ -50,12 +50,12 @@ const Page = async (props: Props) => {
           borderWidth={2}
           containerClassName="rounded-md w-[99%] md:w-11/12 lg:w-10/12 xl:w-6/12"
         >
-          <div className="group  p-5 rounded-md flex flex-col bg-[#1d1d1d] gap-y-3">
+          <div className="group p-5 rounded-md flex flex-col bg-[#1d1d1d] gap-y-3">
             <div className="flex gap-x-2 items-center justify-between">
               <NodeTitle
                 title="When..."
-                icon={<CircleAlert size={18} />}
-                className="text-purple-500 font-semibold"
+                icon={<CircleAlert className="text-purple-500" size={18} />}
+                className="font-bold text-gray-400"
               />
               {/* TODO: handle duplicate automation settings */}
               <DuplicateButton

@@ -60,7 +60,7 @@ const Keywords2 = (props: Props) => {
         <Input
           placeholder="Add keyword..."
           value={keyword}
-          className="bg-transparent ring-0 border-none outline-none"
+          className="bg-transparent ring-0 border-none focus:outline-none focus:ring-0 !ring-[#4F46E5]"
           onChange={onValueChange}
           onKeyUp={(e) => onKeyPress(e, props.listenerId)}
         />

@@ -27,7 +27,9 @@ const AppDialog = (props: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>{props.trigger}</DialogTrigger>
-      <DialogContent className={cn("sm:max-w-[800px]", props?.className)}>
+      <DialogContent
+        className={cn("sm:max-w-[800px] rounded-md", props?.className)}
+      >
         <DialogHeader>
           <DialogTitle>{props.title}</DialogTitle>
           {props.description && (
@@ -38,7 +40,7 @@ const AppDialog = (props: Props) => {
         <DialogFooter>
           {props.actionText && (
             <Button
-              className="bg-gradient-to-br hover:opacity-80 text-white rounded-full from-[#3352cc] font-medium to-[#1c2d70]"
+              className="bg-gradient-to-br hover:opacity-80 text-white rounded-md from-[#3352cc] font-medium to-[#1c2d70]"
               type="button"
               onClick={props.onConfirm}
             >

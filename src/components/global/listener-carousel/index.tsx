@@ -24,6 +24,9 @@ import { cn } from "@/lib/utils";
 import NodeTitle from "../automation/node/node-title";
 import useKeywords2 from "@/hooks/use-keywords2";
 import Keywords2 from "../automation/trigger/keywords2";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import AppTooltip from "../app-tooltip";
 
 interface Props {
   id: string;
@@ -41,10 +44,28 @@ const keywordColors = [
 export function ListenerCarousel(props: Props) {
   const { removeKeyword, isPendingDelete } = useKeywords2(props.id);
 
+  const renderListenerActiveState = (isActive: boolean, index: number) => {
+    return (
+      <AppTooltip side="top" text={isActive ? "Active" : "Disabled"}>
+        <Badge
+          className={cn(
+            "mr-1 flex items-center justify-center w-[15px] h-[22px] rounded-full font-[11px] cursor-pointer",
+            isActive
+              ? "bg-green-500/30 border-green-500 hover:bg-green-500/30 text-green-500"
+              : "bg-gray-500/30 border-gray-500 hover:bg-gray-500/30 text-gray-500"
+          )}
+          variant="default"
+        >
+          {index + 1}
+        </Badge>
+      </AppTooltip>
+    );
+  };
+
   return (
     <Carousel className="-mt-7 w-full md:w-11/12 lg:w-10/12 xl:w-6/12">
       <CarouselContent>
-        {props?.listeners?.map((listener) => (
+        {props?.listeners?.map((listener, i) => (
           <CarouselItem key={listener?.id}>
             <GlowCard
               spread={50}
@@ -54,39 +75,54 @@ export function ListenerCarousel(props: Props) {
               borderWidth={2}
               containerClassName="rounded-md m-1"
             >
-              <div className="h-auto p-5 rounded-md flex flex-col bg-[#1d1d1d] gap-y-3">
+              <div className="h-auto p-5 rounded-md flex flex-col bg-[#1d1d1d] gap-y-3 group/listener">
                 {/* Header with listener type */}
                 <div className="flex items-center justify-between">
                   <NodeTitle
                     title="Then..."
-                    icon={<CircleAlert size={18} />}
-                    className="text-purple-500 font-semibold"
+                    // icon={<CircleAlert className="text-purple-500" size={18} />}
+                    icon={renderListenerActiveState(listener.isActive, i)}
+                    className="font-bold text-gray-400"
                   />
-                  <div>
-                    {listener.listener === ListenerType.SMARTAI ? (
-                      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md p-[1px]">
-                        <div className="w-full bg-muted text-white hover:bg-muted flex items-center justify-center rounded-md px-3 py-1">
-                          <Sparkles
-                            size={10}
-                            className="text-purple-500 mr-1"
-                          />
-                          <span className="text-purple-500 font-medium text-[12px]">
-                            Smart AI
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">
-                        <CircleAlert size={10} className="text-gray-400 mr-1" />
-                        <span className="text-gray-400 font-medium">
-                          Standard
-                        </span>
-                      </div>
-                    )}
+                  <div className="flex items-center gap-x-2">
+                    <Switch className="bg-[#4F46E5] hover:bg-[#4F46E5] data-[state=checked]:bg-[#4F46E5] scale-0 group-hover/listener:scale-100 transition-transform duration-300 hover:opacity-80" />
+
+                    <AppDialog
+                      className="!w-[400px]"
+                      trigger={
+                        <Trash2
+                          size={18}
+                          className="text-purple-500 cursor-pointer group-hover/listener:scale-100 scale-0 transition-transform duration-300 hover:opacity-80"
+                        />
+                      }
+                      title={"Remove listener"}
+                    >
+                      {/* TODO: handle remove listener */}
+                    </AppDialog>
                   </div>
                 </div>
-
                 {/* Keywords section */}
+                <div className="w-[120px] flex justify-between items-center">
+                  {listener.listener === ListenerType.SMARTAI ? (
+                    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md p-[1px]">
+                      <div className="w-full bg-muted text-white hover:bg-muted flex items-center justify-center rounded-md px-3 py-1">
+                        <NodeTitle
+                          icon={<Sparkles size={10} />}
+                          title="Smart AI"
+                          className="text-purple-500 text-[12px]"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">
+                      <NodeTitle
+                        icon={<CircleAlert size={10} />}
+                        title="Standard"
+                        className="text-gray-400 text-[12px]"
+                      />
+                    </div>
+                  )}
+                </div>
                 <div className="space-y-2">
                   <p className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-wide">
                     Keywords{" "}
@@ -160,7 +196,6 @@ export function ListenerCarousel(props: Props) {
                     </TriggerButton2>
                   </div>
                 </div>
-
                 {/* message reply and prompt section */}
                 <>
                   <div className="max-h-[250px] group bg-muted p-3 rounded-md flex flex-col gap-y-2">
