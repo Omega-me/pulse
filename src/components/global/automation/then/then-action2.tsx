@@ -14,17 +14,19 @@ import { ListenerType } from "@prisma/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Props {
-  id: string;
+  automationId: string;
 }
 
 const ThenAction2 = (props: Props) => {
   const {
     isPending,
     listener: Listener,
+    hasOnlyDmTrigger,
     onFormSubmit,
     onSetListener,
     register,
-  } = useListener2(props.id);
+  } = useListener2(props.automationId);
+
   return (
     <TriggerButton2
       trigger={
@@ -44,7 +46,11 @@ const ThenAction2 = (props: Props) => {
         </div>
       }
     >
-      <ScrollArea className="h-auto md:h-[400px] pr-3">
+      <ScrollArea
+        className={cn("h-auto pr-3", {
+          "md:h-[300px]": hasOnlyDmTrigger,
+        })}
+      >
         <div className="flex flex-col gap-y-2 w-full">
           {AUTOMATION_LISTENER.map((listener) =>
             listener.type === "SMARTAI" ? (
@@ -86,7 +92,7 @@ const ThenAction2 = (props: Props) => {
               </div>
             )
           )}
-          <Keywords2 id={props.id} />
+          <Keywords2 automationId={props.automationId} />
           <form onSubmit={onFormSubmit} className="flex flex-col gap-y-2">
             <Textarea
               placeholder={

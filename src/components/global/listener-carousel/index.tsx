@@ -4,7 +4,6 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Keyword, Listener, ListenerType } from "@prisma/client";
 import {
   CircleAlert,
@@ -27,9 +26,14 @@ import Keywords2 from "../automation/trigger/keywords2";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import AppTooltip from "../app-tooltip";
+import {
+  useRemoveListenerMutation,
+  useToggleActiveListenerMutation,
+} from "@/hooks/use-mutations";
+import ListenerResponseEditForm from "../automation/listener-response-edit-form";
 
 interface Props {
-  id: string;
+  automationId: string;
   listeners: Listener[];
   keywords: Keyword[];
 }
@@ -42,7 +46,15 @@ const keywordColors = [
 ];
 
 export function ListenerCarousel(props: Props) {
-  const { removeKeyword, isPendingDelete } = useKeywords2(props.id);
+  const { removeKeyword, isPendingDelete } = useKeywords2(props.automationId);
+  const { mutate: removeListener, isPending: isRemovingListener } =
+    useRemoveListenerMutation(props.automationId);
+  const {
+    mutate: toggleActiveListener,
+    isPending: isTogglingActiveListener,
+    variables,
+  } = useToggleActiveListenerMutation();
+  console.log(variables);
 
   const renderListenerActiveState = (isActive: boolean, index: number) => {
     return (
@@ -80,13 +92,18 @@ export function ListenerCarousel(props: Props) {
                 <div className="flex items-center justify-between">
                   <NodeTitle
                     title="Then..."
-                    // icon={<CircleAlert className="text-purple-500" size={18} />}
                     icon={renderListenerActiveState(listener.isActive, i)}
                     className="font-bold text-gray-400"
                   />
                   <div className="flex items-center gap-x-2">
-                    <Switch className="bg-[#4F46E5] hover:bg-[#4F46E5] data-[state=checked]:bg-[#4F46E5] scale-0 group-hover/listener:scale-100 transition-transform duration-300 hover:opacity-80" />
-
+                    <Switch
+                      defaultChecked={listener.isActive}
+                      id="switch_active"
+                      onCheckedChange={() =>
+                        toggleActiveListener({ id: listener.id } as any)
+                      }
+                      className="bg-[#4F46E5] hover:bg-[#4F46E5] data-[state=checked]:bg-[#4F46E5] scale-0 group-hover/listener:scale-100 transition-transform duration-300 hover:opacity-80"
+                    />
                     <AppDialog
                       className="!w-[400px]"
                       trigger={
@@ -95,13 +112,24 @@ export function ListenerCarousel(props: Props) {
                           className="text-purple-500 cursor-pointer group-hover/listener:scale-100 scale-0 transition-transform duration-300 hover:opacity-80"
                         />
                       }
-                      title={"Remove listener"}
-                    >
-                      {/* TODO: handle remove listener */}
-                    </AppDialog>
+                      onConfirm={() =>
+                        removeListener({ id: listener.id } as any)
+                      }
+                      actionText={
+                        <span className="flex items-center gap-x-2">
+                          <Loader state={isRemovingListener}>
+                            <Trash2 />
+                          </Loader>
+                          Remove
+                        </span>
+                      }
+                      title={"Remove"}
+                      description={"Do you want to remove this listener?"}
+                    />
                   </div>
                 </div>
-                {/* Keywords section */}
+
+                {/* Listener type section */}
                 <div className="w-[120px] flex justify-between items-center">
                   {listener.listener === ListenerType.SMARTAI ? (
                     <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md p-[1px]">
@@ -123,6 +151,8 @@ export function ListenerCarousel(props: Props) {
                     </div>
                   )}
                 </div>
+
+                {/* Keywords section */}
                 <div className="space-y-2">
                   <p className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-wide">
                     Keywords{" "}
@@ -192,7 +222,10 @@ export function ListenerCarousel(props: Props) {
                         </div>
                       }
                     >
-                      <Keywords2 id={props.id} listenerId={listener.id} />
+                      <Keywords2
+                        automationId={props.automationId}
+                        listenerId={listener.id}
+                      />
                     </TriggerButton2>
                   </div>
                 </div>
@@ -242,12 +275,12 @@ export function ListenerCarousel(props: Props) {
                             </Button>
                           }
                         >
-                          {/* TODO: handle message or prompt reply edit*/}
-                          <ScrollArea className="h-[60vh] w-full p-3">
-                            <p className="text-sm font-light">
-                              {listener.prompt}
-                            </p>
-                          </ScrollArea>
+                          <ListenerResponseEditForm
+                            automationId={props.automationId}
+                            listenerId={listener.id}
+                            isMessage={true}
+                            value={listener.prompt}
+                          />
                         </TriggerButton2>
                       </div>
                     </div>
@@ -282,12 +315,12 @@ export function ListenerCarousel(props: Props) {
                             </Button>
                           }
                         >
-                          {/* TODO: handle edit comment reply */}
-                          <ScrollArea className="h-[50vh] w-full p-3">
-                            <p className="text-sm font-light">
-                              {listener.commentReply}
-                            </p>
-                          </ScrollArea>
+                          <ListenerResponseEditForm
+                            automationId={props.automationId}
+                            listenerId={listener.id}
+                            isMessage={false}
+                            value={listener.commentReply || ""}
+                          />
                         </TriggerButton2>
                       </div>
                       <p className="text-sm text-gray-400 leading-snug line-clamp-[4]">

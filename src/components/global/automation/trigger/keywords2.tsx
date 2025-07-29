@@ -10,7 +10,7 @@ import useKeywords2 from "@/hooks/use-keywords2";
 import { Keyword } from "@prisma/client";
 
 interface Props {
-  id: string;
+  automationId: string;
   listenerId?: string;
 }
 const Keywords2 = (props: Props) => {
@@ -22,9 +22,9 @@ const Keywords2 = (props: Props) => {
     variables,
     isPendingAdd,
     onClickAddKeyword,
-  } = useKeywords2(props.id);
+  } = useKeywords2(props.automationId);
   const latestVariables = variables as unknown as { keyword: string };
-  const { data: automation } = useAutomationQuery(props.id);
+  const { data: automation } = useAutomationQuery(props.automationId);
 
   return (
     <div className="bg-muted flex flex-col gap-y-3 p-3 rounded-md w-full">
@@ -50,11 +50,14 @@ const Keywords2 = (props: Props) => {
               </div>
             ))}
 
-        {latestVariables && latestVariables.keyword && isPendingAdd && (
-          <div className="bg-[#141414] flex items-center gap-x-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-md">
-            {latestVariables.keyword}
-          </div>
-        )}
+        {latestVariables &&
+          latestVariables.keyword &&
+          isPendingAdd &&
+          !props.listenerId && (
+            <div className="bg-[#141414] flex items-center gap-x-2 capitalize text-sm text-muted-foreground px-2 py-1 rounded-md">
+              {latestVariables.keyword}
+            </div>
+          )}
       </div>
       <div className="flex justify-between items-center gap-x-2">
         <Input

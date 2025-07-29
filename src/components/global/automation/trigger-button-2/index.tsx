@@ -1,5 +1,5 @@
 "use client";
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -19,37 +19,40 @@ interface Props extends PropsWithChildren {
   footer?: React.ReactNode;
 }
 
-function TriggerButton2(props: Props) {
+function TriggerButton2({
+  trigger,
+  title,
+  description,
+  footer,
+  children,
+}: Props) {
   const isMobile = useIsMobile();
 
   if (!isMobile) {
     return (
-      <PopOver className="w-[400px]" trigger={props.trigger}>
+      <PopOver className="w-[400px]" trigger={trigger}>
         <div>
-          <p>{props.title}</p>
-          <p>{props.description}</p>
+          <p>{title}</p>
+          <p>{description}</p>
         </div>
-        {props.children}
-        <div>{props.footer}</div>
+        {children}
+        <div>{footer}</div>
       </PopOver>
     );
   }
 
-  const renderTrigger = () => {
-    return props.trigger;
-  };
   return (
     <Drawer>
-      <DrawerTrigger asChild>{renderTrigger()}</DrawerTrigger>
+      <DrawerTrigger asChild>{trigger}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>{props?.title}</DrawerTitle>
-          <DrawerDescription>{props?.description}</DrawerDescription>
+          <DrawerTitle>{title}</DrawerTitle>
+          <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
         <div className="flex justify-center items-center w-full p-3">
-          {props.children}
+          {children}
         </div>
-        <DrawerFooter>{props?.footer}</DrawerFooter>
+        <DrawerFooter>{footer}</DrawerFooter>
       </DrawerContent>
     </Drawer>
   );

@@ -18,12 +18,12 @@ export const useMutationData = (
   const { mutate, isPending, variables } = useMutation({
     mutationKey,
     mutationFn,
-    onSuccess: (data) => {
-      if (onSuccess) onSuccess(data);
+    onSuccess: (res) => {
+      if (onSuccess) onSuccess(res);
       const headerTxt =
-        data?.status === 200 || data?.status === 201 ? "Success" : "Error";
+        res?.status === 200 || res?.status === 201 ? "Success" : "Error";
       return toast(headerTxt, {
-        description: data?.data,
+        description: res?.data,
       });
     },
     onSettled: async () => {

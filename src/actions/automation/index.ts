@@ -19,6 +19,7 @@ import {
   addListener2,
   addPosts,
   addTrigger,
+  changeListenerMessageResponses,
   changeListenerPriority,
   createAutomation,
   deleteAutomation,
@@ -27,13 +28,16 @@ import {
   getAllAutomations,
   getConflictingPosts,
   getKeywordsByAutomation,
+  removeAllPosts,
   removeListener,
   removePost,
+  toggleActiveListener,
   updateAutomation,
 } from "./query";
 import { uploadInstagramImages } from "@/lib/uploadthing.lib";
 import { findIntegration } from "@/lib/utils";
 import { InstagrPostProps } from "@/types/posts.type";
+import { z } from "zod";
 
 // Utility wrapper for try/catch
 export const handleRequest = async <T, R>(
@@ -89,18 +93,40 @@ export const onGetAutomationInfo = async (id: string) => {
   );
 };
 
-// TODO: add name lenght validation and use the same methode for activating and changing the automation name
 export const onUpdateAutomationName = async (
   id: string,
   data: { name?: string; active?: boolean; automation?: string }
 ) => {
   await onCurrentUser();
   return handleRequest(
-    () => updateAutomation(id, data),
-    (automation) =>
-      automation
-        ? { status: 200, data: "Automation successfully updated" }
-        : { status: 404, data: "Oops! Could not find an automation" }
+    async () => {
+      const schema = z.object({
+        name: z
+          .string()
+          .min(3, "Name must be at least 3 characters long")
+          .max(25, "Name must be at most 25 characters long"),
+      });
+
+      const result = schema.safeParse({ name: data.name });
+      if (!result.success) {
+        const errorMessage = result.error.errors[0]?.message || "Invalid input";
+        return {
+          status: 400,
+          data: errorMessage,
+        };
+      }
+
+      return updateAutomation(id, data);
+    },
+    (automation) => {
+      if (typeof automation === "boolean") {
+        return automation
+          ? { status: 200, data: "Automation successfully updated" }
+          : { status: 404, data: "Oops! Could not find an automation" };
+      } else {
+        return automation;
+      }
+    }
   );
 };
 
@@ -133,7 +159,32 @@ export const onSaveListener2 = async (
     (created) =>
       created
         ? { status: 200, data: "Listener created" }
-        : { status: 404, data: "Oops! Could not save listener" }
+        : { status: 400, data: "Oops! Could not save listener" }
+  );
+};
+
+export const onChangeListenerMessageResponses = async (
+  id: string,
+  data: { prompt?: string; reply?: string }
+) => {
+  await onCurrentUser();
+  return handleRequest(
+    () => changeListenerMessageResponses(id, data),
+    (updated) =>
+      updated
+        ? { status: 200, data: "Value updated" }
+        : { status: 400, data: "Oops! Could not save value" }
+  );
+};
+
+export const onToggleActiveListener = async (id: string) => {
+  await onCurrentUser();
+  return handleRequest(
+    () => toggleActiveListener(id),
+    (updated) =>
+      updated
+        ? { status: 200, data: "Listener status changed" }
+        : { status: 404, data: "Oops! Could not find listener" }
   );
 };
 
@@ -305,6 +356,17 @@ export const onRemovePost = async (id: string) => {
       removed
         ? { status: 200, data: "Post removed" }
         : { status: 404, data: "Post not found" }
+  );
+};
+
+export const onRemovePosts = async (automationId: string) => {
+  await onCurrentUser();
+  return handleRequest(
+    async () => removeAllPosts(automationId),
+    (removed) =>
+      removed
+        ? { status: 200, data: "Posts removed" }
+        : { status: 404, data: "No posts found for this" }
   );
 };
 

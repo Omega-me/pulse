@@ -69,7 +69,7 @@ const AutomationTrigger2 = ({ id }: Props) => {
         {shouldShowPostButton() ? (
           <PostButton id={id} />
         ) : (
-          <ThenAction2 id={id} />
+          <ThenAction2 automationId={id} />
         )}
       </div>
     );

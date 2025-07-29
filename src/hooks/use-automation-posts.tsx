@@ -3,6 +3,7 @@ import { useMutationData } from "./use-mutation-data";
 import {
   onMarkUsedPosts,
   onRemovePost,
+  onRemovePosts,
   onSavePosts,
 } from "@/actions/automation";
 import { Post } from "@prisma/client";
@@ -50,14 +51,18 @@ const useAutomationPosts = (id: string) => {
     });
   };
 
-  const { mutate, isPending, variables } = useMutationData(
+  const {
+    mutate: savePosts,
+    isPending: isSavingPosts,
+    variables,
+  } = useMutationData(
     ["attach-posts"],
     () => onSavePosts(id, posts),
     ["automation-info"],
     () => setPosts([])
   );
 
-  const { mutate: remove, isPending: isRemovePending } = useMutationData(
+  const { mutate: remove, isPending: isRemovingPost } = useMutationData(
     ["remove-posts"],
     async (data) => {
       const { id } = data as unknown as { id: string };
@@ -65,6 +70,16 @@ const useAutomationPosts = (id: string) => {
     },
     ["automation-info"]
   );
+
+  const { mutate: removeAllPosts, isPending: isRemovingAllPosts } =
+    useMutationData(
+      ["remove-all-posts"],
+      async (data) => {
+        const { automationId } = data as unknown as { automationId: string };
+        return await onRemovePosts(automationId);
+      },
+      ["automation-info"]
+    );
 
   const handleInstagramPosts = async (instagramPosts?: {
     data?: InstagrPostProps[];
@@ -79,13 +94,15 @@ const useAutomationPosts = (id: string) => {
   return {
     onSelectPost,
     posts,
-    mutate,
-    isPending,
+    savePosts,
+    isSavingPosts,
     variables,
     remove,
-    isRemovePending,
+    isRemovingPost,
     handleInstagramPosts,
     instagramPosts,
+    removeAllPosts,
+    isRemovingAllPosts,
   };
 };
 
