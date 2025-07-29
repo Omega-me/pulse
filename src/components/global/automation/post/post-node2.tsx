@@ -15,15 +15,15 @@ import ThenAction2 from "../then/then-action2";
 import PostButton from ".";
 import GlowCard from "../../glow-card";
 import NodeTitle from "../node/node-title";
-import { Button } from "@/components/ui/button";
 
 interface Props {
-  id: string;
+  automationId: string;
 }
 
 const PostNode2 = (props: Props) => {
-  const { data: automation } = useAutomationQuery(props.id);
-  const { remove, isRemovePending } = useAutomationPosts(props.id);
+  const { data: automation } = useAutomationQuery(props.automationId);
+  const { remove, isRemovingPost, removeAllPosts, isRemovingAllPosts } =
+    useAutomationPosts(props.automationId);
   return (
     automation?.data &&
     automation?.data?.posts?.length > 0 && (
@@ -57,9 +57,21 @@ const PostNode2 = (props: Props) => {
                   />
                 }
                 title={"Remove all posts"}
-              >
-                {/* TODO: handle delete all posts */}
-              </AppDialog>
+                onConfirm={() =>
+                  removeAllPosts({
+                    automationId: props.automationId,
+                  } as unknown as any)
+                }
+                actionText={
+                  <span className="flex items-center gap-x-2">
+                    <Loader state={isRemovingAllPosts}>
+                      <Trash2 />
+                    </Loader>
+                    Remove
+                  </span>
+                }
+                description="Do you want to remove all the attached posts from the automation?"
+              />
             </div>
             <div className="bg-muted p-3 rounded-md flex flex-col gap-y-2">
               <div className="bg-muted p-3 rounded-md flex flex-col gap-y-2">
@@ -89,7 +101,7 @@ const PostNode2 = (props: Props) => {
                           }
                           actionText={
                             <span className="flex items-center gap-x-2">
-                              <Loader state={isRemovePending}>
+                              <Loader state={isRemovingPost}>
                                 <Trash2 />
                               </Loader>
                               Remove
@@ -112,12 +124,15 @@ const PostNode2 = (props: Props) => {
                         />
                       </div>
                     ))}
-                    <PostButton isOnSelectedPosts={true} id={props.id} />
+                    <PostButton
+                      isOnSelectedPosts={true}
+                      id={props.automationId}
+                    />
                   </div>
                 </ScrollArea>
               </div>
             </div>
-            <ThenAction2 id={props.id} />
+            <ThenAction2 automationId={props.automationId} />
           </div>
         </GlowCard>
       </>

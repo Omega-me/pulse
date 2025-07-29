@@ -36,8 +36,8 @@ const PostButton = (props: Props) => {
   const {
     onSelectPost,
     posts,
-    mutate,
-    isPending,
+    savePosts,
+    isSavingPosts,
     instagramPosts,
     handleInstagramPosts,
   } = useAutomationPosts(props.id);
@@ -184,11 +184,11 @@ const PostButton = (props: Props) => {
                 </TabsContent>
               </Tabs>
               <Button
-                onClick={() => mutate()}
+                onClick={() => savePosts()}
                 disabled={posts.length === 0}
                 className="bg-gradient-to-br w-full from-[#3352cc] text-white to-[#1c2d70]"
               >
-                <Loader state={isPending}>Attach Post</Loader>
+                <Loader state={isSavingPosts}>Attach Post</Loader>
               </Button>
             </div>
           ) : (

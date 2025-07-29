@@ -1,16 +1,19 @@
 "use client";
 import {
   onActivateAutomation,
+  onChangeListenerMessageResponses,
   onChangeListenerPriority,
   onCreateAutomation,
   onDeleteAutomation,
   onRemoveListener,
+  onSaveListener2,
+  onToggleActiveListener,
   onUpdateAutomationName,
 } from "@/actions/automation";
 import { useMutationData } from "./use-mutation-data";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { IntegrationType } from "@prisma/client";
+import { IntegrationType, ListenerType } from "@prisma/client";
 import {
   onDisconnectIntegration,
   onUpdateFacebookAdAccounts,
@@ -126,15 +129,15 @@ export const useAddFacebookAdAccountMutation = () => {
   return { mutate, isPending, variables };
 };
 
-export const useRemoveListenerMutation = () => {
+export const useRemoveListenerMutation = (automationId?: string) => {
+  const queryKey = automationId ? ["automation-info"] : ["user-automations"];
   const { mutate, isPending, variables } = useMutationData(
     ["remove-listener"],
     async (data) => {
       const { id } = data as unknown as { id: string };
       return await onRemoveListener(id);
     },
-    ["user-automations"]
-    // "automation-info", id
+    queryKey
   );
 
   return { mutate, isPending, variables };
@@ -160,4 +163,64 @@ export const useChangeListenerPriorityMutation = () => {
   );
 
   return { mutate, isPending, variables };
+};
+
+export const useChangeListenerMessageResponsesMutation = () => {
+  const { mutate, isPending, variables } = useMutationData(
+    ["change-listener-message-responses"],
+    async (data) => {
+      const { id, prompt, reply } = data as unknown as {
+        id: string;
+        prompt?: string;
+        reply?: string;
+      };
+
+      return await onChangeListenerMessageResponses(id, { prompt, reply });
+    },
+    ["automation-info"]
+  );
+
+  return { mutate, isPending, variables };
+};
+
+export const useToggleActiveListenerMutation = () => {
+  const { mutate, isPending, variables } = useMutationData(
+    ["toggle-active-listener"],
+    async (data) => {
+      const { id } = data as unknown as {
+        id: string;
+      };
+
+      return await onToggleActiveListener(id);
+    },
+    ["automation-info"]
+  );
+
+  return { mutate, isPending, variables };
+};
+
+export const useSaveListenerMutation = (
+  automationId: string,
+  listenerType: ListenerType,
+  keywords: string[]
+) => {
+  const { isPending, mutate, variables } = useMutationData(
+    ["create-listener"],
+    async (data) => {
+      const { prompt, reply } = data as unknown as {
+        prompt: string;
+        reply: string;
+      };
+      return await onSaveListener2(
+        automationId,
+        listenerType,
+        keywords,
+        prompt,
+        reply
+      );
+    },
+    ["automation-info"]
+  );
+
+  return { isPending, mutate, variables };
 };

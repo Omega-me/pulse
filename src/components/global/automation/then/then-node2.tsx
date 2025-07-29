@@ -6,10 +6,10 @@ import { ListenerCarousel } from "../../listener-carousel";
 import { ArrowDown } from "lucide-react";
 
 interface Props {
-  id: string;
+  automationId: string;
 }
 const ThenNode2 = (props: Props) => {
-  const { data: automation } = useAutomationQuery(props.id);
+  const { data: automation } = useAutomationQuery(props.automationId);
 
   return automation?.data?.listener.length === 0 ? (
     <></>
@@ -21,7 +21,7 @@ const ThenNode2 = (props: Props) => {
         <ArrowDown color="#27272A" className="-mt-2" />
       </div>
       <ListenerCarousel
-        id={props.id}
+        automationId={props.automationId}
         listeners={automation?.data?.listener.sort(
           (a, b) => b.priority - a.priority
         )}

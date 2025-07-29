@@ -18,7 +18,7 @@ interface Props {
 
 const PostNode = (props: Props) => {
   const { data: automation } = useAutomationQuery(props.id);
-  const { remove, isRemovePending } = useAutomationPosts(props.id);
+  const { remove, isRemovingPost } = useAutomationPosts(props.id);
   return (
     automation?.data &&
     automation?.data?.posts?.length > 0 && (
@@ -62,7 +62,7 @@ const PostNode = (props: Props) => {
                         }
                         actionText={
                           <span className="flex items-center gap-x-2">
-                            <Loader state={isRemovePending}>
+                            <Loader state={isRemovingPost}>
                               <Trash2 />
                             </Loader>
                             Remove

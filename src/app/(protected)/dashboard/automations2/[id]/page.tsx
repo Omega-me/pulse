@@ -77,8 +77,8 @@ const Page = async (props: Props) => {
             <AutomationTrigger2 id={id} />
           </div>
         </GlowCard>
-        <PostNode2 id={id} />
-        <ThenNode2 id={id} />
+        <PostNode2 automationId={id} />
+        <ThenNode2 automationId={id} />
       </div>
     </HydrationBoundary>
   );

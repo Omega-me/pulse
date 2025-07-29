@@ -187,6 +187,29 @@ export const changeListenerPriority = async (
   return changed ? true : false;
 };
 
+export const changeListenerMessageResponses = async (
+  id: string,
+  data: { prompt?: string; reply?: string }
+) => {
+  const listener = await client.listener.findUnique({
+    where: { id },
+  });
+  if (!listener) return false;
+
+  const updateData: Record<string, string> = {};
+  if (data.prompt !== undefined) updateData.prompt = data.prompt;
+  if (data.reply !== undefined) updateData.commentReply = data.reply;
+
+  if (Object.keys(updateData).length === 0) return false; // nothing to update
+
+  const changed = await client.listener.update({
+    where: { id },
+    data: updateData,
+  });
+
+  return !!changed;
+};
+
 export const removeListener = async (id: string): Promise<boolean> => {
   return client.$transaction(async (tx) => {
     const listener = await tx.listener.findUnique({
@@ -198,6 +221,17 @@ export const removeListener = async (id: string): Promise<boolean> => {
     await tx.listener.delete({ where: { id } });
     return true;
   });
+};
+
+export const toggleActiveListener = async (id: string) => {
+  const listener = await client.listener.findUnique({ where: { id } });
+  if (!listener) return false;
+
+  const updated = await client.listener.update({
+    where: { id },
+    data: { isActive: !listener.isActive },
+  });
+  return !!updated;
 };
 
 // ─── Triggers ─────────────────────────────────────────────────
@@ -328,5 +362,21 @@ export const removePost = async (id: string) => {
   }
 
   const removed = await client.post.delete({ where: { id } });
+  return removed ? true : false;
+};
+
+export const removeAllPosts = async (automationId: string) => {
+  const posts = await client.post.findMany({ where: { automationId } });
+  if (posts.length === 0) return null;
+
+  await Promise.all(
+    posts.map(async (post) => {
+      if (post.media) {
+        await deleteUploadedFiles([post.media]);
+      }
+    })
+  );
+
+  const removed = await client.post.deleteMany({ where: { automationId } });
   return removed ? true : false;
 };

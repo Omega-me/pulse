@@ -181,6 +181,8 @@ model Product {
 }
 
 // TODO: Orders table
+// TODO: Stats table
+// TODO: fix table names, singular and plural
 
 enum ProductSource {
   SHOPIFY
