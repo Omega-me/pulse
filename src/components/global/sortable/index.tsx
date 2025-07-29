@@ -10,6 +10,7 @@ interface Props extends PropsWithChildren {
   id: string;
   className?: string;
   showHandle?: boolean;
+  key: string;
 }
 
 const Sortable = ({ id, className, showHandle = true, children }: Props) => {
@@ -21,13 +22,15 @@ const Sortable = ({ id, className, showHandle = true, children }: Props) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id });
+  } = useSortable({
+    id,
+  });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition,
     zIndex: isDragging ? 50 : 1,
-    boxShadow: isDragging ? "0 8px 16px rgba(0, 0, 0, 0.25)" : "none",
+    boxShadow: isDragging ? "0 8px 24px rgba(0, 0, 0, 0.2)" : "none",
   };
 
   return (
@@ -39,7 +42,7 @@ const Sortable = ({ id, className, showHandle = true, children }: Props) => {
           {...listeners}
           size="icon"
           variant="ghost"
-          className="!cursor-grab group-hover/listener:text-white group-hover/listener:bg-muted text-muted-foreground transition duration-300 active:!cursor-grabbing"
+          className="!cursor-grab group-hover/listener:text-white group-hover/listener:bg-muted text-muted-foreground transition duration-300 active:!cursor-grabbing m-1"
         >
           <GripVertical />
         </Button>
