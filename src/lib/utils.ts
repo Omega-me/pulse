@@ -29,6 +29,6 @@ export const findIntegration = (
   integrations: Integration[],
   type: IntegrationType
 ) => {
-  const integration = integrations.find((i) => i.name === type);
+  const integration = integrations?.find((i) => i.name === type);
   return integration || null;
 };

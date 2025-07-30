@@ -1,14 +1,9 @@
 "use server";
 
 import {
-  Automations,
   IntegrationType,
-  Keyword,
-  Listener,
   ListenerType,
   Post,
-  Prisma,
-  Trigger,
   TriggerType,
 } from "@prisma/client";
 import { onCurrentUser } from "../user";
@@ -104,7 +99,7 @@ export const onUpdateAutomationName = async (
         name: z
           .string()
           .min(3, "Name must be at least 3 characters long")
-          .max(25, "Name must be at most 25 characters long"),
+          .max(20, "Name must be at most 20 characters long"),
       });
 
       const result = schema.safeParse({ name: data.name });

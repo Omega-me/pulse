@@ -20,12 +20,14 @@ import { useDisconnectIntegrationMutation } from "@/hooks/use-mutations";
 import AppDialog from "../app-dialog";
 import Loader from "../loader";
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Props extends IntegrationCardProps {
   message?: string;
 }
 
 const IntegrationCard = (props: Props) => {
+  const isMobile = useIsMobile();
   const router = useRouter();
   const hasRun = useRef(false);
   const onOAuth = () => onOAuthIntegration(props.strategy);
@@ -54,55 +56,60 @@ const IntegrationCard = (props: Props) => {
   const renderTrigger = () => {
     return (
       <div className="gap-x-5 p-5 flex items-center">
-        {props.icon}
         <div className="flex flex-col flex-1">
-          <h3 className="text-xl">{props.title}</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-x-2 mb-2">
+              <p>{props.icon}</p>
+              <h3 className="text-xl">{props.title}</h3>
+            </div>
+            <div>
+              {props.hasIntegrationBtn &&
+                (integrated ? (
+                  <p>
+                    <AppDialog
+                      trigger={
+                        <span
+                          onClick={(e) => e.stopPropagation()}
+                          className="cursor-pointer flex justify-between items-center gap-2 px-4 py-2 text-white rounded-md text-sm bg-[#4F46E5] hover:opacity-70 transition-all duration-100"
+                        >
+                          <Unplug size={18} />
+                          {!isMobile && <span>Disconnect</span>}
+                        </span>
+                      }
+                      onConfirm={() => disconnect()}
+                      actionText={
+                        <span className="flex items-center gap-x-2">
+                          <Loader state={isPending}>
+                            <Unplug />
+                          </Loader>
+                          {!isMobile && <span>Disconnect</span>}
+                        </span>
+                      }
+                      title="Disconnect"
+                      description={`Do you want to disconnect ${props.strategy.toLowerCase()} ?`}
+                    />
+                  </p>
+                ) : (
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (integrated) {
+                        return;
+                      }
+                      onOAuth();
+                    }}
+                    className="bg-gradient-to-br text-white rounded-full text-sm from-[#3352cc] font-medium to-[#1c2d70] hover:opacity-70 transition-all duration-100"
+                  >
+                    <Cable />
+                    {!isMobile && <span>Connect</span>}
+                  </Button>
+                ))}
+            </div>
+          </div>
           <p className="text-[#9d9d9d] text-base w-full">
             {props.descriptions}
           </p>
         </div>
-
-        {props.hasIntegrationBtn &&
-          (integrated ? (
-            <p>
-              <AppDialog
-                trigger={
-                  <span
-                    onClick={(e) => e.stopPropagation()}
-                    className="cursor-pointer flex justify-between items-center gap-2 px-4 py-2 text-white rounded-md text-sm bg-[#4F46E5] hover:opacity-70 transition-all duration-100"
-                  >
-                    <Unplug size={18} />
-                    <span>Disconnect</span>
-                  </span>
-                }
-                onConfirm={() => disconnect()}
-                actionText={
-                  <span className="flex items-center gap-x-2">
-                    <Loader state={isPending}>
-                      <Unplug />
-                    </Loader>
-                    Disconnect
-                  </span>
-                }
-                title="Disconnect"
-                description={`Do you want to disconnect ${props.strategy.toLowerCase()} ?`}
-              />
-            </p>
-          ) : (
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (integrated) {
-                  return;
-                }
-                onOAuth();
-              }}
-              className="bg-gradient-to-br text-white rounded-full text-sm from-[#3352cc] font-medium to-[#1c2d70] hover:opacity-70 transition-all duration-100"
-            >
-              <Cable />
-              <span>Connect</span>
-            </Button>
-          ))}
       </div>
     );
   };

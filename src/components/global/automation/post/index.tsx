@@ -186,7 +186,7 @@ const PostButton = (props: Props) => {
               <Button
                 onClick={() => savePosts()}
                 disabled={posts.length === 0}
-                className="bg-gradient-to-br w-full from-[#3352cc] text-white to-[#1c2d70]"
+                className="bgw-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 text-white"
               >
                 <Loader state={isSavingPosts}>Attach Post</Loader>
               </Button>

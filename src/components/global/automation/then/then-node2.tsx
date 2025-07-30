@@ -18,7 +18,7 @@ const ThenNode2 = (props: Props) => {
       <div className="flex flex-col justify-between items-center relative !-top-3 m-0">
         <span className="w-2 h-2 rounded-md bg-muted"></span>
         <Separator orientation="vertical" className="h-20 m-0" />
-        <ArrowDown color="#27272A" className="-mt-2" />
+        <ArrowDown color="#27272A" className="-mt-2" strokeWidth={1.2} />
       </div>
       <ListenerCarousel
         automationId={props.automationId}

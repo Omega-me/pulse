@@ -1,7 +1,7 @@
 import React from "react";
 import { AUTOMATION_LISTENER } from "@/constants/automation";
 import SubscriptionPlan from "../../subscription-plan";
-import { cn } from "@/lib/utils";
+import { cn, findIntegration } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,14 +10,22 @@ import Keywords2 from "../trigger/keywords2";
 import useListener2 from "@/hooks/use-listener2";
 import TriggerButton2 from "../trigger-button-2";
 import { CirclePlus, List, Save } from "lucide-react";
-import { ListenerType } from "@prisma/client";
+import { IntegrationType, ListenerType } from "@prisma/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useUserQuery } from "@/hooks/use-queries";
 
 interface Props {
   automationId: string;
 }
 
 const ThenAction2 = (props: Props) => {
+  const { data: user } = useUserQuery();
+  const facebookIntegration = findIntegration(
+    user.data.integrations,
+    IntegrationType.FACEBOOK
+  );
+  const isMobile = useIsMobile();
   const {
     isPending,
     listener: Listener,
@@ -51,7 +59,7 @@ const ThenAction2 = (props: Props) => {
           "md:h-[300px]": hasOnlyDmTrigger,
         })}
       >
-        <div className="flex flex-col gap-y-2 w-full">
+        <div className="flex flex-col gap-y-2 w-full p-1">
           {AUTOMATION_LISTENER.map((listener) =>
             listener.type === "SMARTAI" ? (
               <SubscriptionPlan key={listener.id} type="PRO">
@@ -101,11 +109,19 @@ const ThenAction2 = (props: Props) => {
                   : "Add a message you want to sent to the customers"
               }
               {...register("prompt")}
-              className="bg-muted outline-none border-none ring-0 focus:ring-0 !ring-[#4F46E5]"
+              className={cn(
+                "bg-muted outline-none border-none ring-0 focus:ring-0 !ring-[#4F46E5]",
+                { "h-32": isMobile }
+              )}
             />
             <Input
+              disabled={!facebookIntegration}
               {...register("reply")}
-              placeholder="Add reply for comments (Optional)"
+              placeholder={
+                facebookIntegration
+                  ? "Add comment reply (Optional)"
+                  : "Add comment reply (Facebook integration)"
+              }
               className="bg-muted outline-none border-none ring-0 focus:ring-0 !ring-[#4F46E5]"
             />
             <Button className="w-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 rounded-md font-medium text-white">
