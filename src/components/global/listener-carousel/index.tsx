@@ -49,19 +49,14 @@ export function ListenerCarousel(props: Props) {
   const { removeKeyword, isPendingDelete } = useKeywords2(props.automationId);
   const { mutate: removeListener, isPending: isRemovingListener } =
     useRemoveListenerMutation(props.automationId);
-  const {
-    mutate: toggleActiveListener,
-    isPending: isTogglingActiveListener,
-    variables,
-  } = useToggleActiveListenerMutation();
-  console.log(variables);
+  const { mutate: toggleActiveListener } = useToggleActiveListenerMutation();
 
   const renderListenerActiveState = (isActive: boolean, index: number) => {
     return (
       <AppTooltip side="top" text={isActive ? "Active" : "Disabled"}>
         <Badge
           className={cn(
-            "mr-1 flex items-center justify-center w-[15px] h-[22px] rounded-full font-[11px] cursor-pointer",
+            "mr-1 flex items-center justify-center w-[15px] h-[21px] rounded-full font-[11px] cursor-pointer",
             isActive
               ? "bg-green-500/30 border-green-500 hover:bg-green-500/30 text-green-500"
               : "bg-gray-500/30 border-gray-500 hover:bg-gray-500/30 text-gray-500"
@@ -78,7 +73,10 @@ export function ListenerCarousel(props: Props) {
     <Carousel className="-mt-7 w-full md:w-11/12 lg:w-10/12 xl:w-6/12">
       <CarouselContent>
         {props?.listeners?.map((listener, i) => (
-          <CarouselItem key={listener?.id}>
+          <CarouselItem
+            className="hover:cursor-grab active:cursor-grabbing"
+            key={listener?.id}
+          >
             <GlowCard
               spread={50}
               glow={true}

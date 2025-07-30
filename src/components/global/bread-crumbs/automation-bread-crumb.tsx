@@ -23,8 +23,6 @@ const AutomationBreadCrumb = (props: Props) => {
     useEditAutomationMutation(props.id);
 
   if (error) {
-    console.log(error);
-    // toast.error(error);
     return (
       <div className="w-full lg:mt-0 p-5 bg-[#18181b1a] rounded-xl border-[1px]">
         <p className="text-red-500">Error loading automation</p>
@@ -57,7 +55,7 @@ const AutomationBreadCrumb = (props: Props) => {
         <span className="flex justify-between items-center gap-x-2">
           {edit ? (
             <Input
-              className="mr-3"
+              className="mr-3 outline-none border-none ring-0 focus:ring-0 !ring-[#4F46E5]"
               ref={inputRef}
               defaultValue={automationInfo?.data?.name}
               placeholder={isPending ? variables?.name : "Add new name"}

@@ -3,7 +3,6 @@
 import React from "react";
 import { useAutomationQuery } from "@/hooks/use-queries";
 import { Separator } from "@/components/ui/separator";
-import TriggerButton from "../trigger-button";
 import { AUTOMATION_TRIGGERS } from "@/constants/automation";
 import useTriggers from "@/hooks/use-triggers";
 import { cn } from "@/lib/utils";
@@ -13,6 +12,8 @@ import PostButton from "../post";
 import ActiveTrigger2 from "./active-trigger2";
 import { TriggerType } from "@prisma/client";
 import ThenAction2 from "../then/then-action2";
+import TriggerButton2 from "../trigger-button-2";
+import { CirclePlus } from "lucide-react";
 
 interface Props {
   id: string;
@@ -76,8 +77,20 @@ const AutomationTrigger2 = ({ id }: Props) => {
   }
 
   return (
-    <TriggerButton label="Add Trigger">
-      <div className="flex flex-col gap-y-2">
+    <TriggerButton2
+      trigger={
+        <div
+          className="border-2 border-dashed w-full border-purple-500 
+        hover:opacity-80 cursor-pointer 
+        transition duration-100 rounded-xl 
+        flex gap-x-2 justify-center items-center p-5"
+        >
+          <CirclePlus className="text-purple-500" />
+          <p className="text-purple-500 font-bold">Add Trigger</p>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-y-2 w-full">
         {AUTOMATION_TRIGGERS.map((trigger) => (
           <div
             key={trigger.id}
@@ -86,7 +99,7 @@ const AutomationTrigger2 = ({ id }: Props) => {
               "hover:opacity-80 text-white rounded-xl flex cursor-pointer flex-col p-3 gap-y-2",
               !types?.includes(trigger.type)
                 ? "bg-muted"
-                : "bg-gradient-to-br from-[#3352cc] font-medium  to-[#1c2d70]"
+                : "bg-[#4F46E5] font-medium"
             )}
           >
             <div className="flex gap-x-2 items-center">
@@ -99,12 +112,12 @@ const AutomationTrigger2 = ({ id }: Props) => {
         <Button
           onClick={onSaveTrigger}
           disabled={types?.length === 0}
-          className="bg-gradient-to-br from-[#3352cc] font-medium text-white to-[#1c2d70]"
+          className="bg-[#4F46E5] hover:opacity-80 hover:bg-[#4F46E5] font-medium text-white"
         >
           <Loader state={isPending}>Create Trigger</Loader>
         </Button>
       </div>
-    </TriggerButton>
+    </TriggerButton2>
   );
 };
 

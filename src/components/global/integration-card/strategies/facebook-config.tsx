@@ -11,7 +11,6 @@ import AppDialog from "../../app-dialog";
 import { useFacebookAds } from "@/hooks/use-facebook-ads";
 import { Integration } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 
 interface Props {
   integrated: Integration;
@@ -19,7 +18,7 @@ interface Props {
 
 const FacebookConfig = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: adAccounts } = useFacebookAdAccountsQuery();
+  const { data: adAccounts, isPending } = useFacebookAdAccountsQuery();
   const {
     adAccounts: facebookAdAccounts,
     handleRemoveAdAccount,
@@ -28,7 +27,6 @@ const FacebookConfig = (props: Props) => {
     isRemoveAccountPending,
     filterOutUsedAdAccounts,
     handleSetDefaultAdAccount,
-    isSetDefaultAccountPending,
     handleSetClickedAdAccountId,
     clickedAdAccountId,
   } = useFacebookAds();
@@ -64,6 +62,7 @@ const FacebookConfig = (props: Props) => {
             </div>
           </CollapsibleTrigger>
 
+          {isPending && <Loader state={false}></Loader>}
           {facebookAdAccounts.length > 0 ? (
             <>
               {facebookAdAccounts.map((account) => (
@@ -73,7 +72,9 @@ const FacebookConfig = (props: Props) => {
                   title="Select Ad Account"
                   trigger={
                     <div className="rounded-md border px-4 py-2 font-mono text-sm flex items-center justify-between cursor-pointer">
-                      <span>{account.name}</span>
+                      <span>
+                        {account.name} {account.isDefault ? "(In use)" : ""}
+                      </span>
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
@@ -81,17 +82,10 @@ const FacebookConfig = (props: Props) => {
                         }}
                         className="flex items-center space-x-2"
                       >
-                        <Loader
-                          state={
-                            isSetDefaultAccountPending &&
-                            clickedAdAccountId === account.id
-                          }
-                        >
-                          <Label htmlFor="default_account">Default</Label>
-                        </Loader>
                         <Switch
-                          checked={account.isDefault}
-                          id="default_account"
+                          className="bg-[#4F46E5] hover:bg-[#4F46E5] data-[state=checked]:bg-[#4F46E5]"
+                          checked={clickedAdAccountId === account.id}
+                          defaultChecked={account.isDefault}
                           onCheckedChange={() =>
                             handleSetDefaultAdAccount(account.id)
                           }

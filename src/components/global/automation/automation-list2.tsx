@@ -122,7 +122,7 @@ const AutomationList2 = () => {
                 isPending={isRemovingAutomation}
               />
             </AccordionTrigger>
-            <AccordionContent className="p-5 flex flex-col gap-y-3">
+            <AccordionContent className="p-4 flex flex-col gap-y-3">
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -145,9 +145,9 @@ const AutomationList2 = () => {
                         id={listener.id}
                         showHandle={listeners.length > 1}
                         className={cn(
-                          "bg-[#1d1d1d] group/listener border border-muted-foreground/20 rounded-md",
+                          "bg-[#1d1d1d] group/listener border border-muted-foreground/20 rounded-md p-4",
                           {
-                            "flex justify-between items-center":
+                            "flex justify-between items-center pl-0":
                               listeners.length > 1,
                           }
                         )}
@@ -205,7 +205,7 @@ const AutomationHeader = ({
       <div className="flex flex-col flex-1 items-start">
         <div className="flex items-center gap-x-2">
           <p className="text-sm md:text-md font-semibold">{automation.name}</p>
-          <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-[11px] font-light">
+          <p className="text-muted-foreground whitespace-nowrap text-[9px] sm:text-[11px] font-light">
             {moment(automation.updatedAt).fromNow()}
           </p>
         </div>
@@ -318,7 +318,7 @@ const AutomationActionButtons = ({
         <PopoverTrigger asChild>
           <Button
             onClick={(e) => e.stopPropagation()}
-            className="group-hover:bg-gray-500/15 group-hover:scale-100 scale-0 transition-transform duration-300 absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+            className="group-hover:bg-gray-500/15 group-hover:scale-100 scale-0 transition-transform duration-300 absolute right-0 top-0 lg:top-1/2 lg:-translate-y-1/2 h-8 w-8 p-0"
             variant="ghost"
             size="icon"
           >
@@ -379,27 +379,69 @@ const ListenerItem = ({
         <div className="flex-shrink-0">
           {listener.listener === ListenerType.SMARTAI ? (
             <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md p-[1px]">
-              <div className="w-full bg-muted text-white hover:bg-muted flex items-center justify-center rounded-md px-3 py-1">
+              <div className="flex gap-x-2 w-full bg-muted text-white hover:bg-muted items-center justify-center rounded-md px-3 py-1">
                 <NodeTitle
                   icon={<Sparkles size={10} />}
                   title="Smart AI"
                   className="text-purple-500 text-[11px]"
                 />
+                <AppTooltip
+                  side="top"
+                  text={listener.isActive ? "Active" : "Disabled"}
+                >
+                  {listener.isActive ? (
+                    <Badge
+                      className="p-1 bg-green-500/30 border-green-500 hover:bg-green-500/30"
+                      variant="default"
+                    >
+                      <span className="sr-only" />
+                    </Badge>
+                  ) : (
+                    <Badge
+                      className="p-1 bg-red-500/30 border-red-500 hover:bg-red-500/30"
+                      variant="default"
+                    >
+                      <span className="sr-only" />
+                    </Badge>
+                  )}
+                </AppTooltip>
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center text-[10px] sm:text-[11px] rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">
-              <NodeTitle
-                icon={<CircleAlert size={10} />}
-                title="Standard"
-                className="text-gray-400 text-[11px]"
-              />
+            <div className="flex items-center gap-x-1">
+              <div className="flex gap-x-2 items-center justify-center text-[10px] sm:text-[11px] rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500">
+                <NodeTitle
+                  icon={<CircleAlert size={10} />}
+                  title="Standard"
+                  className="text-gray-400 text-[11px]"
+                />
+                <AppTooltip
+                  side="top"
+                  text={listener.isActive ? "Active" : "Disabled"}
+                >
+                  {listener.isActive ? (
+                    <Badge
+                      className="p-1 bg-green-500/30 border-green-500 hover:bg-green-500/30"
+                      variant="default"
+                    >
+                      <span className="sr-only" />
+                    </Badge>
+                  ) : (
+                    <Badge
+                      className="p-1 bg-red-500/30 border-red-500 hover:bg-red-500/30"
+                      variant="default"
+                    >
+                      <span className="sr-only" />
+                    </Badge>
+                  )}
+                </AppTooltip>
+              </div>
             </div>
           )}
         </div>
 
         <div className="flex items-center gap-x-1 sm:gap-x-2 flex-shrink-0">
-          <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-[11px] font-light transition-all duration-300 opacity-0 group-hover/listener:opacity-100">
+          <p className="text-muted-foreground whitespace-nowrap text-[9px] sm:text-[11px] font-light transition-all duration-300 opacity-0 group-hover/listener:opacity-100">
             {moment(listener.createdAt).fromNow()}
           </p>
           <AppDialog
