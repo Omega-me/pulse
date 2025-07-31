@@ -11,7 +11,7 @@ export function AppSkeleton(props: Props) {
       {props.span ? (
         Array.from({ length: props.span }, (_, i) => i).map((span) => (
           <div key={span} className="flex flex-col space-y-3 mb-2">
-            <Skeleton className="h-[12-px] w-full rounded-xl bg-muted/30" />
+            <Skeleton className="h-[120px] w-full rounded-xl bg-muted/30" />
           </div>
         ))
       ) : (
