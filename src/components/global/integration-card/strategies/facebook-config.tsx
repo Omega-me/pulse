@@ -29,6 +29,7 @@ const FacebookConfig = (props: Props) => {
     handleSetDefaultAdAccount,
     handleSetClickedAdAccountId,
     clickedAdAccountId,
+    getDefaultAdAccount,
   } = useFacebookAds();
 
   const filteredAdAccounts = filterOutUsedAdAccounts(

@@ -1,8 +1,3 @@
-export interface FacebookAdAccountPayload {
-  integration: Integration;
-  adAccounts: AdAccountProps[];
-}
-
 import { findIntegration, Integration } from "@/lib/utils";
 import { AdAccountProps } from "@/types/ads.types";
 import { IntegrationMetadataProps } from "@/types/integrationMetadata.types";
@@ -10,6 +5,11 @@ import { IntegrationType } from "@prisma/client";
 import { useUserQuery } from "./use-queries";
 import { useAddFacebookAdAccountMutation } from "./use-mutations";
 import { useCallback, useEffect, useState } from "react";
+
+export interface FacebookAdAccountPayload {
+  integration: Integration;
+  adAccounts: AdAccountProps[];
+}
 
 export const useFacebookAds = () => {
   const [clickedAdAccountId, setClickedAdAccountId] = useState<string | null>(
@@ -34,13 +34,6 @@ export const useFacebookAds = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const adAccounts =
     metadata?.facebookAdAccounts.sort((a, b) => (a.isDefault ? -1 : 1)) ?? [];
-
-  useEffect(() => {
-    if (!clickedAdAccountId && adAccounts.length > 0) {
-      const defaultAccount = adAccounts.find((acc) => acc.isDefault);
-      setClickedAdAccountId(defaultAccount?.id ?? null);
-    }
-  }, [adAccounts, clickedAdAccountId]);
 
   const handleSaveAdAccount = async (adAccount: AdAccountProps) => {
     if (!integration?.id) return;
@@ -96,9 +89,14 @@ export const useFacebookAds = () => {
     [adAccounts]
   );
 
-  const getDefaultAdAccount = () => {
+  const getDefaultAdAccount = useCallback(() => {
     return adAccounts.find((acc) => acc.isDefault) || adAccounts[0] || null;
-  };
+  }, [adAccounts]);
+
+  useEffect(() => {
+    const defaultAccount = getDefaultAdAccount();
+    setClickedAdAccountId(defaultAccount?.id);
+  }, [getDefaultAdAccount]);
 
   const handleSetDefaultAdAccount = (id: string) => {
     if (!integration?.id) return;
