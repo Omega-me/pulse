@@ -12,6 +12,7 @@ const useAutomations = () => {
   const { pathname, handleGoToRoute } = usePaths();
   const { data: automations, isPending: automationsPending } =
     useAutomationsQuery();
+  const automationsData = useMemo(() => automations?.data ?? [], [automations]);
 
   const [listeners, setListeners] = useState([]);
 
@@ -54,24 +55,16 @@ const useAutomations = () => {
   /**
    * Removes an automation.
    */
-  const handleDeleteAutomation = (automationId: string) => {
-    removeAutomation({ id: automationId } as any);
+  const handleDeleteAutomation = (id: string) => {
+    removeAutomation({ id } as any);
   };
 
   /**
    * Navigates to an automation detail page.
    */
-  const handleGoToAutomation = (automationId: string) => {
-    handleGoToRoute(`${pathname}/${automationId}`);
+  const handleGoToAutomation = (id: string) => {
+    handleGoToRoute(`${pathname}/${id}`);
   };
-
-  /**
-   * Returns the automation list if valid.
-   */
-  const automationsData = useMemo(
-    () => (automations?.data ? automations.data : []),
-    [automations]
-  );
 
   const handleSelectAutomation = (id?: string) => {
     if (!id) return;

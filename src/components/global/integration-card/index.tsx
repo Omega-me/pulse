@@ -76,7 +76,7 @@ const IntegrationCard = (props: Props) => {
                           {!isMobile && <span>Disconnect</span>}
                         </span>
                       }
-                      onConfirm={() => disconnect()}
+                      onConfirm={() => disconnect({})}
                       actionText={
                         <span className="flex items-center gap-x-2">
                           <Loader state={isPending}>

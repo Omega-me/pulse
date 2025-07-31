@@ -6,6 +6,8 @@ import { Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreateAutomationMutation } from "@/hooks/use-mutations";
 import AppTooltip from "../app-tooltip";
+import { Automations } from "@prisma/client";
+import { v4 as uuid } from "uuid";
 
 interface Props {
   hideLabelOnSmallScreen?: boolean;
@@ -13,15 +15,38 @@ interface Props {
   isAd?: boolean;
 }
 
+const newAutomation = (): Automations & {
+  triggers: any[];
+  listener: any[];
+  posts: any[];
+  keywords: any[];
+  dms: any[];
+} => {
+  return {
+    id: uuid(),
+    name: "Untitled",
+    active: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    metadata: {},
+    userId: "user-id",
+    triggers: [],
+    listener: [],
+    posts: [],
+    keywords: [],
+    dms: [],
+  };
+};
+
 const CreateAutomation = (props: Props) => {
-  const { isPending, mutate } = useCreateAutomationMutation();
+  const { isPending, mutate: createAutomation } = useCreateAutomationMutation();
 
   return props.isNav ? (
     <AppTooltip
       text={props.isAd ? "Create ad automation" : "Create automation"}
     >
       <Button
-        onClick={() => mutate()}
+        onClick={() => createAutomation(newAutomation())}
         className="lg:px-10 py-6 bg-gradient-to-br hover:bg-[#4F46E5] hover:opacity-[80%] text-white rounded-md bg-[#4F46E5] transition-opacity duration-300"
       >
         <Loader state={isPending}>
@@ -37,7 +62,7 @@ const CreateAutomation = (props: Props) => {
   ) : (
     <Button
       variant="ghost"
-      onClick={() => mutate()}
+      onClick={() => createAutomation(newAutomation())}
       className="lg:px-10 py-6 bg-gradient-to-br hover:bg-[#4F46E5] hover:opacity-[80%] text-white rounded-md bg-[#4F46E5] transition-opacity duration-300"
     >
       <Loader state={isPending}>

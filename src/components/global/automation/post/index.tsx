@@ -184,7 +184,7 @@ const PostButton = (props: Props) => {
                 </TabsContent>
               </Tabs>
               <Button
-                onClick={() => savePosts()}
+                onClick={() => savePosts({})}
                 disabled={posts.length === 0}
                 className="bgw-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 text-white"
               >

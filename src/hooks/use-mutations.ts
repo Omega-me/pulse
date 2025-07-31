@@ -29,6 +29,9 @@ export const useCreateAutomationMutation = () => {
     ["user-automations"],
     (data) => {
       router.push(`/dashboard/automations2/${data.id}`);
+    },
+    {
+      create: true,
     }
   );
 
@@ -97,6 +100,9 @@ export const useDeleteAutomationMutation = () => {
     ["user-automations"],
     () => {
       router.push("/dashboard/automations2");
+    },
+    {
+      delete: true,
     }
   );
 

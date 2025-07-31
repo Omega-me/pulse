@@ -72,7 +72,6 @@ const AutomationList2 = () => {
     automationsPending,
     listeners,
     handleDeleteAutomation,
-    isRemovingAutomation,
     handleGoToAutomation,
     handleDeleteListener,
     handleSwapListeners,
@@ -105,7 +104,7 @@ const AutomationList2 = () => {
     >
       {automationsData.map((automation) => (
         <GlowCard
-          key={automation.id}
+          key={automation?.id}
           spread={50}
           glow
           proximity={64}
@@ -113,13 +112,12 @@ const AutomationList2 = () => {
           borderWidth={2}
           containerClassName="bg-[#1d1d1d] rounded-md w-[99%] mx-auto h-auto"
         >
-          <AccordionItem value={automation.id} className="border-none group">
+          <AccordionItem value={automation?.id} className="border-none group">
             <AccordionTrigger className="hover:no-underline px-5">
               <AutomationHeader
                 automation={automation}
-                onDelete={() => handleDeleteAutomation(automation.id)}
-                onNavigate={() => handleGoToAutomation(automation.id)}
-                isPending={isRemovingAutomation}
+                onDelete={() => handleDeleteAutomation(automation?.id)}
+                onNavigate={() => handleGoToAutomation(automation?.id)}
               />
             </AccordionTrigger>
             <AccordionContent className="p-4 flex flex-col gap-y-3">
@@ -135,9 +133,9 @@ const AutomationList2 = () => {
                   strategy={verticalListSortingStrategy}
                 >
                   {listeners.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">
-                      No listeners found for this automation.
-                    </p>
+                    <div className="text-muted-foreground text-sm p-4">
+                      <span>No listeners found for this automation.</span>
+                    </div>
                   ) : (
                     listeners.map((listener) => (
                       <Sortable
@@ -176,13 +174,11 @@ interface AutomationHeaderProps {
   automation: Automations & { keywords: Keyword[]; triggers: Trigger[] };
   onDelete: () => void;
   onNavigate: () => void;
-  isPending: boolean;
 }
 const AutomationHeader = ({
   automation,
   onDelete,
   onNavigate,
-  isPending,
 }: AutomationHeaderProps) => {
   const isTouchDevice = useTouch();
   return (
@@ -233,7 +229,6 @@ const AutomationHeader = ({
       <AutomationActionButtons
         onNavigate={onNavigate}
         onDelete={onDelete}
-        isPending={isPending}
         isTouchDevice={isTouchDevice}
       />
     </div>
@@ -257,13 +252,7 @@ const NavigateButton = ({ onNavigate }: { onNavigate: () => void }) => (
   </Button>
 );
 
-const DeleteButton = ({
-  onDelete,
-  isPending,
-}: {
-  onDelete: () => void;
-  isPending: boolean;
-}) => (
+const DeleteButton = ({ onDelete }: { onDelete: () => void }) => (
   <AppDialog
     className="!w-[400px] border-md"
     trigger={
@@ -284,9 +273,7 @@ const DeleteButton = ({
     description="Do you want to remove this automation?"
     actionText={
       <span className="flex items-center gap-x-2">
-        <Loader state={isPending}>
-          <Trash2 />
-        </Loader>
+        <Trash2 />
         Remove
       </span>
     }
@@ -297,18 +284,16 @@ const DeleteButton = ({
 const AutomationActionButtons = ({
   onNavigate,
   onDelete,
-  isPending,
   isTouchDevice,
 }: {
   onNavigate: () => void;
   onDelete: () => void;
-  isPending: boolean;
   isTouchDevice: boolean;
 }) => {
   const ButtonGroup = () => (
     <div className="flex gap-x-2">
       <NavigateButton onNavigate={onNavigate} />
-      <DeleteButton onDelete={onDelete} isPending={isPending} />
+      <DeleteButton onDelete={onDelete} />
     </div>
   );
 
@@ -318,7 +303,7 @@ const AutomationActionButtons = ({
         <PopoverTrigger asChild>
           <Button
             onClick={(e) => e.stopPropagation()}
-            className="group-hover:bg-gray-500/15 group-hover:scale-100 scale-0 transition-transform duration-300 absolute right-0 top-0 lg:top-1/2 lg:-translate-y-1/2 h-8 w-8 p-0"
+            className="group-hover:bg-gray-500/15 group-active:scale-100 group-hover:scale-100 scale-0 transition-transform duration-300 absolute right-0 top-0 lg:top-1/2 lg:-translate-y-1/2 h-8 w-8 p-0"
             variant="ghost"
             size="icon"
           >
@@ -391,14 +376,14 @@ const ListenerItem = ({
                 >
                   {listener.isActive ? (
                     <Badge
-                      className="p-1 bg-green-500/30 border-green-500 hover:bg-green-500/30"
+                      className="p-1 bg-green-500/30 border-green-500 hover:bg-green-500/30 cursor-pointer"
                       variant="default"
                     >
                       <span className="sr-only" />
                     </Badge>
                   ) : (
                     <Badge
-                      className="p-1 bg-red-500/30 border-red-500 hover:bg-red-500/30"
+                      className="p-1 bg-red-500/30 border-red-500 hover:bg-red-500/30 cursor-pointer"
                       variant="default"
                     >
                       <span className="sr-only" />
@@ -421,14 +406,14 @@ const ListenerItem = ({
                 >
                   {listener.isActive ? (
                     <Badge
-                      className="p-1 bg-green-500/30 border-green-500 hover:bg-green-500/30"
+                      className="p-1 bg-green-500/30 border-green-500 hover:bg-green-500/30 cursor-pointer"
                       variant="default"
                     >
                       <span className="sr-only" />
                     </Badge>
                   ) : (
                     <Badge
-                      className="p-1 bg-red-500/30 border-red-500 hover:bg-red-500/30"
+                      className="p-1 bg-red-500/30 border-red-500 hover:bg-red-500/30 cursor-pointer"
                       variant="default"
                     >
                       <span className="sr-only" />
@@ -461,10 +446,12 @@ const ListenerItem = ({
             }
             onConfirm={onDelete}
             title="Remove"
-            description="Do you want to remove this automation?"
+            description="Do you want to remove this listener?"
             actionText={
               <span className="flex items-center gap-x-2">
-                <Trash2 />
+                <Loader state={false}>
+                  <Trash2 />
+                </Loader>
                 Remove
               </span>
             }
@@ -538,33 +525,37 @@ const ListenerItem = ({
             </div>
           ))}
 
-          {keywords.length > 3 && (
-            <TriggerButton2
-              trigger={
-                <div className="flex items-center justify-center rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500 hover:bg-gray-500/30 cursor-pointer text-[10px] sm:text-[11px] font-medium">
-                  <span className="text-gray-300 mr-1">
-                    +{keywords.length - 3}
-                  </span>
-                  <Ellipsis size={10} className="text-gray-300 sm:size-3" />
-                </div>
-              }
-              title="All keywords"
-            >
-              <div className="flex flex-wrap gap-2 mt-5">
-                {keywords.map((keyword, i) => (
-                  <div
-                    key={keyword.id}
-                    className={cn(
-                      "flex items-center justify-center text-[11px] sm:text-[12px] rounded-md py-2 px-3 border-[1px] font-medium",
-                      keywordColors[i % keywordColors.length]
-                    )}
-                  >
-                    <p>{keyword.word}</p>
-                  </div>
-                ))}
+          <TriggerButton2
+            trigger={
+              <div className="flex items-center justify-center rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500 hover:bg-gray-500/30 cursor-pointer text-[10px] sm:text-[11px] font-medium">
+                <span className="text-gray-300 ">
+                  {keywords.length <= 3 ? (
+                    <Ellipsis size={10} className="text-gray-300 sm:size-3" />
+                  ) : (
+                    <span className="flex items-center gap-x-1">
+                      <span>+{keywords.length - 3}</span>
+                      <Ellipsis size={10} className="text-gray-300 sm:size-3" />
+                    </span>
+                  )}
+                </span>
               </div>
-            </TriggerButton2>
-          )}
+            }
+            title="All keywords"
+          >
+            <div className="flex flex-wrap gap-2 mt-5">
+              {keywords.map((keyword, i) => (
+                <div
+                  key={keyword.id}
+                  className={cn(
+                    "flex items-center justify-center text-[11px] sm:text-[12px] rounded-md py-2 px-3 border-[1px] font-medium",
+                    keywordColors[i % keywordColors.length]
+                  )}
+                >
+                  <p>{keyword.word}</p>
+                </div>
+              ))}
+            </div>
+          </TriggerButton2>
 
           {keywords.length === 0 && (
             <div className="flex items-center justify-center rounded-md border-[1px] bg-muted/50 border-dashed border-muted-foreground/40 py-1 px-2 sm:px-3">

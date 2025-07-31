@@ -19,7 +19,7 @@ const DoubleGradientCard = (props: Props) => {
       </div>
       <div className="flex justify-between items-center z-10 gap-x-10">
         <p className="text-muted-foreground text-sm">{props.description}</p>
-        <Button onClick={() => mutate()} className="rounded-full">
+        <Button onClick={() => mutate({})} className="rounded-full">
           <Loader state={isPending}>
             <ArrowRight color="white" />
           </Loader>
