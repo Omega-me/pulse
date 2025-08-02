@@ -126,7 +126,7 @@ const PostNode2 = (props: Props) => {
                     ))}
                     <PostButton
                       isOnSelectedPosts={true}
-                      id={props.automationId}
+                      automationId={props.automationId}
                     />
                   </div>
                 </ScrollArea>

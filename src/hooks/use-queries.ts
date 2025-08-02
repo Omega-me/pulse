@@ -7,10 +7,13 @@ import { onGetFacebookAdAccounts } from "@/actions/integrations";
 import { onUserInfo } from "@/actions/user";
 import { useQuery } from "@tanstack/react-query";
 
-export const useAutomationsQuery = () => {
+export const useAutomationsQuery = (query?: string) => {
+  const automationKey = query
+    ? ["user-automations", query]
+    : ["user-automations"];
   return useQuery({
-    queryKey: ["user-automations"],
-    queryFn: () => onGetAllAutomations(),
+    queryKey: automationKey,
+    queryFn: () => onGetAllAutomations(query),
   });
 };
 

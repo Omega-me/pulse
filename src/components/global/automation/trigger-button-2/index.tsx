@@ -17,6 +17,7 @@ interface Props extends PropsWithChildren {
   title?: string;
   description?: string;
   footer?: React.ReactNode;
+  onOpenChange?: (open: boolean) => void;
 }
 
 function TriggerButton2({
@@ -25,12 +26,17 @@ function TriggerButton2({
   description,
   footer,
   children,
+  onOpenChange,
 }: Props) {
   const isMobile = useIsMobile();
 
   if (!isMobile) {
     return (
-      <PopOver className="w-[400px]" trigger={trigger}>
+      <PopOver
+        onOpenChange={onOpenChange}
+        className="w-[400px]"
+        trigger={trigger}
+      >
         <div>
           <p>{title}</p>
           <p>{description}</p>
@@ -42,7 +48,7 @@ function TriggerButton2({
   }
 
   return (
-    <Drawer>
+    <Drawer onOpenChange={(open) => onOpenChange?.(open)}>
       <DrawerTrigger asChild>{trigger}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>

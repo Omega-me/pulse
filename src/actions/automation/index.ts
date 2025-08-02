@@ -65,10 +65,10 @@ export const onCreateAutomation = async () => {
   );
 };
 
-export const onGetAllAutomations = async () => {
+export const onGetAllAutomations = async (query?: string) => {
   const user = await onCurrentUser();
   return handleRequest(
-    async () => getAllAutomations(user.id),
+    async () => getAllAutomations(user.id, query),
     (automations) => ({
       status: 200,
       data: automations || [],

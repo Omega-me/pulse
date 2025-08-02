@@ -39,7 +39,7 @@ const AutomationBreadCrumb = (props: Props) => {
     >
       <div className="flex justify-between items-center">
         <p
-          onClick={() => handleGoToRoute("/dashboard/automations")}
+          onClick={() => handleGoToRoute("/dashboard/automations2")}
           className="text-[#bec0c5] cursor-pointer flex items-center gap-x-2"
         >
           {isMobile ? (

@@ -67,10 +67,11 @@ const IntegrationCard = (props: Props) => {
                 (integrated ? (
                   <p>
                     <AppDialog
+                      className="!w-[400px]"
                       trigger={
                         <span
                           onClick={(e) => e.stopPropagation()}
-                          className="cursor-pointer flex justify-between items-center gap-2 px-4 py-2 text-white rounded-md text-sm bg-[#4F46E5] hover:opacity-70 transition-all duration-100"
+                          className="cursor-pointer flex justify-between items-center gap-2 px-4 py-2 text-white rounded-md text-sm bg-[#4F46E5] hover:opacity-80 hover:bg-[#4F46E5]"
                         >
                           <Unplug size={18} />
                           {!isMobile && <span>Disconnect</span>}
@@ -82,7 +83,7 @@ const IntegrationCard = (props: Props) => {
                           <Loader state={isPending}>
                             <Unplug />
                           </Loader>
-                          {!isMobile && <span>Disconnect</span>}
+                          <span>Disconnect</span>
                         </span>
                       }
                       title="Disconnect"
@@ -98,7 +99,7 @@ const IntegrationCard = (props: Props) => {
                       }
                       onOAuth();
                     }}
-                    className="bg-gradient-to-br text-white rounded-full text-sm from-[#3352cc] font-medium to-[#1c2d70] hover:opacity-70 transition-all duration-100"
+                    className="text-white rounded-md text-sm font-medium bg-[#4F46E5] hover:opacity-80 hover:bg-[#4F46E5]"
                   >
                     <Cable />
                     {!isMobile && <span>Connect</span>}

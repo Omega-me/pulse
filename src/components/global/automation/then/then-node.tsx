@@ -24,7 +24,7 @@ const ThenNode = (props: Props) => {
       return <></>;
     }
     if (commentTrigger) {
-      return <PostButton id={props.id} />;
+      return <PostButton automationId={props.id} />;
     }
 
     return <></>;

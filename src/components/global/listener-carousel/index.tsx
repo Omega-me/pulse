@@ -290,15 +290,11 @@ export function ListenerCarousel(props: Props) {
                   {listener.commentReply && (
                     <div className="max-h-[150px] group bg-muted p-3 rounded-md flex flex-col gap-y-2 mt-1">
                       <div className="flex gap-x-2 items-center justify-between">
-                        <div className="flex items-center gap-x-2">
-                          <MessageCircleHeart
-                            size={18}
-                            className="text-pink-500"
-                          />
-                          <p className="text-md text-pink-500">
-                            Comment reply to the user
-                          </p>
-                        </div>
+                        <NodeTitle
+                          title="Comment reply to the user"
+                          icon={<MessageCircleHeart size={18} />}
+                          className="text-md text-pink-500"
+                        />
                         <TriggerButton2
                           trigger={
                             <Button

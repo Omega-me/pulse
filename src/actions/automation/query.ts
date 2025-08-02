@@ -6,11 +6,19 @@ import { ListenerType, Post, TriggerType } from "@prisma/client";
 
 // ─── Automations ─────────────────────────────────────────────
 
-export const getAllAutomations = async (clerkId: string) => {
+export const getAllAutomations = async (clerkId: string, query?: string) => {
   const automations = await client.user.findUnique({
     where: { clerkId },
     select: {
       automations: {
+        where: query
+          ? {
+              name: {
+                contains: query,
+                mode: "insensitive", // optional: case-insensitive match
+              },
+            }
+          : undefined,
         orderBy: { createdAt: "desc" },
         include: {
           keywords: true,

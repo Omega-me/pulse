@@ -25,9 +25,12 @@ import {
 } from "@/components/ui/select";
 import TriggerButton2 from "../trigger-button-2";
 import { cn } from "@/lib/utils";
+import { FaAd } from "react-icons/fa";
+import NodeTitle from "../node/node-title";
+import Link from "next/link";
 
 interface Props {
-  id: string;
+  automationId: string;
   isOnSelectedPosts?: boolean;
 }
 const PostButton = (props: Props) => {
@@ -40,9 +43,10 @@ const PostButton = (props: Props) => {
     isSavingPosts,
     instagramPosts,
     handleInstagramPosts,
-  } = useAutomationPosts(props.id);
-  const { data: automation } = useAutomationQuery(props.id);
-  const { adAccounts, getDefaultAdAccount } = useFacebookAds();
+  } = useAutomationPosts(props.automationId);
+  const { data: automation } = useAutomationQuery(props.automationId);
+  const { adAccounts, getDefaultAdAccount, hasFacebookIntegration } =
+    useFacebookAds();
   const defaultAdAccount = getDefaultAdAccount();
   const hasSavedPosts =
     automation?.status === 200 && automation?.data?.posts?.length > 0;
@@ -53,6 +57,11 @@ const PostButton = (props: Props) => {
         ""
       ) : (
         <TriggerButton2
+          onOpenChange={(open) => {
+            if (!open) {
+              setTabsValue("posts");
+            }
+          }}
           trigger={
             <div
               onClick={async () => handleInstagramPosts(postsData)}
@@ -89,35 +98,32 @@ const PostButton = (props: Props) => {
                     >
                       Posts
                     </TabsTrigger>
-                    <TabsTrigger
-                      className="data-[state=active]:bg-[#1D1D1D]"
-                      value="ads"
-                    >
-                      Ads
-                    </TabsTrigger>
+                    {hasFacebookIntegration && (
+                      <TabsTrigger
+                        className="data-[state=active]:bg-[#1D1D1D]"
+                        value="ads"
+                      >
+                        Ads
+                      </TabsTrigger>
+                    )}
                   </TabsList>
-                  {tabsValue === "ads" && (
-                    // TODO: get instagram ads for the selected ad account
+                  {/* TODO: get instagram ads for the selected ad account */}
+                  {tabsValue === "ads" && adAccounts.length > 0 && (
                     <Select
                       onValueChange={(value) => console.log(value)}
                       defaultValue={defaultAdAccount?.id ?? ""}
                     >
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full !ring-0">
                         <SelectValue placeholder="Select an ad account" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1D1D1D]">
                         <SelectGroup>
-                          <SelectLabel>
-                            {adAccounts.length > 0
-                              ? "Connected ad accounts"
-                              : "No ad accounts connected"}
-                          </SelectLabel>
-                          {adAccounts.length > 0 &&
-                            adAccounts?.map((account) => (
-                              <SelectItem key={account.id} value={account.id}>
-                                {account.name}
-                              </SelectItem>
-                            ))}
+                          <SelectLabel>Connected ad accounts</SelectLabel>
+                          {adAccounts?.map((account) => (
+                            <SelectItem key={account.id} value={account.id}>
+                              {account.name}
+                            </SelectItem>
+                          ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -138,7 +144,7 @@ const PostButton = (props: Props) => {
                                 caption: post?.caption,
                                 createdAt: new Date(),
                                 updatedAt: new Date(),
-                                automationId: props?.id,
+                                automationId: props?.automationId,
                                 id: post.id,
                                 metadata: null,
                                 postType: PostType.POST,
@@ -179,7 +185,18 @@ const PostButton = (props: Props) => {
                 </TabsContent>
                 <TabsContent value="ads">
                   <ScrollArea className="h-[300px] w-full rounded-md border">
-                    {/* TODO: render ads here */}
+                    {adAccounts.length === 0 ? (
+                      <div className="w-full h-[295px] flex flex-col justify-center items-center">
+                        <Link href="/dashboard/integrations/">
+                          <NodeTitle
+                            title={"Link an ad account"}
+                            icon={<FaAd />}
+                          />
+                        </Link>
+                      </div>
+                    ) : (
+                      <div>{/* TODO: render ads here */}</div>
+                    )}
                   </ScrollArea>
                 </TabsContent>
               </Tabs>

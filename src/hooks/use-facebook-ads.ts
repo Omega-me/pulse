@@ -132,5 +132,6 @@ export const useFacebookAds = () => {
     isSetDefaultAccountPending,
     handleSetClickedAdAccountId,
     clickedAdAccountId,
+    hasFacebookIntegration: !!integration,
   };
 };
