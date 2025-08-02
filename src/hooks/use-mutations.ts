@@ -89,7 +89,10 @@ export const useActivateAutomationMutation = (id: string) => {
   return { mutate, isPending, variables };
 };
 
-export const useDeleteAutomationMutation = () => {
+export const useDeleteAutomationMutation = (query?: string) => {
+  const automationKey = query
+    ? ["user-automations", query]
+    : ["user-automations"];
   const router = useRouter();
   const { mutate, isPending, variables } = useMutationData(
     ["delete-automation"],
@@ -97,9 +100,11 @@ export const useDeleteAutomationMutation = () => {
       const { id } = data as unknown as { id: string };
       return await onDeleteAutomation(id);
     },
-    ["user-automations"],
+    automationKey,
     () => {
-      router.push("/dashboard/automations2");
+      if (!query) {
+        router.push("/dashboard/automations2");
+      }
     },
     {
       delete: true,
@@ -135,8 +140,15 @@ export const useAddFacebookAdAccountMutation = () => {
   return { mutate, isPending, variables };
 };
 
-export const useRemoveListenerMutation = (automationId?: string) => {
-  const queryKey = automationId ? ["automation-info"] : ["user-automations"];
+export const useRemoveListenerMutation = (
+  automationId?: string,
+  query?: string
+) => {
+  const queryKey = automationId
+    ? ["automation-info"]
+    : query
+    ? ["user-automations", query]
+    : ["user-automations"];
   const { mutate, isPending, variables } = useMutationData(
     ["remove-listener"],
     async (data) => {
@@ -149,7 +161,10 @@ export const useRemoveListenerMutation = (automationId?: string) => {
   return { mutate, isPending, variables };
 };
 
-export const useChangeListenerPriorityMutation = () => {
+export const useChangeListenerPriorityMutation = (query?: string) => {
+  const automationKey = query
+    ? ["user-automations", query]
+    : ["user-automations"];
   const { mutate, isPending, variables } = useMutationData(
     ["change-listener-priority"],
     async (data) => {
@@ -165,7 +180,7 @@ export const useChangeListenerPriorityMutation = () => {
         swapedListenerId
       );
     },
-    ["user-automations"]
+    automationKey
   );
 
   return { mutate, isPending, variables };

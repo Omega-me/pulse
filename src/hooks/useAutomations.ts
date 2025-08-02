@@ -7,20 +7,23 @@ import {
   useRemoveListenerMutation,
 } from "./use-mutations";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useSearchParams } from "next/navigation";
 
 const useAutomations = () => {
+  const searchParams = useSearchParams();
+  const query = searchParams.get("name");
   const { pathname, handleGoToRoute } = usePaths();
   const { data: automations, isPending: automationsPending } =
-    useAutomationsQuery();
+    useAutomationsQuery(query);
   const automationsData = useMemo(() => automations?.data ?? [], [automations]);
 
   const [listeners, setListeners] = useState([]);
 
   const { mutate: removeAutomation, isPending: isRemovingAutomation } =
-    useDeleteAutomationMutation();
-  const { mutate: removeListener } = useRemoveListenerMutation();
+    useDeleteAutomationMutation(query);
+  const { mutate: removeListener } = useRemoveListenerMutation(query);
   const { mutate: changeListenerPriority } =
-    useChangeListenerPriorityMutation();
+    useChangeListenerPriorityMutation(query);
 
   /**
    * Reorders listener items and triggers backend priority update.

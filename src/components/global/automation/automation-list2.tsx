@@ -302,8 +302,15 @@ const AutomationActionButtons = ({
       <Popover>
         <PopoverTrigger asChild>
           <Button
+            tabIndex={0}
             onClick={(e) => e.stopPropagation()}
-            className="group-hover:bg-gray-500/15 group-active:scale-100 group-hover:scale-100 scale-0 transition-transform duration-300 absolute right-0 top-0 lg:top-1/2 lg:-translate-y-1/2 h-8 w-8 p-0"
+            className={cn(
+              "scale-0 transition-transform duration-300 absolute right-0 top-0 lg:top-1/2 lg:-translate-y-1/2 h-8 w-8 p-0",
+              {
+                "group-hover:scale-100 group-hover:bg-gray-500/15":
+                  isTouchDevice,
+              }
+            )}
             variant="ghost"
             size="icon"
           >
@@ -542,7 +549,7 @@ const ListenerItem = ({
             }
             title="All keywords"
           >
-            <div className="flex flex-wrap gap-2 mt-5">
+            <div className="flex flex-wrap gap-2 mt-5 bg-muted rounded-md p-3 w-full">
               {keywords.map((keyword, i) => (
                 <div
                   key={keyword.id}

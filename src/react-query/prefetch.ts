@@ -18,8 +18,15 @@ export const prefetchUserProfile = async (client: QueryClient) => {
   return await prefetch(client, onUserInfo, "user-profile");
 };
 
-export const prefetchAutomations = async (client: QueryClient) => {
-  return await prefetch(client, onGetAllAutomations, "user-automations");
+export const prefetchAutomations = async (
+  client: QueryClient,
+  query?: string
+) => {
+  return await prefetch(
+    client,
+    () => onGetAllAutomations(query),
+    "user-automations"
+  );
 };
 
 export const prefetchUserAutomation = async (
