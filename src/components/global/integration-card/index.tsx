@@ -71,7 +71,7 @@ const IntegrationCard = (props: Props) => {
                       trigger={
                         <span
                           onClick={(e) => e.stopPropagation()}
-                          className="cursor-pointer flex justify-between items-center gap-2 px-4 py-2 text-white rounded-md text-sm bg-[#4F46E5] hover:opacity-80 hover:bg-[#4F46E5]"
+                          className="cursor-pointer flex justify-between items-center gap-2 px-3 py-2 text-white rounded-md text-sm bg-[#4F46E5] hover:opacity-80 hover:bg-[#4F46E5]"
                         >
                           <Unplug size={18} />
                           {!isMobile && <span>Disconnect</span>}

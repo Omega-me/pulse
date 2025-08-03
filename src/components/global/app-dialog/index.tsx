@@ -40,7 +40,7 @@ const AppDialog = (props: Props) => {
         <DialogFooter>
           {props.actionText && (
             <Button
-              className="hover:opacity-80 hover:bg-[#4F46E5] text-white rounded-md bg-[#4F46E5] font-medium"
+              className="hover:opacity-80 hover:bg-[#4F46E5] text-white rounded-md bg-[#4F46E5] font-medium border-none"
               type="button"
               onClick={props.onConfirm}
             >

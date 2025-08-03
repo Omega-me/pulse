@@ -547,9 +547,9 @@ const ListenerItem = ({
                 </span>
               </div>
             }
-            title="All keywords"
+            title="Keywords"
           >
-            <div className="flex flex-wrap gap-2 mt-5 bg-muted rounded-md p-3 w-full">
+            <div className="flex flex-wrap gap-2 mt-5 bg-[#191919] rounded-md p-3 w-full">
               {keywords.map((keyword, i) => (
                 <div
                   key={keyword.id}
