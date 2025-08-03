@@ -1,11 +1,4 @@
-import {
-  Activity,
-  Blocks,
-  Bolt,
-  House,
-  Rocket,
-  ShoppingCart,
-} from "lucide-react";
+import { Activity, Bolt, House, Rocket, ShoppingCart } from "lucide-react";
 import { v4 as uuid } from "uuid";
 
 interface FieldProps {
@@ -16,16 +9,12 @@ interface FieldProps {
 export interface SidebarProps extends FieldProps {
   icon: React.ReactNode;
 }
+
 export const SIDEBAR_MENU: SidebarProps[] = [
   {
     id: uuid(),
     label: "home",
     icon: <House />,
-  },
-  {
-    id: uuid(),
-    label: "automations",
-    icon: <Activity />,
   },
   {
     id: uuid(),

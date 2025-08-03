@@ -13,7 +13,10 @@ const SidebarContent = () => {
   const { handleGoToRoute } = usePaths();
   return (
     <>
-      <div className="flex flex-col gap-y-5 w-full h-full p-3 bg-[#0e0e0e] bg-opacity-90 bg-clip-padding backdrop-filter backdrop-blur-3xl overflow-y-auto max-h-screen scrollbar-hide lg:rounded-[1.4em]">
+      <div
+        // className="flex flex-col gap-y-5 w-full h-full p-3 bg-[#0e0e0e] bg-opacity-90 bg-clip-padding backdrop-filter backdrop-blur-3xl overflow-y-auto max-h-screen scrollbar-hide lg:rounded-[1.4em]"
+        className="flex flex-col gap-y-5 w-full h-full p-3 bg-[#0e0e0e] bg-opacity-90 bg-clip-padding backdrop-filter backdrop-blur-3xl overflow-y-auto max-h-screen scrollbar-hide lg:rounded-md"
+      >
         <div className="flex gap-x-2 items-center justify-center">
           <LogoSmall />
         </div>
