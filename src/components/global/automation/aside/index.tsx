@@ -39,10 +39,10 @@ const Aside = () => {
         title="Automations"
         description="Start by automating a post or an ad"
         actionBtn={
-          <div className="flex flex-col gap-3">
-            <CreateAutomation />
+          <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-center gap-3">
+            <CreateAutomation className="w-full" />
             {facebookIntegration && adAccounts.length > 0 && (
-              <CreateAutomation isAd />
+              <CreateAutomation isAd className="w-full" />
             )}
           </div>
         }

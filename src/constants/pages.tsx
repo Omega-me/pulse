@@ -1,14 +1,12 @@
 import {
-  ContactRound,
-  Bolt,
-  House,
-  Activity,
-  Rocket,
-  ShoppingCart,
-} from "lucide-react";
+  DuotoneActivity,
+  DuotoneBolt,
+  DuotoneCart,
+  DuotoneHouse,
+  DuotoneRocket,
+} from "@/components/global/icons";
 
 export const PAGE_BREAD_CRUMBS: string[] = [
-  "automations",
   "automations2",
   "integrations",
   "settings",
@@ -20,11 +18,19 @@ type PageIcon = {
 };
 
 export const PAGE_ICON: PageIcon = {
-  AUTOMATIONS: <Activity color="#4F46E5" size={30} />,
-  AUTOMATIONS2: <Activity color="#4F46E5" size={30} />,
-  CONTACTS: <ContactRound color="#4F46E5" size={30} />,
-  INTEGRATIONS: <Rocket color="#4F46E5" size={30} />,
-  SETTINGS: <Bolt color="#4F46E5" size={30} />,
-  PRODUCTS: <ShoppingCart color="#4F46E5" size={30} />,
-  HOME: <House color="#4F46E5" size={30} />,
+  AUTOMATIONS2: (
+    <DuotoneActivity
+      size={35}
+      baseOpacity={1}
+      accentOpacity={0}
+      baseColor="#4F46E5"
+      accentColor="#4F46E5"
+    />
+  ),
+  INTEGRATIONS: (
+    <DuotoneRocket size={35} baseColor="#4F46E5" accentColor="#4F46E5" />
+  ),
+  SETTINGS: <DuotoneBolt size={35} baseColor="#4F46E5" accentColor="#4F46E5" />,
+  PRODUCTS: <DuotoneCart size={35} baseColor="#4F46E5" accentColor="#4F46E5" />,
+  HOME: <DuotoneHouse size={35} baseColor="#4F46E5" accentColor="#4F46E5" />,
 };
