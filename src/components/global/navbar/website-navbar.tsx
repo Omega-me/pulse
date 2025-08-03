@@ -1,7 +1,6 @@
 "use client";
 import usePaths from "@/hooks/use-navs";
 import React from "react";
-import Link from "next/link";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -16,10 +15,7 @@ const WebsiteNavbar = () => {
 
   return (
     !isPrivateRoute && (
-      <div
-        // className="p-2 w-full flex justify-center sticky top-0 bg-[#09090B]/50 backdrop-blur-sm"
-        className="p-2 w-full flex justify-center sticky top-0 bg-[#09090B]/50 backdrop-blur-sm"
-      >
+      <div className="p-2 w-full flex justify-center sticky top-0 bg-[#09090B]/50 backdrop-blur-sm">
         <NavigationMenu>
           <NavigationMenuList>
             {PUBLIC_ROUTES.map((r) => (

@@ -1,4 +1,10 @@
-import { Activity, Bolt, House, Rocket, ShoppingCart } from "lucide-react";
+import {
+  DuotoneActivity,
+  DuotoneBolt,
+  DuotoneCart,
+  DuotoneHouse,
+  DuotoneRocket,
+} from "@/components/global/icons";
 import { v4 as uuid } from "uuid";
 
 interface FieldProps {
@@ -14,26 +20,26 @@ export const SIDEBAR_MENU: SidebarProps[] = [
   {
     id: uuid(),
     label: "home",
-    icon: <House />,
+    icon: <DuotoneHouse />,
   },
   {
     id: uuid(),
     label: "automations2",
-    icon: <Activity />,
+    icon: <DuotoneActivity baseOpacity={1} accentOpacity={0} />,
   },
   {
     id: uuid(),
     label: "integrations",
-    icon: <Rocket />,
+    icon: <DuotoneRocket />,
   },
   {
     id: uuid(),
     label: "products",
-    icon: <ShoppingCart />,
+    icon: <DuotoneCart />,
   },
   {
     id: uuid(),
     label: "settings",
-    icon: <Bolt />,
+    icon: <DuotoneBolt />,
   },
 ];

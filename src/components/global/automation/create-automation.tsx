@@ -13,6 +13,7 @@ interface Props {
   hideLabelOnSmallScreen?: boolean;
   isNav?: boolean;
   isAd?: boolean;
+  className?: string;
 }
 
 const newAutomation = (): Automations & {
@@ -47,7 +48,10 @@ const CreateAutomation = (props: Props) => {
     >
       <Button
         onClick={() => createAutomation(newAutomation())}
-        className="lg:px-10 py-6 bg-gradient-to-br hover:bg-[#4F46E5] hover:opacity-[80%] text-white rounded-md bg-[#4F46E5] transition-opacity duration-300"
+        className={cn(
+          "lg:px-10 py-6 bg-gradient-to-br hover:bg-[#4F46E5] hover:opacity-[80%] text-white rounded-md bg-[#4F46E5] transition-opacity duration-300",
+          props.className
+        )}
       >
         <Loader state={isPending}>
           <Activity />
@@ -63,7 +67,10 @@ const CreateAutomation = (props: Props) => {
     <Button
       variant="ghost"
       onClick={() => createAutomation(newAutomation())}
-      className="lg:px-10 py-6 bg-gradient-to-br hover:bg-[#4F46E5] hover:opacity-[80%] text-white rounded-md bg-[#4F46E5] transition-opacity duration-300"
+      className={cn(
+        "lg:px-10 py-6 bg-gradient-to-br hover:bg-[#4F46E5] hover:opacity-[80%] text-white rounded-md bg-[#4F46E5] transition-opacity duration-300",
+        props.className
+      )}
     >
       <Loader state={isPending}>
         <Activity />
