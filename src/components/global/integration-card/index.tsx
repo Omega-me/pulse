@@ -69,7 +69,6 @@ const IntegrationCard = (props: Props) => {
                     <AppDialog
                       className="!w-[400px]"
                       trigger={
-                        // WIP
                         <span
                           onClick={(e) => e.stopPropagation()}
                           className="cursor-pointer flex justify-between items-center gap-2 px-3 py-2 text-white rounded-md text-sm bg-[#4F46E5] hover:opacity-80 hover:bg-[#4F46E5]"
