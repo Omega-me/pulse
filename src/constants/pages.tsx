@@ -21,16 +21,48 @@ export const PAGE_ICON: PageIcon = {
   AUTOMATIONS2: (
     <DuotoneActivity
       size={35}
-      baseOpacity={1}
-      accentOpacity={0}
       baseColor="#4F46E5"
-      accentColor="#4F46E5"
+      accentColor="#19164a"
+      accentOpacity={0}
+      baseOpacity={1}
     />
   ),
   INTEGRATIONS: (
-    <DuotoneRocket size={35} baseColor="#4F46E5" accentColor="#4F46E5" />
+    <DuotoneRocket
+      size={35}
+      baseColor="#4F46E5"
+      accentColor="#19164a"
+      accentOpacity={0.5}
+      baseOpacity={1}
+    />
   ),
-  SETTINGS: <DuotoneBolt size={35} baseColor="#4F46E5" accentColor="#4F46E5" />,
-  PRODUCTS: <DuotoneCart size={35} baseColor="#4F46E5" accentColor="#4F46E5" />,
-  HOME: <DuotoneHouse size={35} baseColor="#4F46E5" accentColor="#4F46E5" />,
+  SETTINGS: (
+    <DuotoneBolt
+      size={35}
+      baseColor="#4F46E5"
+      accentColor="#19164a"
+      accentOpacity={0.5}
+      baseOpacity={1}
+      borderOpacity={1}
+    />
+  ),
+  PRODUCTS: (
+    <DuotoneCart
+      size={35}
+      baseColor="#4F46E5"
+      accentColor="#19164a"
+      accentOpacity={0.5}
+      baseOpacity={1}
+    />
+  ),
+  HOME: (
+    <DuotoneHouse
+      size={35}
+      baseColor="#4F46E5"
+      accentColor="#19164a"
+      accentOpacity={0.5}
+      baseOpacity={1}
+      borderOpacity={0}
+    />
+  ),
 };
