@@ -20,26 +20,66 @@ export const SIDEBAR_MENU: SidebarProps[] = [
   {
     id: uuid(),
     label: "home",
-    icon: <DuotoneHouse />,
+    icon: (
+      <DuotoneHouse
+        accentOpacity={0.5}
+        baseOpacity={1}
+        baseColor="gray"
+        accentColor="#16181E"
+        borderOpacity={0.5}
+      />
+    ),
   },
   {
     id: uuid(),
     label: "automations2",
-    icon: <DuotoneActivity baseOpacity={1} accentOpacity={0} />,
+    icon: (
+      <DuotoneActivity
+        accentOpacity={0}
+        baseOpacity={1}
+        baseColor="gray"
+        accentColor="#16181E"
+        borderOpacity={0.5}
+      />
+    ),
   },
   {
     id: uuid(),
     label: "integrations",
-    icon: <DuotoneRocket />,
+    icon: (
+      <DuotoneRocket
+        accentOpacity={0.5}
+        baseOpacity={1}
+        baseColor="gray"
+        accentColor="#16181E"
+        borderOpacity={1}
+      />
+    ),
   },
   {
     id: uuid(),
     label: "products",
-    icon: <DuotoneCart />,
+    icon: (
+      <DuotoneCart
+        accentOpacity={0.5}
+        baseOpacity={1}
+        baseColor="gray"
+        accentColor="#16181E"
+        borderOpacity={0.5}
+      />
+    ),
   },
   {
     id: uuid(),
     label: "settings",
-    icon: <DuotoneBolt />,
+    icon: (
+      <DuotoneBolt
+        accentOpacity={0.5}
+        baseOpacity={1}
+        baseColor="gray"
+        accentColor="#16181E"
+        borderOpacity={0.5}
+      />
+    ),
   },
 ];
