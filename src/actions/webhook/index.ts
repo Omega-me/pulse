@@ -2,6 +2,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Dms } from "@prisma/client";
 import { generateText, CoreMessage } from "ai";
+import { matchKeywordFromComment, matchKeywordFromDm } from "./queries";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY as string,
@@ -52,5 +53,21 @@ export const onGenerateSmartAiMessage = async (
   } catch (error) {
     console.error("Error generating Smart AI message:", error);
     return null;
+  }
+};
+
+export const testAction = async (keyword: string, postid?: string) => {
+  try {
+    if (postid) {
+      const result = await matchKeywordFromComment(postid, keyword);
+      console.log("Comment match result:", result);
+      return;
+    }
+    const result = await matchKeywordFromDm(keyword);
+    console.log("DM match result:", result);
+    console.log("handle message match keyword");
+    return;
+  } catch (error) {
+    console.error("Error in test action:", error);
   }
 };

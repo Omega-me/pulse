@@ -4,12 +4,20 @@ import {
   getChatHistory,
   getKeywordAutomation,
   getKeywordPost,
-  matchKeyword,
+  matchKeywordFromComment,
+  matchKeywordFromDm,
   trackResponses,
 } from "@/actions/webhook/queries";
 import { replyToInstagramComment, sendDM, sendPrivateDM } from "@/lib/fetch";
 import { NextRequest, NextResponse } from "next/server";
-import { IntegrationType, Keyword } from "@prisma/client";
+import {
+  IntegrationType,
+  Keyword,
+  Listener,
+  ListenerType,
+  SubscriptionPlan,
+  TriggerType,
+} from "@prisma/client";
 import { client } from "@/lib/prisma.lib";
 import { findIntegration } from "@/lib/utils";
 
@@ -57,8 +65,11 @@ export async function POST(req: NextRequest) {
   if (messaging?.message?.is_echo) return jsonResponse("Skipping echo message");
 
   try {
-    const matchedResult = await matchKeyword(text, comment?.value?.media?.id);
-    const source = messaging ? "DM" : "COMMENT";
+    const source = messaging ? TriggerType.DM : TriggerType.COMMENT;
+    const matchedResult =
+      source === TriggerType.COMMENT
+        ? await matchKeywordFromComment(comment?.value?.media?.id, text)
+        : await matchKeywordFromDm(text);
     const senderId = entry.id;
     const receiverId = messaging?.sender.id ?? comment?.value.from.id;
     if (senderId === receiverId) {
@@ -66,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (matchedResult)
-      return await handleKeywordMatch(
+      return await handleKeywordMatched(
         matchedResult,
         text,
         source,
@@ -86,21 +97,22 @@ function jsonResponse(message: string) {
   return NextResponse.json({ message }, { status: 200 });
 }
 
-async function handleKeywordMatch(
+async function handleKeywordMatched(
   matchedResult: {
     automation: {
       id: string;
     };
     keyword: Keyword;
+    listener: Listener;
   },
   text: string,
-  source: "DM" | "COMMENT",
+  source: TriggerType,
   senderId: string,
   receiverId: string,
   comment?: Changes
 ) {
   const { keyword } = matchedResult;
-  const automation = await getKeywordAutomation(matchedResult.automation.id);
+  const automation = await getKeywordAutomation(matchedResult.listener.id);
   if (
     !automation ||
     !automation.active ||
@@ -108,6 +120,11 @@ async function handleKeywordMatch(
     !automation.triggers?.length
   )
     return jsonResponse("Invalid or inactive automation");
+  if (!automation.listener)
+    return jsonResponse("No listener attached to this automation");
+  if (!automation.listener.isActive) {
+    return jsonResponse("Listener is not active");
+  }
 
   const instagramToken = findIntegration(
     automation.User?.integrations,
@@ -120,17 +137,14 @@ async function handleKeywordMatch(
 
   if (!instagramToken) return jsonResponse("Missing Instagram token");
 
-  // TODO: fix it to handle multiple listeners
-  if (automation.listener.length === 0)
-    return jsonResponse("No listener attached to this automation");
-  const listener = automation.listener[0];
+  const listener = automation?.listener;
   const listenerType = listener?.listener;
   const prompt = listener?.prompt;
   const triggers = automation.triggers.map((t) => t.type);
   const commentReply = listener?.commentReply;
-  const isPro = automation.User.subscription?.plan === "PRO";
+  const isPro = automation.User.subscription?.plan === SubscriptionPlan.PRO;
 
-  if (source === "COMMENT") {
+  if (source === TriggerType.COMMENT) {
     const postCheck = await getKeywordPost(
       automation.id,
       comment?.value?.media?.id
@@ -140,12 +154,12 @@ async function handleKeywordMatch(
 
   if (!triggers.includes(source)) return jsonResponse("Trigger type mismatch");
 
-  if (listenerType === "MESSAGE") {
-    const message = await (source === "COMMENT"
+  if (listenerType === ListenerType.MESSAGE) {
+    const message = await (source === TriggerType.COMMENT
       ? sendPrivateDM(senderId, comment!.value.id, prompt, instagramToken)
       : sendDM(senderId, receiverId, prompt, instagramToken));
 
-    if (facebookToken && source === "COMMENT" && commentReply) {
+    if (facebookToken && source === TriggerType.COMMENT && commentReply) {
       await replyToInstagramComment(
         comment!.value.id,
         commentReply,
@@ -156,10 +170,10 @@ async function handleKeywordMatch(
     if (message.status === 200) await trackResponses(automation.id, source);
   }
 
-  if (listenerType === "SMARTAI" && isPro) {
+  if (listenerType === ListenerType.SMARTAI && isPro) {
     const history = await getChatHistory(senderId, receiverId);
     let promptMessage: string;
-    if (source === "COMMENT") {
+    if (source === TriggerType.COMMENT) {
       promptMessage = prompt;
     } else {
       if (!history) {
@@ -186,11 +200,11 @@ async function handleKeywordMatch(
       keywordId: keyword.id,
     });
 
-    const status = await (source === "COMMENT"
+    const status = await (source === TriggerType.COMMENT
       ? sendPrivateDM(senderId, comment!.value.id, aiMessage, instagramToken)
       : sendDM(senderId, receiverId, aiMessage, instagramToken));
 
-    if (facebookToken && source === "COMMENT" && commentReply) {
+    if (facebookToken && source === TriggerType.COMMENT && commentReply) {
       await replyToInstagramComment(
         comment!.value.id,
         commentReply,
@@ -222,7 +236,7 @@ async function handleFallback(
   const history = await getChatHistory(senderId, receiverId);
   if (!history) return jsonResponse("No Ai chat history found with this user");
 
-  const automation = await getKeywordAutomation(history.automationId);
+  const automation = await getKeywordAutomation(history.listenerId);
   if (
     !automation ||
     !automation.active ||
@@ -231,12 +245,17 @@ async function handleFallback(
   )
     return jsonResponse("Invalid or inactive automation");
 
-  const token = automation.User?.integrations?.find(
-    (int) => int.name === "INSTAGRAM"
-  )?.token;
+  const instagramIntegration = findIntegration(
+    automation.User?.integrations,
+    IntegrationType.INSTAGRAM
+  );
+  if (!instagramIntegration) {
+    return jsonResponse("Missing Instagram integration");
+  }
+  const { token } = instagramIntegration;
   if (!token) return jsonResponse("Missing Instagram token");
 
-  const isPro = automation.User.subscription?.plan === "PRO";
+  const isPro = automation.User.subscription?.plan === SubscriptionPlan.PRO;
   if (!isPro) return jsonResponse("User is not a pro member");
 
   const aiMessage = await onGenerateSmartAiMessage(history.chatHistory, text);
@@ -251,7 +270,8 @@ async function handleFallback(
   });
 
   const status = await sendDM(senderId, receiverId!, aiMessage, token);
-  if (status.status === 200) await trackResponses(automation.id, "DM");
+  if (status.status === 200)
+    await trackResponses(automation.id, TriggerType.DM);
 
   return jsonResponse("Message sent via fallback");
 }

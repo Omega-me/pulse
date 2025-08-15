@@ -7,6 +7,7 @@ import ThenNode2 from "@/components/global/automation/then/then-node2";
 import AutomationTrigger2 from "@/components/global/automation/trigger/automation-trigger2";
 import AutomationBreadCrumb from "@/components/global/bread-crumbs/automation-bread-crumb";
 import GlowCard from "@/components/global/glow-card";
+import TestMessageComment from "@/components/global/test-message-comment";
 import { prefetchUserAutomation } from "@/react-query/prefetch";
 import {
   dehydrate,
@@ -80,8 +81,8 @@ const Page = async (props: Props) => {
         <PostNode2 automationId={id} />
         <ThenNode2 automationId={id} />
       </div>
+      <TestMessageComment automationId={id} />
     </HydrationBoundary>
   );
 };
-
 export default Page;
