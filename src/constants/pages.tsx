@@ -18,7 +18,7 @@ type PageIcon = {
 };
 
 export const PAGE_ICON: PageIcon = {
-  AUTOMATIONS2: (
+  AUTOMATIONS: (
     <DuotoneActivity
       size={35}
       baseColor="#4F46E5"
