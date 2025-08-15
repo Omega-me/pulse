@@ -1,32 +1,67 @@
-import React, { PropsWithChildren } from "react";
+"use client";
+import React, { PropsWithChildren, useState } from "react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 import PopOver from "../../popover";
-import { CirclePlus } from "lucide-react";
 
 interface Props extends PropsWithChildren {
-  label: string;
-  onClick?: () => void;
+  trigger: React.JSX.Element;
+  title?: string;
+  description?: string;
+  footer?: React.ReactNode;
+  onOpenChange?: (open: boolean) => void;
 }
 
-const TriggerButton = (props: Props) => {
-  return (
-    <PopOver
-      className="w-[400px]"
-      trigger={
-        <div
-          onClick={props.onClick}
-          className="border-2 border-dashed w-full border-purple-500 
-        hover:opacity-80 cursor-pointer 
-        transition duration-100 rounded-xl 
-        flex gap-x-2 justify-center items-center p-5"
-        >
-          <CirclePlus className="text-purple-500" />
-          <p className="text-purple-500 font-bold">{props.label}</p>
+function TriggerButton({
+  trigger,
+  title,
+  description,
+  footer,
+  children,
+  onOpenChange,
+}: Props) {
+  const isMobile = useIsMobile();
+
+  if (!isMobile) {
+    return (
+      <PopOver
+        onOpenChange={onOpenChange}
+        className="w-[400px]"
+        trigger={trigger}
+      >
+        <div>
+          <p>{title}</p>
+          <p>{description}</p>
         </div>
-      }
-    >
-      {props.children}
-    </PopOver>
+        {children}
+        <div>{footer}</div>
+      </PopOver>
+    );
+  }
+
+  return (
+    <Drawer onOpenChange={onOpenChange}>
+      <DrawerTrigger asChild>{trigger}</DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>{title}</DrawerTitle>
+          <DrawerDescription>{description}</DrawerDescription>
+        </DrawerHeader>
+        <div className="flex justify-center items-center w-full p-3">
+          {children}
+        </div>
+        <DrawerFooter>{footer}</DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
-};
+}
 
 export default TriggerButton;

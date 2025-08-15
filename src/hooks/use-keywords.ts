@@ -1,50 +1,65 @@
-import { useState } from 'react';
-import { useMutationData } from './use-mutation-data';
-import { onDeleteKeyword, onSaveKeyword } from '@/actions/automation';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState } from "react";
+import { useMutationData } from "./use-mutation-data";
+import { onDeleteKeyword, onSaveKeyword } from "@/actions/automation";
 
 const useKeywords = (id: string) => {
-  const [keyword, setKeyword] = useState('');
-  const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => setKeyword(e.target.value);
+  const [keyword, setKeyword] = useState("");
+  const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setKeyword(e.target.value);
 
   const {
-    mutate,
+    mutate: addKeyword,
     isPending: isPendingAdd,
     variables,
   } = useMutationData(
-    ['add-keyword'],
+    ["add-keyword"],
     async (data) => {
-      const { keyword } = data as unknown as { keyword: string };
-      return await onSaveKeyword(id, keyword);
+      const { keyword, listenerId } = data as unknown as {
+        keyword: string;
+        listenerId?: string;
+      };
+      return await onSaveKeyword(id, keyword, listenerId);
     },
-    ['automation-info'],
-    () => setKeyword('')
+    ["automation-info"],
+    () => setKeyword("")
   );
 
-  const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      if (keyword.trim() === '') return;
-      mutate({ keyword } as any);
-      setKeyword('');
+  const onKeyPress = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    listenerId?: string
+  ) => {
+    if (e.key === "Enter") {
+      if (keyword.trim() === "") return;
+      addKeyword({ keyword, listenerId } as any);
+      setKeyword("");
     }
   };
 
-  const onClickAddKeyword = () => {
-    if (keyword.trim() === '') return;
-    mutate({ keyword } as any);
-    setKeyword('');
+  const onClickAddKeyword = (listenerId?: string) => {
+    if (keyword.trim() === "") return;
+    addKeyword({ keyword, listenerId } as any);
+    setKeyword("");
   };
 
-  const { mutate: deleteMuatation, isPending: isPendingDelete } = useMutationData(
-    ['delete-keyword'],
+  const { mutate: removeKeyword, isPending: isPendingDelete } = useMutationData(
+    ["delete-keyword"],
     async (data) => {
       const { id } = data as unknown as { id: string };
       return await onDeleteKeyword(id);
     },
-    ['automation-info']
+    ["automation-info"]
   );
 
-  return { keyword, onValueChange, onKeyPress, onClickAddKeyword, deleteMuatation, variables, isPendingAdd, isPendingDelete };
+  return {
+    keyword,
+    onValueChange,
+    onKeyPress,
+    onClickAddKeyword,
+    removeKeyword,
+    variables,
+    isPendingAdd,
+    isPendingDelete,
+  };
 };
 
 export default useKeywords;

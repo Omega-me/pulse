@@ -11,7 +11,6 @@ import { findUser } from "../user/queries";
 import {
   addKeyword,
   addListener,
-  addListener2,
   addPosts,
   addTrigger,
   changeListenerMessageResponses,
@@ -128,29 +127,13 @@ export const onUpdateAutomationName = async (
 export const onSaveListener = async (
   automationId: string,
   listener: ListenerType,
-  prompt: string,
-  reply?: string
-) => {
-  await onCurrentUser();
-  return handleRequest(
-    () => addListener(automationId, listener, prompt, reply),
-    (created) =>
-      created
-        ? { status: 200, data: "Listener created" }
-        : { status: 404, data: "Oops! Could not save listener" }
-  );
-};
-
-export const onSaveListener2 = async (
-  automationId: string,
-  listener: ListenerType,
   keywordIds: string[],
   prompt: string,
   reply?: string
 ) => {
   await onCurrentUser();
   return handleRequest(
-    () => addListener2(automationId, listener, keywordIds, prompt, reply),
+    () => addListener(automationId, listener, keywordIds, prompt, reply),
     (created) =>
       created
         ? { status: 200, data: "Listener created" }

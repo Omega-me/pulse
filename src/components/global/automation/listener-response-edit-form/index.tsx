@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import useListener2 from "@/hooks/use-listener2";
 import { ListenerType } from "@prisma/client";
 import React from "react";
 import Loader from "../../loader";
 import { Save } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import useListener from "@/hooks/use-listener";
 
 interface Props {
   automationId: string;
@@ -23,7 +23,7 @@ const ListenerResponseEditForm = (props: Props) => {
     onSaveCommentReply,
     registerCommentReply,
     isChangingCommentReply,
-  } = useListener2(props.automationId, props.listenerId, {
+  } = useListener(props.automationId, props.listenerId, {
     prompt: props.value,
     reply: props.isMessage ? "" : props.value,
   } as any);

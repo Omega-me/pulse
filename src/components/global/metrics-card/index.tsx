@@ -1,11 +1,7 @@
 "use client";
-import { useAutomationsQuery } from "@/hooks/use-queries";
 import React from "react";
 
 const MetricsCard = () => {
-  // TODO: fix it with different listeners or the one with more comments
-  // const { data: automations } = useAutomationsQuery();
-
   // TODO: fix the analytics
   const comments = 20;
   const dms = 30;

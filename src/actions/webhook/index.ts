@@ -55,19 +55,3 @@ export const onGenerateSmartAiMessage = async (
     return null;
   }
 };
-
-export const testAction = async (keyword: string, postid?: string) => {
-  try {
-    if (postid) {
-      const result = await matchKeywordFromComment(postid, keyword);
-      console.log("Comment match result:", result);
-      return;
-    }
-    const result = await matchKeywordFromDm(keyword);
-    console.log("DM match result:", result);
-    console.log("handle message match keyword");
-    return;
-  } catch (error) {
-    console.error("Error in test action:", error);
-  }
-};

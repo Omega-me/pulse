@@ -1,5 +1,5 @@
 "use client";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAutomationQuery } from "@/hooks/use-queries";
 import { TriangleAlert } from "lucide-react";
 import React from "react";

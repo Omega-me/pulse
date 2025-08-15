@@ -20,7 +20,7 @@ interface Props extends PropsWithChildren {
   onClick?: () => void;
 }
 
-function AppTriggerButton(props: Props) {
+function DublicateButton(props: Props) {
   const isMobile = useIsMobile();
 
   if (!isMobile) {
@@ -51,4 +51,4 @@ function AppTriggerButton(props: Props) {
   );
 }
 
-export default AppTriggerButton;
+export default DublicateButton;

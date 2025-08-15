@@ -7,7 +7,7 @@ import {
 } from "@/components/global/icons";
 
 export const PAGE_BREAD_CRUMBS: string[] = [
-  "automations2",
+  "automations",
   "integrations",
   "settings",
   "products",
