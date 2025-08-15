@@ -23,11 +23,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import TriggerButton2 from "../trigger-button-2";
 import { cn } from "@/lib/utils";
 import { FaAd } from "react-icons/fa";
 import NodeTitle from "../node/node-title";
 import Link from "next/link";
+import TriggerButton from "../trigger-button";
 
 interface Props {
   automationId: string;
@@ -35,7 +35,7 @@ interface Props {
 }
 const PostButton = (props: Props) => {
   const [tabsValue, setTabsValue] = React.useState("posts");
-  const { data: postsData } = useAutomationPostsQuery();
+  const { data: postsData, isPending } = useAutomationPostsQuery();
   const {
     onSelectPost,
     posts,
@@ -56,7 +56,7 @@ const PostButton = (props: Props) => {
       {!props.isOnSelectedPosts && hasSavedPosts ? (
         ""
       ) : (
-        <TriggerButton2
+        <TriggerButton
           onOpenChange={(open) => {
             if (!open) {
               setTabsValue("posts");
@@ -107,7 +107,6 @@ const PostButton = (props: Props) => {
                       </TabsTrigger>
                     )}
                   </TabsList>
-                  {/* TODO: get instagram ads for the selected ad account */}
                   {tabsValue === "ads" && adAccounts.length > 0 && (
                     <Select
                       onValueChange={(value) => console.log(value)}
@@ -132,54 +131,59 @@ const PostButton = (props: Props) => {
                 <TabsContent value="posts">
                   <ScrollArea className="h-[300px] w-full rounded-md border">
                     <div className="flex flex-wrap gap-2 p-2">
-                      {instagramPosts?.map((post: InstagrPostProps) => (
-                        <div
-                          key={post?.id}
-                          onClick={() => {
-                            onSelectPost(
-                              {
-                                postid: post?.id,
-                                media: post?.media_url,
-                                mediaType: post?.media_type,
-                                caption: post?.caption,
-                                createdAt: new Date(),
-                                updatedAt: new Date(),
-                                automationId: props?.automationId,
-                                id: post.id,
-                                metadata: null,
-                                postType: PostType.POST,
-                              },
-                              post.extraInfo
-                            );
-                          }}
-                          className="relative w-[30%] aspect-square rounded-md cursor-pointer overflow-hidden"
-                        >
-                          {post.extraInfo.isUsed && (
-                            <AppTooltip text="Used in another automation">
-                              <div className="absolute bg-gray-900 bg-opacity-50 flex  justify-center z-[90] w-full h-full">
-                                <LockKeyhole
-                                  stroke="white"
-                                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
-                                />
-                              </div>
-                            </AppTooltip>
-                          )}
-                          {posts.find((p) => p.postid === post.id) && (
-                            <CircleCheck
-                              fill="white"
-                              stroke="black"
-                              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+                      <Loader
+                        className="w-full h-[280px] flex justify-center items-center"
+                        state={isPending || instagramPosts.length === 0}
+                      >
+                        {instagramPosts?.map((post: InstagrPostProps) => (
+                          <div
+                            key={post?.id}
+                            onClick={() => {
+                              onSelectPost(
+                                {
+                                  postid: post?.id,
+                                  media: post?.media_url,
+                                  mediaType: post?.media_type,
+                                  caption: post?.caption,
+                                  createdAt: new Date(),
+                                  updatedAt: new Date(),
+                                  automationId: props?.automationId,
+                                  id: post.id,
+                                  metadata: null,
+                                  postType: PostType.POST,
+                                },
+                                post.extraInfo
+                              );
+                            }}
+                            className="relative w-[30%] aspect-square rounded-md cursor-pointer overflow-hidden"
+                          >
+                            {post.extraInfo.isUsed && (
+                              <AppTooltip text="Used in another automation">
+                                <div className="absolute bg-gray-900 bg-opacity-50 flex  justify-center z-[90] w-full h-full">
+                                  <LockKeyhole
+                                    stroke="white"
+                                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+                                  />
+                                </div>
+                              </AppTooltip>
+                            )}
+                            {posts.find((p) => p.postid === post.id) && (
+                              <CircleCheck
+                                fill="white"
+                                stroke="black"
+                                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+                              />
+                            )}
+                            <img
+                              src={post.media_url}
+                              alt="Instagram post"
+                              width={300}
+                              height={300}
+                              className="w-full h-full object-cover"
                             />
-                          )}
-                          <img
-                            src={post.media_url}
-                            alt="Instagram post"
-                            width={300}
-                            height={300}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ))}
+                          </div>
+                        ))}
+                      </Loader>
                     </div>
                   </ScrollArea>
                 </TabsContent>
@@ -213,7 +217,7 @@ const PostButton = (props: Props) => {
               No posts found
             </p>
           )}
-        </TriggerButton2>
+        </TriggerButton>
       )}
     </>
   );

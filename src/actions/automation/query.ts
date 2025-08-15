@@ -99,28 +99,6 @@ export const deleteAutomation = async (id: string) => {
 
 export const addListener = async (
   automationId: string,
-  listener: "SMARTAI" | "MESSAGE",
-  prompt: string,
-  reply?: string
-) => {
-  return await client.automations.update({
-    where: { id: automationId },
-    data: {
-      listener: {
-        create: {
-          listener,
-          prompt,
-          commentReply: reply,
-          commentCount: 0,
-          dmCount: 0,
-        },
-      },
-    },
-  });
-};
-
-export const addListener2 = async (
-  automationId: string,
   listener: ListenerType,
   keywordIds: string[],
   prompt: string,

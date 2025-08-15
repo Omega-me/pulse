@@ -15,14 +15,14 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import TriggerButton2 from "../automation/trigger-button-2";
+import TriggerButton2 from "../automation/trigger-button";
 import AppDialog from "../app-dialog";
 import Loader from "../loader";
 import GlowCard from "../glow-card";
 import { cn } from "@/lib/utils";
 import NodeTitle from "../automation/node/node-title";
-import useKeywords2 from "@/hooks/use-keywords2";
-import Keywords2 from "../automation/trigger/keywords2";
+import useKeywords2 from "@/hooks/use-keywords";
+import Keywords2 from "../automation/trigger/keywords";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import AppTooltip from "../app-tooltip";
@@ -317,6 +317,7 @@ export function ListenerCarousel(props: Props) {
                           />
                         </TriggerButton2>
                       </div>
+
                       <p className="text-sm text-gray-400 leading-snug line-clamp-[4]">
                         {listener.commentReply}
                       </p>

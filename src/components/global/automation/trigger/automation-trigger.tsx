@@ -1,35 +1,51 @@
 "use client";
-import { useAutomationQuery } from "@/hooks/use-queries";
+
 import React from "react";
-import ActiveTrigger from "./active-trigger";
+import { useAutomationQuery } from "@/hooks/use-queries";
 import { Separator } from "@/components/ui/separator";
-import ThenAction from "../then/then-action";
-import TriggerButton from "../trigger-button";
 import { AUTOMATION_TRIGGERS } from "@/constants/automation";
 import useTriggers from "@/hooks/use-triggers";
 import { cn } from "@/lib/utils";
-import Keywords from "./keywords";
 import { Button } from "@/components/ui/button";
 import Loader from "../../loader";
+import PostButton from "../post";
+import { TriggerType } from "@prisma/client";
+import TriggerButton2 from "../trigger-button";
+import { CirclePlus } from "lucide-react";
+import ActiveTrigger from "./active-trigger";
+import ThenAction from "../then/then-action";
 
 interface Props {
   id: string;
 }
 
-const AutomationTrigger = (props: Props) => {
-  const { data: automation } = useAutomationQuery(props.id);
-  const { onSetTrigger, onSaveTrigger, types, isPending } = useTriggers(
-    props.id
-  );
+const AutomationTrigger = ({ id }: Props) => {
+  const { data: automation } = useAutomationQuery(id);
+  const { onSetTrigger, onSaveTrigger, types, isPending } = useTriggers(id);
+  const hasDmTriggerOnly =
+    automation.data.triggers.length === 1 &&
+    automation.data.triggers[0].type === TriggerType.DM;
 
-  if (automation?.data && automation?.data?.triggers.length > 0) {
+  const triggers = automation?.data?.triggers ?? [];
+
+  const shouldShowPostButton = () => {
+    if (triggers.length === 2) return true;
+    if (triggers.length === 1 && triggers[0].type === TriggerType.COMMENT) {
+      return true;
+    }
+    return false;
+  };
+
+  const renderActiveTriggers = () => {
+    if (triggers.length === 0) return null;
+
     return (
-      <div className="flex flex-col gap-y-6 items-center">
+      <>
         <ActiveTrigger
-          type={automation.data.triggers[0].type}
-          keywords={automation.data.keywords}
+          type={triggers[0].type}
+          keywords={automation!.data.keywords}
         />
-        {automation.data.triggers.length > 1 && (
+        {triggers.length > 1 && (
           <>
             <div className="relative w-6/12">
               <p className="absolute transform bg-[#1d1d1d] px-2 -translate-y-1/2 top-1/2 -translate-x-1/2 left-1/2">
@@ -41,28 +57,52 @@ const AutomationTrigger = (props: Props) => {
               />
             </div>
             <ActiveTrigger
-              type={automation.data.triggers[1].type}
-              keywords={automation.data.keywords}
+              type={triggers[1].type}
+              keywords={automation!.data.keywords}
             />
           </>
         )}
-        {!automation.data.listener && <ThenAction id={props.id} />}
+      </>
+    );
+  };
+
+  if (automation?.data && triggers.length > 0) {
+    return (
+      <div className="flex flex-col gap-y-6 items-center">
+        {renderActiveTriggers()}
+        {shouldShowPostButton() ? (
+          <PostButton automationId={id} />
+        ) : (
+          <ThenAction hasDmTriggerOnly={hasDmTriggerOnly} automationId={id} />
+        )}
       </div>
     );
   }
 
   return (
-    <TriggerButton label="Add Trigger">
-      <div className="flex flex-col gap-y-2">
+    <TriggerButton2
+      trigger={
+        <div
+          className="border-2 border-dashed w-full border-purple-500 
+        hover:opacity-80 cursor-pointer 
+        transition duration-100 rounded-xl 
+        flex gap-x-2 justify-center items-center p-5"
+        >
+          <CirclePlus className="text-purple-500" />
+          <p className="text-purple-500 font-bold">Add Trigger</p>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-y-2 w-full">
         {AUTOMATION_TRIGGERS.map((trigger) => (
           <div
             key={trigger.id}
             onClick={() => onSetTrigger(trigger.type)}
             className={cn(
               "hover:opacity-80 text-white rounded-xl flex cursor-pointer flex-col p-3 gap-y-2",
-              !types?.find((t) => t === trigger.type)
+              !types?.includes(trigger.type)
                 ? "bg-muted"
-                : "bg-gradient-to-br from-[#3352cc] font-medium  to-[#1c2d70]"
+                : "bg-[#4F46E5] font-medium"
             )}
           >
             <div className="flex gap-x-2 items-center">
@@ -72,16 +112,15 @@ const AutomationTrigger = (props: Props) => {
             <p className="text-sm font-light">{trigger.description}</p>
           </div>
         ))}
-        <Keywords id={props.id} />
         <Button
           onClick={onSaveTrigger}
           disabled={types?.length === 0}
-          className="bg-gradient-to-br from-[#3352cc] font-medium text-white to-[#1c2d70]"
+          className="bg-[#4F46E5] hover:opacity-80 hover:bg-[#4F46E5] font-medium text-white"
         >
           <Loader state={isPending}>Create Trigger</Loader>
         </Button>
       </div>
-    </TriggerButton>
+    </TriggerButton2>
   );
 };
 

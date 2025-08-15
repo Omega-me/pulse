@@ -2,7 +2,7 @@ import { onBoardUser } from "@/actions/user";
 import Navbar from "@/components/global/navbar";
 import Sidebar from "@/components/global/sidebar";
 import React, { PropsWithChildren } from "react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import {
   dehydrate,
   HydrationBoundary,
@@ -13,6 +13,8 @@ import {
   prefetchUserProfile,
   prefetchAutomations,
 } from "@/react-query/prefetch";
+import { auth, clerkClient } from "@clerk/nextjs/server";
+import LogoutUser from "@/components/global/logout-user";
 
 interface Props extends PropsWithChildren {}
 
@@ -27,8 +29,10 @@ const Layout = async (props: Props) => {
     };
   };
 
-  // TODO: handle this in other ways because when the onBoarduser fails it goes to an infinite loop
-  if (user.status === 500) return redirect("/sign-in");
+  if (user.status === 500) {
+    return <LogoutUser />;
+  }
+
   let userName = `${user.data?.firstname || ""}  ${user.data?.lastname || ""}`;
   if (userName.trim() === "") userName = "Anonymous Ally";
 

@@ -6,7 +6,7 @@ import {
   onCreateAutomation,
   onDeleteAutomation,
   onRemoveListener,
-  onSaveListener2,
+  onSaveListener,
   onToggleActiveListener,
   onUpdateAutomationName,
 } from "@/actions/automation";
@@ -28,7 +28,7 @@ export const useCreateAutomationMutation = () => {
     onCreateAutomation,
     ["user-automations"],
     (data) => {
-      router.push(`/dashboard/automations2/${data.id}`);
+      router.push(`/dashboard/automations/${data.id}`);
     },
     {
       create: true,
@@ -103,7 +103,7 @@ export const useDeleteAutomationMutation = (query?: string) => {
     automationKey,
     () => {
       if (!query) {
-        router.push("/dashboard/automations2");
+        router.push("/dashboard/automations");
       }
     },
     {
@@ -232,7 +232,7 @@ export const useSaveListenerMutation = (
         prompt: string;
         reply: string;
       };
-      return await onSaveListener2(
+      return await onSaveListener(
         automationId,
         listenerType,
         keywords,

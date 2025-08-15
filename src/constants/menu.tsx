@@ -32,7 +32,7 @@ export const SIDEBAR_MENU: SidebarProps[] = [
   },
   {
     id: uuid(),
-    label: "automations2",
+    label: "automations",
     icon: (
       <DuotoneActivity
         accentOpacity={0}

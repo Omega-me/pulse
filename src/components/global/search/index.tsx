@@ -24,8 +24,8 @@ const Search = () => {
 
     const queryString = params.toString();
     const url =
-      page !== "automations2"
-        ? `/dashboard/automations2?${queryString}`
+      page !== "automations"
+        ? `/dashboard/automations?${queryString}`
         : `?${queryString}`;
 
     router.push(url);
