@@ -19,13 +19,18 @@ model User {
   email     String   @unique
   firstname String?
   lastname  String?
+  phone     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   metadata  Json?
 
   subscription Subscription?
-  automations  Automations[]
-  integrations Integrations[]
+  automations  Automation[]
+  integrations Integration[]
+  stats        Stat[]
+  Order        Order[]
+
+  @@map("users")
 }
 
 model Subscription {
@@ -36,42 +41,49 @@ model Subscription {
   customerId String?          @unique
   metadata   Json?
 
-  User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique @db.Uuid
+
+  @@map("subscriptions")
 }
 
-model Integrations {
+model Integration {
   id            String          @id @default(uuid()) @db.Uuid
   name          IntegrationType @default(INSTAGRAM)
   token         String          @unique
-  integrationId String?         @unique // TODO: display a message to the user if id exists when creating an integration
+  integrationId String?         @unique
   expiresAt     DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @default(now())
   metadata      Json?
 
-  User   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
 
-  Product Product[]
+  products Product[]
+
+  @@map("integrations")
 }
 
-model Automations {
+model Automation {
   id        String   @id @default(uuid()) @db.Uuid
   name      String   @default("Untitled")
   active    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  metadata  Json?
 
-  User     User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String @db.Uuid
-  metadata Json?
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
 
-  triggers Trigger[]
-  listener Listener[]
-  posts    Post[]
-  keywords Keyword[]
-  dms      Dms[]
+  triggers  Trigger[]
+  listeners Listener[]
+  posts     Post[]
+  keywords  Keyword[]
+  dms       Dm[]
+  stats     Stat[]
+
+  @@map("automations")
 }
 
 model Trigger {
@@ -81,8 +93,10 @@ model Trigger {
   updatedAt DateTime    @default(now())
   metadata  Json?
 
-  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
-  automationId String?      @db.Uuid
+  automation   Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId String     @db.Uuid
+
+  @@map("triggers")
 }
 
 model Keyword {
@@ -93,15 +107,17 @@ model Keyword {
   userId    String
   metadata  Json?
 
-  automationId String?      @db.Uuid
-  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId String?     @db.Uuid
+  automation   Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
 
   listenerId String?   @db.Uuid
-  Listener   Listener? @relation(fields: [listenerId], references: [id], onDelete: Cascade)
+  listener   Listener? @relation(fields: [listenerId], references: [id], onDelete: Cascade)
 
-  Dms Dms[]
+  dms   Dm[]
+  stats Stat[]
 
   @@unique([automationId, word])
+  @@map("keywords")
 }
 
 model Listener {
@@ -117,29 +133,34 @@ model Listener {
   priority     Int
   metadata     Json?
 
-  automationId String?      @db.Uuid
-  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId String?     @db.Uuid
+  automation   Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
 
-  Keywords Keyword[]
+  keywords Keyword[]
+  stats    Stat[]
+
+  @@map("listeners")
 }
 
-model Dms {
-  id       String  @id @default(uuid()) @db.Uuid
-  senderId String?
-  reciever String?
-  message  String?
-
+model Dm {
+  id          String   @id @default(uuid()) @db.Uuid
+  senderId    String?
+  reciever    String?
+  message     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
   system_dm   Boolean
   usedSmartAI Boolean
   metadata    Json?
 
-  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
-  automationId String?      @db.Uuid
+  automationId String?     @db.Uuid
+  automation   Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
 
-  Keyword   Keyword? @relation(fields: [keywordId], references: [id], onDelete: Cascade)
   keywordId String?  @db.Uuid
+  keyword   Keyword? @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  Order     Order[]
+
+  @@map("dms")
 }
 
 model Post {
@@ -153,36 +174,110 @@ model Post {
   updatedAt DateTime  @default(now())
   metadata  Json?
 
-  Automation   Automations? @relation(fields: [automationId], references: [id], onDelete: Cascade)
-  automationId String?      @db.Uuid
+  automationId String?     @db.Uuid
+  automation   Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+
+  stats Stat[]
+
+  @@map("posts")
 }
 
 model Product {
   id          String        @id @default(uuid()) @db.Uuid
   source      ProductSource
-  externalId  String? // ID from Shopify or WooCommerce
+  externalId  String?
   title       String
   description String?
   price       Float?
-  discount    Float?        @default(0.0) // Percentage discount
+  discount    Float?        @default(0.0)
   currency    String?       @default("EUR")
   imageUrl    String?
-  productUrl  String? // Link to Shopify/WooCommerce product
+  productUrl  String?
   sku         String?
-  units       Int?          @default(1) // Number of units available
+  units       Int?          @default(1)
   available   Boolean       @default(true)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   metadata    Json?
 
-  // Source references
-  integrationId String?       @db.Uuid
-  Integration   Integrations? @relation(fields: [integrationId], references: [id])
+  integrationId String?      @db.Uuid
+  integration   Integration? @relation(fields: [integrationId], references: [id])
+  OrderItem     OrderItem[]
+
+  @@map("products")
 }
 
-// TODO: Orders table
-// TODO: Stats table
-// TODO: fix table names, singular and plural
+model Order {
+  id          String      @id @default(uuid()) @db.Uuid
+  userId      String      @db.Uuid
+  dmId        String?     @db.Uuid
+  totalAmount Float       @default(0.0) // Total price of the order
+  currency    String      @default("EUR")
+  status      OrderStatus @default(PENDING)
+  metadata    Json? // Optional for custom info like discounts, delivery notes
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderType   OrderType   @default(SMART_AI)
+
+  // Relations
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  Stat       Stat[]
+  dm         Dm?         @relation(fields: [dmId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(uuid()) @db.Uuid
+  orderId   String @db.Uuid
+  productId String @db.Uuid
+  quantity  Int    @default(1)
+  price     Float // Price per unit at the time of purchase
+  discount  Float? @default(0.0) // Percentage or fixed discount
+  metadata  Json?
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Stat {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @db.Uuid
+  automationId  String?  @db.Uuid
+  listenerId    String?  @db.Uuid
+  keywordId     String?  @db.Uuid
+  postId        String?  @db.Uuid
+  orderId       String?  @db.Uuid
+  date          DateTime // Day only, truncate time
+  keywordHits   Int      @default(0)
+  triggersCount Int      @default(0)
+  ordersCount   Int      @default(0)
+  metadata      Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keyword    Keyword?    @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  listener   Listener?   @relation(fields: [listenerId], references: [id], onDelete: Cascade)
+  post       Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  automation Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  order      Order?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, automationId, listenerId, keywordId, postId, date])
+  @@index([date])
+  @@index([userId, date])
+  @@index([automationId, date])
+  @@map("stats")
+}
 
 enum ProductSource {
   SHOPIFY
@@ -222,4 +317,18 @@ enum ListenerType {
 enum TriggerType {
   COMMENT
   DM
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum OrderType {
+  ONLINE
+  IN_STORE
+  SMART_AI
 }

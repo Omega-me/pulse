@@ -5,7 +5,7 @@ export const matchKeywordFromDm = async (keyword: string) => {
   const keywordFilter = {
     word: { equals: keyword.trim(), mode: "insensitive" as const },
   };
-  const automation = await client.automations.findFirst({
+  const automation = await client.automation.findFirst({
     where: {
       keywords: {
         some: keywordFilter,
@@ -20,9 +20,9 @@ export const matchKeywordFromDm = async (keyword: string) => {
       keywords: {
         where: keywordFilter,
       },
-      listener: {
+      listeners: {
         where: {
-          Keywords: {
+          keywords: {
             some: keywordFilter,
           },
         },
@@ -33,13 +33,13 @@ export const matchKeywordFromDm = async (keyword: string) => {
   const results = {
     automation,
     keyword: automation?.keywords[0],
-    listener: automation?.listener[0],
+    listener: automation?.listeners[0],
   };
 
   if (
     automation &&
     automation.keywords.length > 0 &&
-    automation.listener.length > 0
+    automation.listeners.length > 0
   ) {
     return results;
   }
@@ -54,7 +54,7 @@ export const matchKeywordFromComment = async (
   const keywordFilter = {
     word: { equals: keyword.trim(), mode: "insensitive" as const },
   };
-  const automation = await client.automations.findFirst({
+  const automation = await client.automation.findFirst({
     where: {
       posts: {
         some: { postid },
@@ -67,9 +67,9 @@ export const matchKeywordFromComment = async (
       keywords: {
         where: keywordFilter,
       },
-      listener: {
+      listeners: {
         where: {
-          Keywords: {
+          keywords: {
             some: keywordFilter,
           },
         },
@@ -80,13 +80,13 @@ export const matchKeywordFromComment = async (
   const results = {
     automation,
     keyword: automation?.keywords[0],
-    listener: automation?.listener[0],
+    listener: automation?.listeners[0],
   };
 
   if (
     automation &&
     automation.keywords.length > 0 &&
-    automation.listener.length > 0
+    automation.listeners.length > 0
   ) {
     return results;
   }
@@ -99,7 +99,7 @@ export const getKeywordAutomation = async (listenerId: string) => {
   const listener = await client.listener.findUnique({
     where: { id: listenerId },
     include: {
-      Automation: {
+      automation: {
         select: {
           id: true,
         },
@@ -110,12 +110,12 @@ export const getKeywordAutomation = async (listenerId: string) => {
   if (!listener) return null; // no listener found
 
   // Step 2: Fetch automation using automationId
-  const automation = await client.automations.findUnique({
+  const automation = await client.automation.findUnique({
     where: { id: listener.automationId },
     include: {
       dms: true,
       triggers: true,
-      User: {
+      user: {
         select: {
           subscription: { select: { plan: true } },
           integrations: true,
@@ -164,7 +164,7 @@ export const createChatHistory = (opts: {
   usedSmartAI: boolean;
   keywordId?: string;
 }) => {
-  return client.automations.update({
+  return client.automation.update({
     where: {
       id: opts.automationId,
     },
@@ -185,7 +185,7 @@ export const createChatHistory = (opts: {
 
 export const getChatHistory = async (senderId: string, receiverId: string) => {
   // Fetch recent messages based on the condition
-  const recentMessages = await client.dms.findMany({
+  const recentMessages = await client.dm.findMany({
     where: {
       senderId,
       reciever: receiverId,
@@ -219,7 +219,7 @@ export const getChatHistory = async (senderId: string, receiverId: string) => {
   // get listener
   const listener = await client.listener.findFirst({
     where: {
-      Keywords: {
+      keywords: {
         some: {
           id: lastKeywordId,
         },
@@ -242,9 +242,9 @@ export const getKeywordPost = async (automationId: string, postId: string) => {
       AND: [{ postid: postId }, { automationId }],
     },
     include: {
-      Automation: {
+      automation: {
         include: {
-          listener: {
+          listeners: {
             where: {
               automationId,
             },

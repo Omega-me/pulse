@@ -127,11 +127,11 @@ async function handleKeywordMatched(
   }
 
   const instagramToken = findIntegration(
-    automation.User?.integrations,
+    automation.user?.integrations,
     IntegrationType.INSTAGRAM
   )?.token;
   const facebookToken = findIntegration(
-    automation.User?.integrations,
+    automation.user?.integrations,
     IntegrationType.FACEBOOK
   )?.token;
 
@@ -142,7 +142,7 @@ async function handleKeywordMatched(
   const prompt = listener?.prompt;
   const triggers = automation.triggers.map((t) => t.type);
   const commentReply = listener?.commentReply;
-  const isPro = automation.User.subscription?.plan === SubscriptionPlan.PRO;
+  const isPro = automation.user.subscription?.plan === SubscriptionPlan.PRO;
 
   if (source === TriggerType.COMMENT) {
     const postCheck = await getKeywordPost(
@@ -246,7 +246,7 @@ async function handleFallback(
     return jsonResponse("Invalid or inactive automation");
 
   const instagramIntegration = findIntegration(
-    automation.User?.integrations,
+    automation.user?.integrations,
     IntegrationType.INSTAGRAM
   );
   if (!instagramIntegration) {
@@ -255,7 +255,7 @@ async function handleFallback(
   const { token } = instagramIntegration;
   if (!token) return jsonResponse("Missing Instagram token");
 
-  const isPro = automation.User.subscription?.plan === SubscriptionPlan.PRO;
+  const isPro = automation.user.subscription?.plan === SubscriptionPlan.PRO;
   if (!isPro) return jsonResponse("User is not a pro member");
 
   const aiMessage = await onGenerateSmartAiMessage(history.chatHistory, text);

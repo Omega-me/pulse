@@ -1,4 +1,5 @@
 import { client } from "@/lib/prisma.lib";
+import { SubscriptionPlan } from "@prisma/client";
 
 export const findUser = async (clerkId: string) => {
   return await client.user.findUnique({
@@ -43,7 +44,7 @@ export const createUser = async (data: {
 
 export const updateSubscription = async (
   clerkId: string,
-  props: { customerId?: string; plan?: "PRO" | "FREE" }
+  props: { customerId?: string; plan?: SubscriptionPlan }
 ) => {
   return await client.user.update({
     where: {

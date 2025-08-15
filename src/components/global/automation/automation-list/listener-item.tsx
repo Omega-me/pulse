@@ -1,5 +1,5 @@
 import {
-  Automations,
+  Automation,
   Keyword,
   Listener,
   ListenerType,
@@ -26,7 +26,7 @@ import TriggerButton from "../trigger-button";
 
 interface Props {
   listener: Listener;
-  automation: Automations & { keywords: Keyword[]; triggers: Trigger[] };
+  automation: Automation & { keywords: Keyword[]; triggers: Trigger[] };
   onDelete: () => void;
   showHandle: boolean;
 }

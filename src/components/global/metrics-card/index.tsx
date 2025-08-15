@@ -2,15 +2,9 @@
 import React from "react";
 
 const MetricsCard = () => {
-  // TODO: fix the analytics
+  // TODO: Add stats and analytics
   const comments = 20;
   const dms = 30;
-  // const comments = automations?.data.reduce((current, next) => {
-  //   return current + next?.listener?.[0].commentCount!;
-  // }, 0);
-  // const dms = automations?.data.reduce((current, next) => {
-  //   return current + next?.listener?.[0].dmCount!;
-  // }, 0);
 
   return (
     <div className="flex flex-col md:flex-row h-full gap-5">

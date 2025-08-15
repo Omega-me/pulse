@@ -1,5 +1,5 @@
 import useTouch from "@/hooks/use-touch";
-import { Automations, Keyword, Trigger, TriggerType } from "@prisma/client";
+import { Automation, Keyword, Trigger, TriggerType } from "@prisma/client";
 import moment from "moment";
 import { FaInstagram } from "react-icons/fa";
 import AppTooltip from "../../app-tooltip";
@@ -9,7 +9,7 @@ import { SendHorizontal } from "lucide-react";
 import AutomationActionButtons from "./automation-action-buttons";
 
 interface Props {
-  automation: Automations & { keywords: Keyword[]; triggers: Trigger[] };
+  automation: Automation & { keywords: Keyword[]; triggers: Trigger[] };
   onDelete: () => void;
   onNavigate: () => void;
 }
