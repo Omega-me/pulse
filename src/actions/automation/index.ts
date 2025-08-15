@@ -56,11 +56,25 @@ export const onCreateAutomation = async () => {
   const user = await onCurrentUser();
   const userInfo = await findUser(user.id);
   return handleRequest(
-    () => createAutomation(userInfo.id),
-    (create) =>
-      create
-        ? { status: 201, data: "Automation created", id: create.id }
-        : { status: 400, data: "Oops! Could not create automation" }
+    async () => {
+      const instagramIntegration = findIntegration(
+        userInfo.integrations,
+        IntegrationType.INSTAGRAM
+      );
+      if (!instagramIntegration || !instagramIntegration.token) {
+        return { status: 403, data: "Instagram integration token not found" };
+      }
+      return await createAutomation(userInfo.id);
+    },
+    (create) => {
+      if (typeof create === "object" && create !== null && "id" in create) {
+        return create
+          ? { status: 201, data: "Automation created", id: create.id }
+          : { status: 400, data: "Oops! Could not create automation" };
+      } else {
+        return create;
+      }
+    }
   );
 };
 
@@ -334,7 +348,7 @@ export const onMarkUsedPosts = async (
   >();
 
   conflictingPosts.forEach((post) => {
-    const matchedKeywords = post.Automation.keywords
+    const matchedKeywords = post.automation.keywords
       .map((k) => k.word.toLowerCase())
       .filter((k) => keywords.includes(k));
 

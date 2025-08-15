@@ -118,7 +118,7 @@ const ThenAction = (props: Props) => {
             {!props.hasDmTriggerOnly && (
               <Input
                 disabled={!facebookIntegration}
-                {...register("reply")}
+                {...register("reply", { required: false })}
                 placeholder={
                   facebookIntegration
                     ? "Add comment reply (Optional)"
@@ -127,7 +127,10 @@ const ThenAction = (props: Props) => {
                 className="bg-muted outline-none border-none ring-0 focus:ring-0 !ring-[#4F46E5]"
               />
             )}
-            <Button className="w-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 rounded-md font-medium text-white">
+            <Button
+              type="submit"
+              className="w-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 rounded-md font-medium text-white"
+            >
               <Loader state={isPending}>
                 <Save />
               </Loader>

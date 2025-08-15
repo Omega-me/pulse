@@ -22,7 +22,7 @@ export const getAllAutomations = async (clerkId: string, query?: string) => {
         orderBy: { createdAt: "desc" },
         include: {
           keywords: true,
-          listener: true,
+          listeners: true,
           triggers: true,
         },
       },
@@ -33,20 +33,20 @@ export const getAllAutomations = async (clerkId: string, query?: string) => {
 };
 
 export const createAutomation = async (userId: string) => {
-  return await client.automations.create({
+  return await client.automation.create({
     data: { userId },
   });
 };
 
 export const findAutomation = async (id: string) => {
-  const found = await client.automations.findUnique({
+  const found = await client.automation.findUnique({
     where: { id },
     include: {
       keywords: true,
       triggers: true,
-      listener: true,
+      listeners: true,
       posts: true,
-      User: {
+      user: {
         select: {
           subscription: true,
           integrations: true,
@@ -67,7 +67,7 @@ export const updateAutomation = async (
   const automation = await findAutomation(id);
   if (!automation) return false;
 
-  await client.automations.update({
+  await client.automation.update({
     where: { id },
     data: {
       name: data.name,
@@ -88,7 +88,7 @@ export const deleteAutomation = async (id: string) => {
     await deleteUploadedFiles(urls);
   }
 
-  await client.automations.delete({
+  await client.automation.delete({
     where: { id },
   });
 
@@ -115,10 +115,10 @@ export const addListener = async (
     const nextPriority = (latest?.priority ?? -1) + 1;
 
     // 2. Create the new listener with connected keywords
-    const updatedAutomation = await tx.automations.update({
+    const updatedAutomation = await tx.automation.update({
       where: { id: automationId },
       data: {
-        listener: {
+        listeners: {
           create: {
             listener,
             prompt,
@@ -126,7 +126,7 @@ export const addListener = async (
             commentCount: 0,
             dmCount: 0,
             priority: nextPriority,
-            Keywords: {
+            keywords: {
               connect: keywordIds.map((id) => ({ id })),
             },
           },
@@ -152,10 +152,10 @@ export const changeListenerPriority = async (
     return false;
   }
 
-  const changed = await client.automations.update({
+  const changed = await client.automation.update({
     where: { id: automationId },
     data: {
-      listener: {
+      listeners: {
         update: [
           {
             where: { id: activeListenerId },
@@ -237,7 +237,7 @@ export const addTrigger = async (
           create: { type: trigger[0] },
         };
 
-  const saved = await client.automations.update({
+  const saved = await client.automation.update({
     where: { id: automationId },
     data: {
       triggers: createData,
@@ -263,7 +263,7 @@ export const addKeyword = async (
   listenerId?: string
 ) => {
   const trimmedKeyword = keyword.trim();
-  const created = await client.automations.update({
+  const created = await client.automation.update({
     where: { id: automationId },
     data: {
       keywords: {
@@ -294,7 +294,7 @@ export const getConflictingPosts = async (
     where: {
       automationId: { not: automationId },
       postid: { in: instagramPostIds },
-      Automation: {
+      automation: {
         keywords: {
           some: {
             word: {
@@ -309,7 +309,7 @@ export const getConflictingPosts = async (
       postid: true,
       automationId: true,
       media: true,
-      Automation: {
+      automation: {
         select: {
           keywords: {
             select: { word: true },

@@ -11,7 +11,7 @@ import {
 
 const promptSchema = z.object({
   prompt: z.string().min(1),
-  reply: z.string(),
+  reply: z.string().optional(),
 });
 
 const useListener = (

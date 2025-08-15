@@ -73,7 +73,7 @@ const useAutomations = () => {
     if (!id) return;
     const selected = automationsData.find((a) => a.id === id);
     setListeners(
-      selected?.listener.sort((a, b) => b.priority - a.priority) || []
+      selected?.listeners.sort((a, b) => b.priority - a.priority) || []
     );
   };
 

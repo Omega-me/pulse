@@ -1,3 +1,4 @@
+import { ListenerType, TriggerType } from "@prisma/client";
 import { MessageCircle, SendHorizontal, Sparkles } from "lucide-react";
 import { JSX } from "react";
 import { v4 as uuid } from "uuid";
@@ -7,7 +8,7 @@ export interface AutomationListenerProps {
   label: string;
   icon: JSX.Element;
   description: string;
-  type: "SMARTAI" | "MESSAGE";
+  type: ListenerType;
 }
 
 export interface AutomationTriggerProps {
@@ -15,7 +16,7 @@ export interface AutomationTriggerProps {
   label: string;
   icon: JSX.Element;
   description: string;
-  type: "COMMENT" | "DM";
+  type: TriggerType;
 }
 
 export const AUTOMATION_LISTENER: AutomationListenerProps[] = [
@@ -24,14 +25,14 @@ export const AUTOMATION_LISTENER: AutomationListenerProps[] = [
     label: "Send the user a message",
     icon: <SendHorizontal />,
     description: "Enter the message that you want to sent the user.",
-    type: "MESSAGE",
+    type: ListenerType.MESSAGE,
   },
   {
     id: uuid(),
     label: "Let Smart AI take over",
     icon: <Sparkles />,
     description: "Tell AI about your project. (Upgrade to use this feature)",
-    type: "SMARTAI",
+    type: ListenerType.SMARTAI,
   },
 ];
 
@@ -41,13 +42,13 @@ export const AUTOMATION_TRIGGERS: AutomationTriggerProps[] = [
     label: "User comments on my post",
     description: "Select if you want to automate comments in you post",
     icon: <MessageCircle />,
-    type: "COMMENT",
+    type: TriggerType.COMMENT,
   },
   {
     id: uuid(),
     label: "User sends me a dm with a keyword",
     description: "Select if you want to automate DMs in your profile",
     icon: <SendHorizontal />,
-    type: "DM",
+    type: TriggerType.DM,
   },
 ];

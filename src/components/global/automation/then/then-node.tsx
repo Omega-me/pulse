@@ -11,7 +11,7 @@ interface Props {
 const ThenNode = (props: Props) => {
   const { data: automation } = useAutomationQuery(props.automationId);
 
-  return automation?.data?.listener.length === 0 ? (
+  return automation?.data?.listeners.length === 0 ? (
     <></>
   ) : (
     <div className="w-full flex flex-col items-center gap-y-2">
@@ -22,7 +22,7 @@ const ThenNode = (props: Props) => {
       </div>
       <ListenerCarousel
         automationId={props.automationId}
-        listeners={automation?.data?.listener.sort(
+        listeners={automation?.data?.listeners.sort(
           (a, b) => b.priority - a.priority
         )}
         keywords={automation?.data?.keywords}

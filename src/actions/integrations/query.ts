@@ -10,7 +10,7 @@ export const updateIntegration = async (
   expiresAt: Date,
   id: string
 ) => {
-  return await client.integrations.update({
+  return await client.integration.update({
     where: { id },
     data: {
       token,
@@ -46,7 +46,7 @@ export const getFacebookIntegration = async (clerkId: string) => {
 };
 
 export const removeIntegration = async (id: string) => {
-  return await client.integrations.delete({
+  return await client.integration.delete({
     where: { id },
   });
 };
@@ -65,7 +65,7 @@ export const updateFacebookAdAccounts = async (
     facebookAdAccounts: adAccounts,
   };
 
-  return await client.integrations.update({
+  return await client.integration.update({
     where: { id: integration.id },
     data: {
       metadata: updatedMetadata as unknown as Prisma.JsonObject,

@@ -6,7 +6,7 @@ import {
 } from "@/hooks/use-queries";
 import React from "react";
 import { InstagrPostProps } from "@/types/posts.type";
-import { CircleCheck, CirclePlus, LockKeyhole } from "lucide-react";
+import { CircleCheck, CirclePlus, LockKeyhole, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Loader from "../../loader";
 import AppTooltip from "../../app-tooltip";
@@ -73,11 +73,19 @@ const PostButton = (props: Props) => {
                 }
               )}
             >
-              <CirclePlus
-                className={cn("text-purple-500", {
-                  "text-gray-500": props.isOnSelectedPosts,
-                })}
-              />
+              {props.isOnSelectedPosts ? (
+                <CirclePlus
+                  className={cn("text-purple-500", {
+                    "text-gray-500": props.isOnSelectedPosts,
+                  })}
+                />
+              ) : (
+                <Paperclip
+                  className={cn("text-purple-500", {
+                    "text-gray-500": props.isOnSelectedPosts,
+                  })}
+                />
+              )}
               {props.isOnSelectedPosts ? null : (
                 <p className="text-purple-500 font-bold">Attach posts</p>
               )}
@@ -209,7 +217,10 @@ const PostButton = (props: Props) => {
                 disabled={posts.length === 0}
                 className="bgw-full bg-[#4F46E5] hover:bg-[#4F46E5] hover:opacity-80 text-white"
               >
-                <Loader state={isSavingPosts}>Attach Post</Loader>
+                <Loader state={isSavingPosts}>
+                  <Paperclip />
+                </Loader>
+                Attach posts
               </Button>
             </div>
           ) : (

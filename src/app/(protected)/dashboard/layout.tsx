@@ -33,7 +33,9 @@ const Layout = async (props: Props) => {
     return <LogoutUser />;
   }
 
-  let userName = `${user.data?.firstname || ""}  ${user.data?.lastname || ""}`;
+  let userName = `${user.data?.firstname.trim() || ""}  ${
+    user.data?.lastname.trim() || ""
+  }`;
   if (userName.trim() === "") userName = "Anonymous Ally";
 
   // prefetch data

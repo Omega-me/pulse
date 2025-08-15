@@ -11,7 +11,7 @@ import Loader from "../../loader";
 import PostButton from "../post";
 import { TriggerType } from "@prisma/client";
 import TriggerButton2 from "../trigger-button";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, Save } from "lucide-react";
 import ActiveTrigger from "./active-trigger";
 import ThenAction from "../then/then-action";
 
@@ -117,7 +117,10 @@ const AutomationTrigger = ({ id }: Props) => {
           disabled={types?.length === 0}
           className="bg-[#4F46E5] hover:opacity-80 hover:bg-[#4F46E5] font-medium text-white"
         >
-          <Loader state={isPending}>Create Trigger</Loader>
+          <Loader state={isPending}>
+            <Save />
+          </Loader>
+          <p>Create trigger</p>
         </Button>
       </div>
     </TriggerButton2>

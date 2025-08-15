@@ -37,7 +37,11 @@ const Aside = () => {
       )}
       <SideCard
         title="Automations"
-        description="Start by automating a post or an ad"
+        description={
+          facebookIntegration && adAccounts.length > 0
+            ? "Start by automating a post or an ad"
+            : "Start by automating a post"
+        }
         actionBtn={
           <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-center gap-3">
             <CreateAutomation className="w-full" />
