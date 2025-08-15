@@ -1,72 +1,130 @@
 import { client } from "@/lib/prisma.lib";
 import { TriggerType } from "@prisma/client";
 
-export const matchKeyword = async (keyword: string, postid?: string) => {
-  if (!postid) {
-    return null;
-  }
-
-  const post = await client.post.findFirst({
+export const matchKeywordFromDm = async (keyword: string) => {
+  const keywordFilter = {
+    word: { equals: keyword.trim(), mode: "insensitive" as const },
+  };
+  const automation = await client.automations.findFirst({
     where: {
-      postid,
+      keywords: {
+        some: keywordFilter,
+      },
+      triggers: {
+        some: {
+          type: TriggerType.DM,
+        },
+      },
     },
     include: {
-      Automation: {
+      keywords: {
+        where: keywordFilter,
+      },
+      listener: {
         where: {
-          keywords: {
-            some: {
-              word: {
-                equals: keyword.trim(),
-                mode: "insensitive",
-              },
-            },
+          Keywords: {
+            some: keywordFilter,
           },
-        },
-        select: {
-          id: true,
-          keywords: true,
         },
       },
     },
   });
 
-  if (post && post.Automation) {
-    const matchedKeyword = post?.Automation?.keywords.find(
-      (k) => k.word === keyword.trim()
-    );
+  const results = {
+    automation,
+    keyword: automation?.keywords[0],
+    listener: automation?.listener[0],
+  };
 
-    return {
-      automation: post.Automation,
-      keyword: matchedKeyword,
-    };
+  if (
+    automation &&
+    automation.keywords.length > 0 &&
+    automation.listener.length > 0
+  ) {
+    return results;
   }
 
   return null;
 };
 
-export const getKeywordAutomation = async (automationId: string) => {
-  const automation = await client.automations.findUnique({
+export const matchKeywordFromComment = async (
+  postid: string,
+  keyword: string
+) => {
+  const keywordFilter = {
+    word: { equals: keyword.trim(), mode: "insensitive" as const },
+  };
+  const automation = await client.automations.findFirst({
     where: {
-      id: automationId,
+      posts: {
+        some: { postid },
+      },
+      keywords: {
+        some: keywordFilter,
+      },
     },
+    include: {
+      keywords: {
+        where: keywordFilter,
+      },
+      listener: {
+        where: {
+          Keywords: {
+            some: keywordFilter,
+          },
+        },
+      },
+    },
+  });
+
+  const results = {
+    automation,
+    keyword: automation?.keywords[0],
+    listener: automation?.listener[0],
+  };
+
+  if (
+    automation &&
+    automation.keywords.length > 0 &&
+    automation.listener.length > 0
+  ) {
+    return results;
+  }
+
+  return null;
+};
+
+export const getKeywordAutomation = async (listenerId: string) => {
+  // Step 1: Fetch listener with its automationId
+  const listener = await client.listener.findUnique({
+    where: { id: listenerId },
+    include: {
+      Automation: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  if (!listener) return null; // no listener found
+
+  // Step 2: Fetch automation using automationId
+  const automation = await client.automations.findUnique({
+    where: { id: listener.automationId },
     include: {
       dms: true,
       triggers: true,
-      listener: true,
       User: {
         select: {
-          subscription: {
-            select: {
-              plan: true,
-            },
-          },
+          subscription: { select: { plan: true } },
           integrations: true,
         },
       },
     },
   });
 
-  return automation;
+  return { ...automation, listener };
 };
 
 export const trackResponses = async (listenerId: string, type: TriggerType) => {
@@ -158,10 +216,22 @@ export const getChatHistory = async (senderId: string, receiverId: string) => {
   // If no keyword found, return null
   if (!keyword) return null;
 
+  // get listener
+  const listener = await client.listener.findFirst({
+    where: {
+      Keywords: {
+        some: {
+          id: lastKeywordId,
+        },
+      },
+    },
+  });
+
   // Return the keyword, its automationId, and the recent chat history
   return {
     keyword,
-    automationId: keyword.automationId,
+    automationId: keyword?.automationId,
+    listenerId: listener?.id,
     chatHistory: recentMessages,
   };
 };

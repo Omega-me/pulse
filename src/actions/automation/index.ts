@@ -231,11 +231,61 @@ export const onSaveKeyword = async (
 ) => {
   const user = await onCurrentUser();
   return handleRequest(
-    () => addKeyword(user.id, automationId, keyword, listenerId),
-    (created) =>
-      created
-        ? { status: 200, data: "Keyword added successfully" }
-        : { status: 400, data: "Oops! Could not add this keyword" }
+    async () => {
+      // get all users automations
+      const automations = await onGetAllAutomations();
+
+      if (automations.data.filter((a) => a.id === automationId).length > 0) {
+        const currentAutomation = automations.data.find(
+          (a) => a.id === automationId
+        );
+
+        // 1. checks if keyword exists in current automation
+        if (
+          currentAutomation.keywords.some(
+            (k) => k.word.toLowerCase() === keyword.toLowerCase().trim()
+          )
+        ) {
+          return {
+            status: 400,
+            data: `Keyword already exists in this automation`,
+          };
+        }
+
+        // 3. checks if keyword exists in other automations for DM triggers
+        const dmtrigger = currentAutomation.triggers.find(
+          (t) => t.type === TriggerType.DM
+        );
+        if (!!dmtrigger) {
+          // get all user automations and check for keyword duplication
+          const allDmAutomations = automations.data.filter((a) =>
+            a.triggers.some((t) => t.type === TriggerType.DM)
+          );
+          const allKeywords = allDmAutomations.flatMap((a) => a.keywords);
+
+          if (
+            allKeywords.some(
+              (k) => k.word.toLowerCase() === keyword.toLowerCase().trim()
+            )
+          ) {
+            return {
+              status: 400,
+              data: "Keyword used in another direct message automation",
+            };
+          }
+        }
+      }
+      return addKeyword(user.id, automationId, keyword, listenerId);
+    },
+    (created) => {
+      if (typeof created === "boolean") {
+        return created
+          ? { status: 200, data: "Keyword added successfully" }
+          : { status: 404, data: "Oops! Could not add this keyword" };
+      } else {
+        return created;
+      }
+    }
   );
 };
 
