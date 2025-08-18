@@ -9,6 +9,7 @@ import NodeTitle from "../node/node-title";
 import {
   CircleAlert,
   Ellipsis,
+  Eye,
   MessageCircleHeart,
   SendHorizontal,
   Sparkles,
@@ -23,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import Loader from "../../loader";
 import { cn } from "@/lib/utils";
 import TriggerButton from "../trigger-button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Props {
   listener: Listener;
@@ -157,26 +159,55 @@ const ListenerItem = ({
       {/* Main content area */}
       <div className="space-y-2">
         {/* DM Response */}
-        <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
+        <div className="group/response flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
           <div className="flex-1 min-w-0">
-            <NodeTitle
-              title={
-                listener.listener === ListenerType.SMARTAI
-                  ? "AI Prompt"
-                  : "DM Response"
-              }
-              icon={
-                listener.listener === ListenerType.SMARTAI ? (
-                  <Sparkles size={14} />
-                ) : (
-                  <SendHorizontal size={14} />
-                )
-              }
-              className={cn("text-[10px] sm:text-[11px] font-medium mb-0.5", {
-                "text-purple-500": listener.listener === ListenerType.SMARTAI,
-                "text-blue-400": listener.listener === ListenerType.MESSAGE,
-              })}
-            />
+            <div className="flex justify-between items-center">
+              <NodeTitle
+                title={
+                  listener.listener === ListenerType.SMARTAI
+                    ? "AI Prompt"
+                    : "DM Response"
+                }
+                icon={
+                  listener.listener === ListenerType.SMARTAI ? (
+                    <Sparkles size={14} />
+                  ) : (
+                    <SendHorizontal size={14} />
+                  )
+                }
+                className={cn("text-[10px] sm:text-[11px] font-medium mb-0.5", {
+                  "text-purple-500": listener.listener === ListenerType.SMARTAI,
+                  "text-blue-400": listener.listener === ListenerType.MESSAGE,
+                })}
+              />
+              <TriggerButton
+                title={
+                  listener.listener === ListenerType.SMARTAI
+                    ? "View AI Prompt"
+                    : "View DM Response"
+                }
+                trigger={
+                  <Eye
+                    className={cn(
+                      "cursor-pointer opacity-0 group-hover/response:opacity-100",
+                      {
+                        "text-purple-500":
+                          listener.listener === ListenerType.SMARTAI,
+                        "text-blue-400":
+                          listener.listener === ListenerType.MESSAGE,
+                      }
+                    )}
+                    size={14}
+                  />
+                }
+              >
+                <ScrollArea className="h-[400px]">
+                  <div className="bg-[#191919] rounded-md p-3 w-full mt-3">
+                    {listener.prompt}
+                  </div>
+                </ScrollArea>
+              </TriggerButton>
+            </div>
             <p className="text-xs sm:text-sm text-gray-400 leading-snug line-clamp-3">
               {listener.prompt}
             </p>
@@ -185,13 +216,28 @@ const ListenerItem = ({
 
         {/* Comment Reply */}
         {listener.commentReply && (
-          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
+          <div className="group/comment flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-[#0f0f0f]/30 rounded-md border border-muted-foreground/10">
             <div className="flex-1 min-w-0">
-              <NodeTitle
-                title="Comment Reply"
-                icon={<MessageCircleHeart size={14} />}
-                className="text-[10px] sm:text-[11px] text-pink-400 font-medium mb-0.5"
-              />
+              <div className="flex justify-between items-center">
+                <NodeTitle
+                  title="Comment Reply"
+                  icon={<MessageCircleHeart size={14} />}
+                  className="text-[10px] sm:text-[11px] text-pink-400 font-medium mb-0.5"
+                />
+                <TriggerButton
+                  title="View Comment reply"
+                  trigger={
+                    <Eye
+                      className="cursor-pointer opacity-0 group-hover/comment:opacity-100 text-pink-400"
+                      size={14}
+                    />
+                  }
+                >
+                  <div className="bg-[#191919] rounded-md p-3 w-full mt-3">
+                    {listener.commentReply}
+                  </div>
+                </TriggerButton>
+              </div>
               <p className="text-xs sm:text-sm text-gray-400 leading-snug line-clamp-3">
                 {listener.commentReply || "No comment reply set"}
               </p>
@@ -220,44 +266,47 @@ const ListenerItem = ({
             </div>
           ))}
 
-          <TriggerButton
-            trigger={
-              <div className="flex items-center justify-center rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500 hover:bg-gray-500/30 cursor-pointer text-[10px] sm:text-[11px] font-medium">
-                <span className="text-gray-300 ">
-                  {keywords.length <= 3 ? (
-                    <Ellipsis size={10} className="text-gray-300 sm:size-3" />
-                  ) : (
-                    <span className="flex items-center gap-x-1">
-                      <span>+{keywords.length - 3}</span>
-                      <Ellipsis size={10} className="text-gray-300 sm:size-3" />
-                    </span>
-                  )}
-                </span>
-              </div>
-            }
-            title="Keywords"
-          >
-            <div className="flex flex-wrap gap-2 mt-5 bg-[#191919] rounded-md p-3 w-full">
-              {keywords.map((keyword, i) => (
-                <div
-                  key={keyword.id}
-                  className={cn(
-                    "flex items-center justify-center text-[11px] sm:text-[12px] rounded-md py-2 px-3 border-[1px] font-medium",
-                    keywordColors[i % keywordColors.length]
-                  )}
-                >
-                  <p>{keyword.word}</p>
-                </div>
-              ))}
-            </div>
-          </TriggerButton>
-
-          {keywords.length === 0 && (
+          {keywords.length === 0 ? (
             <div className="flex items-center justify-center rounded-md border-[1px] bg-muted/50 border-dashed border-muted-foreground/40 py-1 px-2 sm:px-3">
               <p className="text-[10px] sm:text-[11px] text-muted-foreground font-medium italic">
                 No keywords configured
               </p>
             </div>
+          ) : (
+            <TriggerButton
+              trigger={
+                <div className="flex items-center justify-center rounded-md px-2 sm:px-3 py-1 border-[1px] bg-gray-500/15 border-gray-500 hover:bg-gray-500/30 cursor-pointer text-[10px] sm:text-[11px] font-medium">
+                  <span className="text-gray-300 ">
+                    {keywords.length <= 3 ? (
+                      <Ellipsis size={10} className="text-gray-300 sm:size-3" />
+                    ) : (
+                      <span className="flex items-center gap-x-1">
+                        <span>+{keywords.length - 3}</span>
+                        <Ellipsis
+                          size={10}
+                          className="text-gray-300 sm:size-3"
+                        />
+                      </span>
+                    )}
+                  </span>
+                </div>
+              }
+              title="Keywords"
+            >
+              <div className="flex flex-wrap gap-2 mt-5 bg-[#191919] rounded-md p-3 w-full">
+                {keywords.map((keyword, i) => (
+                  <div
+                    key={keyword.id}
+                    className={cn(
+                      "flex items-center justify-center text-[11px] sm:text-[12px] rounded-md py-2 px-3 border-[1px] font-medium",
+                      keywordColors[i % keywordColors.length]
+                    )}
+                  >
+                    <p>{keyword.word}</p>
+                  </div>
+                ))}
+              </div>
+            </TriggerButton>
           )}
         </div>
       </div>

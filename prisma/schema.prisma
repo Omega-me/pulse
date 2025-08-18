@@ -120,18 +120,21 @@ model Keyword {
   @@map("keywords")
 }
 
+// TODO: set continous conversation to true only on SMART AI keyword if we need continous conversations,
+//  for the standard listener will not use continuous conversations.
 model Listener {
-  id           String       @id @default(uuid()) @db.Uuid
-  listener     ListenerType @default(MESSAGE)
-  isActive     Boolean      @default(true)
-  prompt       String
-  commentReply String?
-  dmCount      Int
-  commentCount Int
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @default(now())
-  priority     Int
-  metadata     Json?
+  id                     String       @id @default(uuid()) @db.Uuid
+  listener               ListenerType @default(MESSAGE)
+  isActive               Boolean      @default(true)
+  prompt                 String
+  commentReply           String?
+  dmCount                Int
+  commentCount           Int
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @default(now())
+  priority               Int
+  continuousConversation Boolean      @default(false)
+  metadata               Json?
 
   automationId String?     @db.Uuid
   automation   Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
@@ -156,11 +159,42 @@ model Dm {
   automationId String?     @db.Uuid
   automation   Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
 
-  keywordId String?  @db.Uuid
-  keyword   Keyword? @relation(fields: [keywordId], references: [id], onDelete: Cascade)
-  Order     Order[]
+  keywordId             String?              @db.Uuid
+  keyword               Keyword?             @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  order                 Order[]
+  conversationSession   ConversationSession? @relation(fields: [conversationSessionId], references: [id])
+  conversationSessionId String?
 
   @@map("dms")
+}
+
+/**
+ * TODO: Fallback dm message handling for SMART AI listeners
+ * Fallback IG DMs using conversation session:
+ * 1. IG webhook delivers a DM (senderId, text).
+ * 2. Keyword check happens first:
+ * - If the text matches a keyword → we proceed with automation flow and create a conversation session.
+ * - If no keyword matched → fallback AI will handle it, but we still
+ * need to check if there’s an active conversation session.
+ * 3. Conversation session handling:
+ * - Fetch latest ConversationSession for (userId, senderId) ordered by startedAt DESC.
+ * - If session exists AND not expired (expiresAt > now()):
+ * → get the listener and see if we it has continous converstion set to true, messages attached to the session has the keywordId
+ * we can use the last message in the session to get it if we need.
+ */
+
+model ConversationSession {
+  id         String   @id @default(cuid())
+  userId     String
+  senderId   String
+  listenerId String
+  startedAt  DateTime @default(now())
+  expiresAt  DateTime
+  metadata   Json?
+
+  dms Dm[]
+
+  @@map("conversation_sessions")
 }
 
 model Post {
