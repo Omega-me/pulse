@@ -201,7 +201,7 @@ const ListenerItem = ({
                   />
                 }
               >
-                <ScrollArea className="h-[400px]">
+                <ScrollArea className="h-[400px] w-full">
                   <div className="bg-[#191919] rounded-md p-3 w-full mt-3">
                     {listener.prompt}
                   </div>
