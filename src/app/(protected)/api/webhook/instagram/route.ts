@@ -1,7 +1,4 @@
-import {
-  onCreateConversationSession,
-  onGenerateSmartAiMessage,
-} from "@/actions/webhook";
+import { onGenerateSmartAiMessage } from "@/actions/webhook";
 import {
   createChatHistory,
   createConversationSession,
@@ -25,7 +22,6 @@ import {
 } from "@prisma/client";
 import { client } from "@/lib/prisma.lib";
 import { findIntegration } from "@/lib/utils";
-import { currentUser } from "@clerk/nextjs/server";
 
 interface Changes {
   field: "comments" | "messages";
@@ -124,21 +120,18 @@ async function handleKeywordMatched(
   if (!matchedListener.isActive) return jsonResponse("Listener is not active");
 
   let conversationId: string | null = null;
-
   if (
     matchedListener.listener === ListenerType.SMARTAI &&
     matchedListener.continuousConversation
   ) {
-    // TODO: I think this user is not defined here and breaks the conversation session creation
-    const conversationSession = await onCreateConversationSession(
+    const conversationSession = await createConversationSession(
       senderId,
       receiverId,
       matchedListener.id,
       keyword.id
     );
     if (conversationSession) {
-      conversationId = (conversationSession as any)?.id;
-      console.log("Created conversation session:", conversationSession);
+      conversationId = conversationSession.id;
     }
   }
 

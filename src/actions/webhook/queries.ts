@@ -239,7 +239,6 @@ export const getChatHistory = async (senderId: string, receiverId: string) => {
 };
 
 export const createConversationSession = async (
-  userId: string,
   senderId: string,
   receiverId: string,
   listenerId: string,
@@ -247,7 +246,6 @@ export const createConversationSession = async (
 ) => {
   return await client.conversationSession.create({
     data: {
-      userId,
       senderId,
       receiverId,
       listenerId,
