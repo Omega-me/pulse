@@ -1,1 +1,0 @@
-TODO: configurate Smart AI listeners to have continous conversation after they have been triggered or just one time 
