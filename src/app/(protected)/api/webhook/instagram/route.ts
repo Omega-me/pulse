@@ -1,7 +1,9 @@
 import { onGenerateSmartAiMessage } from "@/actions/webhook";
 import {
   createChatHistory,
+  createConversationSession,
   getChatHistory,
+  getConversationSession,
   getKeywordAutomation,
   getKeywordPost,
   matchKeywordFromComment,
@@ -20,6 +22,7 @@ import {
 } from "@prisma/client";
 import { client } from "@/lib/prisma.lib";
 import { findIntegration } from "@/lib/utils";
+import { onCurrentUser } from "@/actions/user";
 
 interface Changes {
   field: "comments" | "messages";
@@ -63,6 +66,7 @@ export async function POST(req: NextRequest) {
 
   if (!text) return jsonResponse("No message text found");
   if (messaging?.message?.is_echo) return jsonResponse("Skipping echo message");
+  // Configure different keywords to handle different behaviour direct form chat for the echo messages
 
   try {
     const source = messaging ? TriggerType.DM : TriggerType.COMMENT;
@@ -76,7 +80,7 @@ export async function POST(req: NextRequest) {
       return jsonResponse("You are trying to send e message to yourself");
     }
 
-    if (matchedResult)
+    if (matchedResult) {
       return await handleKeywordMatched(
         matchedResult,
         text,
@@ -85,6 +89,7 @@ export async function POST(req: NextRequest) {
         receiverId,
         comment
       );
+    }
     return await handleFallback(entry, text, messaging);
   } catch (error) {
     console.error("Webhook Error ==>>:", error);
@@ -111,7 +116,31 @@ async function handleKeywordMatched(
   receiverId: string,
   comment?: Changes
 ) {
-  const { keyword } = matchedResult;
+  const { keyword, listener: matchedListener } = matchedResult;
+
+  if (!matchedListener.isActive) return jsonResponse("Listener is not active");
+  if (!matchedListener.continuousConversation)
+    return jsonResponse("Listener is not continuous");
+
+  let conversationId: string | null = null;
+  if (
+    matchedListener.listener === ListenerType.SMARTAI &&
+    matchedListener.continuousConversation
+  ) {
+    const user = await onCurrentUser();
+    const conversationSession = await createConversationSession(
+      user.id,
+      senderId,
+      receiverId,
+      matchedListener.id,
+      keyword.id
+    );
+    if (conversationSession) {
+      conversationId = conversationSession.id;
+      console.log("Created conversation session:", conversationSession);
+    }
+  }
+
   const automation = await getKeywordAutomation(matchedResult.listener.id);
   if (
     !automation ||
@@ -122,9 +151,6 @@ async function handleKeywordMatched(
     return jsonResponse("Invalid or inactive automation");
   if (!automation.listener)
     return jsonResponse("No listener attached to this automation");
-  if (!automation.listener.isActive) {
-    return jsonResponse("Listener is not active");
-  }
 
   const instagramToken = findIntegration(
     automation.user?.integrations,
@@ -198,6 +224,7 @@ async function handleKeywordMatched(
       message: promptMessage,
       aiMessage,
       keywordId: keyword.id,
+      conversationSessionId: conversationId,
     });
 
     const status = await (source === TriggerType.COMMENT
@@ -233,10 +260,19 @@ async function handleFallback(
   if (senderId === receiverId) {
     return jsonResponse("You are trying to send e message to yourself");
   }
-  const history = await getChatHistory(senderId, receiverId);
-  if (!history) return jsonResponse("No Ai chat history found with this user");
+  const conversationSession = await getConversationSession(
+    senderId,
+    receiverId
+  );
 
-  const automation = await getKeywordAutomation(history.listenerId);
+  if (!conversationSession)
+    return jsonResponse("No active conversation session found");
+  if (!conversationSession.listener.continuousConversation)
+    return jsonResponse("Continuous conversation is disabled");
+  if (!conversationSession.listener.isActive)
+    return jsonResponse("Listener is not active");
+
+  const automation = await getKeywordAutomation(conversationSession.listenerId);
   if (
     !automation ||
     !automation.active ||
@@ -258,7 +294,10 @@ async function handleFallback(
   const isPro = automation.user.subscription?.plan === SubscriptionPlan.PRO;
   if (!isPro) return jsonResponse("User is not a pro member");
 
-  const aiMessage = await onGenerateSmartAiMessage(history.chatHistory, text);
+  const aiMessage = await onGenerateSmartAiMessage(
+    conversationSession.dms,
+    text
+  );
   if (!aiMessage?.trim()) return jsonResponse("AI failed");
   await handleCreateChatHistory({
     automationId: automation.id,
@@ -266,7 +305,8 @@ async function handleFallback(
     reciever: receiverId,
     message: text,
     aiMessage,
-    keywordId: history.keyword.id,
+    keywordId: conversationSession.keywordId,
+    conversationSessionId: conversationSession.id,
   });
 
   const status = await sendDM(senderId, receiverId!, aiMessage, token);
@@ -283,6 +323,7 @@ async function handleCreateChatHistory(opts: {
   message: string;
   aiMessage: string;
   keywordId: string;
+  conversationSessionId: string;
 }) {
   const [recvChat, sendChat] = [
     createChatHistory({
@@ -293,6 +334,7 @@ async function handleCreateChatHistory(opts: {
       systemDm: false,
       usedSmartAI: true,
       keywordId: opts.keywordId,
+      conversationSessionId: opts.conversationSessionId,
     }),
     createChatHistory({
       automationId: opts.automationId,
@@ -302,6 +344,7 @@ async function handleCreateChatHistory(opts: {
       systemDm: true,
       usedSmartAI: true,
       keywordId: opts.keywordId,
+      conversationSessionId: opts.conversationSessionId,
     }),
   ];
   await client.$transaction([recvChat, sendChat]);

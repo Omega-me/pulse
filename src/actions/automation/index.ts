@@ -29,28 +29,9 @@ import {
   updateAutomation,
 } from "./query";
 import { uploadInstagramImages } from "@/lib/uploadthing.lib";
-import { findIntegration } from "@/lib/utils";
+import { findIntegration, handleRequest } from "@/lib/utils";
 import { InstagrPostProps } from "@/types/posts.type";
 import { z } from "zod";
-
-// Utility wrapper for try/catch
-export const handleRequest = async <T, R>(
-  fn: () => Promise<T>,
-  successHandler: (res: T) => R,
-  errorStatus = 500,
-  errorMsg = "Oops! Something went wrong"
-): Promise<R | { status: number; data?: null; message?: string }> => {
-  try {
-    const res = await fn();
-    return successHandler(res);
-  } catch {
-    return {
-      status: errorStatus,
-      data: null,
-      message: errorMsg,
-    };
-  }
-};
 
 export const onCreateAutomation = async () => {
   const user = await onCurrentUser();

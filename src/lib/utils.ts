@@ -32,3 +32,21 @@ export const findIntegration = (
   const integration = integrations?.find((i) => i.name === type);
   return integration || null;
 };
+
+export const handleRequest = async <T, R>(
+  fn: () => Promise<T>,
+  successHandler: (res: T) => R,
+  errorStatus = 500,
+  errorMsg = "Oops! Something went wrong"
+): Promise<R | { status: number; data?: null; message?: string }> => {
+  try {
+    const res = await fn();
+    return successHandler(res);
+  } catch {
+    return {
+      status: errorStatus,
+      data: null,
+      message: errorMsg,
+    };
+  }
+};
