@@ -172,7 +172,6 @@ model Dm {
 
 model ConversationSession {
   id         String   @id @default(cuid())
-  userId     String
   receiverId String
   senderId   String
   listenerId String   @db.Uuid

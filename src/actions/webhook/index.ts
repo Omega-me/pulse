@@ -58,28 +58,3 @@ export const onGenerateSmartAiMessage = async (
     return null;
   }
 };
-
-export const onCreateConversationSession = async (
-  senderId: string,
-  recieverId: string,
-  listenerId: string,
-  keywordId: string
-) => {
-  const user = await onCurrentUser();
-  return handleRequest(
-    async () => {
-      const conversationSession = await createConversationSession(
-        user.id,
-        senderId,
-        recieverId,
-        listenerId,
-        keywordId
-      );
-      console.log("Logged in User:", user);
-      console.log("Created conversation session:", conversationSession);
-      return conversationSession;
-    },
-    (created) => created
-    // created ? { status: 200, data: created } : { status: 400, data: null }
-  );
-};
