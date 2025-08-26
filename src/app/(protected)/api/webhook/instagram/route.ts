@@ -121,13 +121,15 @@ async function handleKeywordMatched(
   if (!matchedListener.isActive) return jsonResponse("Listener is not active");
 
   let conversationId: string | null = null;
+
+  const user = await currentUser();
+  console.log("Current user:", user);
   if (
     matchedListener.listener === ListenerType.SMARTAI &&
     matchedListener.continuousConversation
   ) {
-    const user = await currentUser();
+    // TODO: I think this user is not defined here and breaks the conversation session creation
     if (user) {
-      console.log("Current user:", user);
       const conversationSession = await createConversationSession(
         user.id,
         senderId,
