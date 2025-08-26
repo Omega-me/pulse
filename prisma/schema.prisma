@@ -113,8 +113,9 @@ model Keyword {
   listenerId String?   @db.Uuid
   listener   Listener? @relation(fields: [listenerId], references: [id], onDelete: Cascade)
 
-  dms   Dm[]
-  stats Stat[]
+  dms                 Dm[]
+  stats               Stat[]
+  ConversationSession ConversationSession[]
 
   @@unique([automationId, word])
   @@map("keywords")
@@ -139,8 +140,9 @@ model Listener {
   automationId String?     @db.Uuid
   automation   Automation? @relation(fields: [automationId], references: [id], onDelete: Cascade)
 
-  keywords Keyword[]
-  stats    Stat[]
+  keywords             Keyword[]
+  conversationSessions ConversationSession[]
+  stats                Stat[]
 
   @@map("listeners")
 }
@@ -168,31 +170,20 @@ model Dm {
   @@map("dms")
 }
 
-/**
- * TODO: Fallback dm message handling for SMART AI listeners
- * Fallback IG DMs using conversation session:
- * 1. IG webhook delivers a DM (senderId, text).
- * 2. Keyword check happens first:
- * - If the text matches a keyword → we proceed with automation flow and create a conversation session.
- * - If no keyword matched → fallback AI will handle it, but we still
- * need to check if there’s an active conversation session.
- * 3. Conversation session handling:
- * - Fetch latest ConversationSession for (userId, senderId) ordered by startedAt DESC.
- * - If session exists AND not expired (expiresAt > now()):
- * → get the listener and see if we it has continous converstion set to true, messages attached to the session has the keywordId
- * we can use the last message in the session to get it if we need.
- */
-
 model ConversationSession {
   id         String   @id @default(cuid())
   userId     String
+  receiverId String
   senderId   String
-  listenerId String
+  listenerId String   @db.Uuid
+  keywordId  String   @db.Uuid
   startedAt  DateTime @default(now())
   expiresAt  DateTime
   metadata   Json?
 
-  dms Dm[]
+  dms      Dm[]
+  listener Listener @relation(fields: [listenerId], references: [id])
+  keyword  Keyword  @relation(fields: [keywordId], references: [id])
 
   @@map("conversation_sessions")
 }

@@ -24,11 +24,13 @@ export const useMutationData = (
     mutationFn,
     onSuccess: (res) => {
       if (onSuccess) onSuccess(res);
-      const headerTxt =
-        res?.status === 200 || res?.status === 201 ? "Success" : "Error";
-      return toast(headerTxt, {
-        description: res?.data,
-      });
+      if (res?.data) {
+        const headerTxt =
+          res?.status === 200 || res?.status === 201 ? "Success" : "Error";
+        return toast(headerTxt, {
+          description: res?.data,
+        });
+      }
     },
     onMutate: async (variables: any) => {
       await client.cancelQueries({ queryKey });

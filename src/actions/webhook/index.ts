@@ -2,6 +2,9 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Dm } from "@prisma/client";
 import { generateText, CoreMessage } from "ai";
+import { onCurrentUser } from "../user";
+import { createConversationSession, getConversationSession } from "./queries";
+import { handleRequest } from "@/lib/utils";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY as string,
@@ -53,4 +56,26 @@ export const onGenerateSmartAiMessage = async (
     console.error("Error generating Smart AI message:", error);
     return null;
   }
+};
+
+export const onCreateConversationSession = async (
+  senderId: string,
+  recieverId: string,
+  listenerId: string,
+  keywordId: string
+) => {
+  const user = await onCurrentUser();
+  return handleRequest(
+    async () => {
+      return await createConversationSession(
+        user.id,
+        senderId,
+        recieverId,
+        listenerId,
+        keywordId
+      );
+    },
+    (created) =>
+      created ? { status: 200, data: created } : { status: 400, data: null }
+  );
 };

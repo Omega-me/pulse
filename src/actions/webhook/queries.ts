@@ -163,6 +163,7 @@ export const createChatHistory = (opts: {
   systemDm: boolean;
   usedSmartAI: boolean;
   keywordId?: string;
+  conversationSessionId: string;
 }) => {
   return client.automation.update({
     where: {
@@ -177,6 +178,7 @@ export const createChatHistory = (opts: {
           system_dm: opts.systemDm,
           usedSmartAI: opts.usedSmartAI,
           keywordId: opts.keywordId,
+          conversationSessionId: opts.conversationSessionId,
         },
       },
     },
@@ -234,6 +236,48 @@ export const getChatHistory = async (senderId: string, receiverId: string) => {
     listenerId: listener?.id,
     chatHistory: recentMessages,
   };
+};
+
+export const createConversationSession = async (
+  userId: string,
+  senderId: string,
+  receiverId: string,
+  listenerId: string,
+  keywordId: string
+) => {
+  return await client.conversationSession.create({
+    data: {
+      userId,
+      senderId,
+      receiverId,
+      listenerId,
+      keywordId,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000 * 12), // 12 hours from now
+    },
+  });
+};
+
+export const getConversationSession = async (
+  senderId: string,
+  receiverId: string
+) => {
+  return await client.conversationSession.findFirst({
+    where: {
+      senderId,
+      receiverId,
+      expiresAt: {
+        gt: new Date(), // only sessions that haven't expired
+      },
+    },
+    orderBy: {
+      startedAt: "desc",
+    },
+    include: {
+      dms: true,
+      listener: true,
+      keyword: true,
+    },
+  });
 };
 
 export const getKeywordPost = async (automationId: string, postId: string) => {
