@@ -58,24 +58,24 @@ export const onGenerateSmartAiMessage = async (
   }
 };
 
-export const onCreateConversationSession = async (
-  senderId: string,
-  recieverId: string,
-  listenerId: string,
-  keywordId: string
-) => {
-  const user = await onCurrentUser();
-  return handleRequest(
-    async () => {
-      return await createConversationSession(
-        user.id,
-        senderId,
-        recieverId,
-        listenerId,
-        keywordId
-      );
-    },
-    (created) =>
-      created ? { status: 200, data: created } : { status: 400, data: null }
-  );
-};
+// export const onCreateConversationSession = async (
+//   senderId: string,
+//   recieverId: string,
+//   listenerId: string,
+//   keywordId: string
+// ) => {
+//   const user = await onCurrentUser();
+//   return handleRequest(
+//     async () => {
+//       return await createConversationSession(
+//         user.id,
+//         senderId,
+//         recieverId,
+//         listenerId,
+//         keywordId
+//       );
+//     },
+//     (created) =>
+//       created ? { status: 200, data: created } : { status: 400, data: null }
+//   );
+// };

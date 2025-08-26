@@ -1,9 +1,7 @@
-import {
-  onCreateConversationSession,
-  onGenerateSmartAiMessage,
-} from "@/actions/webhook";
+import { onGenerateSmartAiMessage } from "@/actions/webhook";
 import {
   createChatHistory,
+  createConversationSession,
   getChatHistory,
   getConversationSession,
   getKeywordAutomation,
@@ -24,6 +22,7 @@ import {
 } from "@prisma/client";
 import { client } from "@/lib/prisma.lib";
 import { findIntegration } from "@/lib/utils";
+import { onCurrentUser } from "@/actions/user";
 
 interface Changes {
   field: "comments" | "messages";
@@ -120,20 +119,25 @@ async function handleKeywordMatched(
   const { keyword, listener: matchedListener } = matchedResult;
 
   if (!matchedListener.isActive) return jsonResponse("Listener is not active");
+  if (!matchedListener.continuousConversation)
+    return jsonResponse("Listener is not continuous");
 
   let conversationId: string | null = null;
   if (
     matchedListener.listener === ListenerType.SMARTAI &&
     matchedListener.continuousConversation
   ) {
-    const conversationSession = await onCreateConversationSession(
+    const user = await onCurrentUser();
+    const conversationSession = await createConversationSession(
+      user.id,
       senderId,
       receiverId,
       matchedListener.id,
       keyword.id
     );
-    if (conversationSession.data) {
-      conversationId = conversationSession.data.id;
+    if (conversationSession) {
+      conversationId = conversationSession.id;
+      console.log("Created conversation session:", conversationSession);
     }
   }
 
