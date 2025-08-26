@@ -1,4 +1,7 @@
-import { onGenerateSmartAiMessage } from "@/actions/webhook";
+import {
+  onCreateConversationSession,
+  onGenerateSmartAiMessage,
+} from "@/actions/webhook";
 import {
   createChatHistory,
   createConversationSession,
@@ -122,25 +125,20 @@ async function handleKeywordMatched(
 
   let conversationId: string | null = null;
 
-  const user = await currentUser();
-  console.log("Current user:", user);
   if (
     matchedListener.listener === ListenerType.SMARTAI &&
     matchedListener.continuousConversation
   ) {
     // TODO: I think this user is not defined here and breaks the conversation session creation
-    if (user) {
-      const conversationSession = await createConversationSession(
-        user.id,
-        senderId,
-        receiverId,
-        matchedListener.id,
-        keyword.id
-      );
-      if (conversationSession) {
-        conversationId = conversationSession.id;
-        console.log("Created conversation session:", conversationSession);
-      }
+    const conversationSession = await onCreateConversationSession(
+      senderId,
+      receiverId,
+      matchedListener.id,
+      keyword.id
+    );
+    if (conversationSession) {
+      conversationId = (conversationSession as any)?.id;
+      console.log("Created conversation session:", conversationSession);
     }
   }
 
