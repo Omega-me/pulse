@@ -165,7 +165,7 @@ model Dm {
   keyword               Keyword?             @relation(fields: [keywordId], references: [id], onDelete: Cascade)
   order                 Order[]
   conversationSession   ConversationSession? @relation(fields: [conversationSessionId], references: [id])
-  conversationSessionId String?
+  conversationSessionId String?              @db.Uuid
 
   @@map("dms")
 }
