@@ -115,7 +115,6 @@ async function handleKeywordMatched(
   receiverId: string,
   comment?: Changes
 ) {
-  console.log(matchedResult, "matchedResult");
   const { keyword, listener: matchedListener } = matchedResult;
 
   if (!matchedListener.isActive) return jsonResponse("Listener is not active");
