@@ -245,19 +245,15 @@ export const createConversationSession = async (
   listenerId: string,
   keywordId: string
 ) => {
-  try {
-    return await client.conversationSession.create({
-      data: {
-        receiverId,
-        senderId,
-        listenerId,
-        keywordId,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000 * 12), // 12 hours from now
-      },
-    });
-  } catch (error) {
-    console.error("Error creating conversation session:", error);
-  }
+  return await client.conversationSession.create({
+    data: {
+      receiverId,
+      senderId,
+      listenerId,
+      keywordId,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000 * 12), // 12 hours from now
+    },
+  });
 };
 
 export const getConversationSession = async (

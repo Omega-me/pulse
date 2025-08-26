@@ -187,7 +187,8 @@ async function handleKeywordMatched(
       );
     }
 
-    if (message.status === 200) await trackResponses(automation.id, source);
+    if (message.status === 200)
+      await trackResponses(matchedListener.id, source);
   }
 
   if (listenerType === ListenerType.SMARTAI && isPro) {
@@ -233,7 +234,7 @@ async function handleKeywordMatched(
       );
     }
 
-    if (status.status === 200) await trackResponses(automation.id, source);
+    if (status.status === 200) await trackResponses(matchedListener.id, source);
   }
 
   return jsonResponse("DM sent");
@@ -305,7 +306,7 @@ async function handleFallback(
 
   const status = await sendDM(senderId, receiverId!, aiMessage, token);
   if (status.status === 200)
-    await trackResponses(automation.id, TriggerType.DM);
+    await trackResponses(conversationSession.listenerId, TriggerType.DM);
 
   return jsonResponse("Message sent via fallback");
 }
