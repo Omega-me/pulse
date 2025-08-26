@@ -22,7 +22,7 @@ import {
 } from "@prisma/client";
 import { client } from "@/lib/prisma.lib";
 import { findIntegration } from "@/lib/utils";
-import { onCurrentUser } from "@/actions/user";
+import { currentUser } from "@clerk/nextjs/server";
 
 interface Changes {
   field: "comments" | "messages";
@@ -119,25 +119,26 @@ async function handleKeywordMatched(
   const { keyword, listener: matchedListener } = matchedResult;
 
   if (!matchedListener.isActive) return jsonResponse("Listener is not active");
-  if (!matchedListener.continuousConversation)
-    return jsonResponse("Listener is not continuous");
 
   let conversationId: string | null = null;
   if (
     matchedListener.listener === ListenerType.SMARTAI &&
     matchedListener.continuousConversation
   ) {
-    const user = await onCurrentUser();
-    const conversationSession = await createConversationSession(
-      user.id,
-      senderId,
-      receiverId,
-      matchedListener.id,
-      keyword.id
-    );
-    if (conversationSession) {
-      conversationId = conversationSession.id;
-      console.log("Created conversation session:", conversationSession);
+    const user = await currentUser();
+    if (user) {
+      console.log("Current user:", user);
+      const conversationSession = await createConversationSession(
+        user.id,
+        senderId,
+        receiverId,
+        matchedListener.id,
+        keyword.id
+      );
+      if (conversationSession) {
+        conversationId = conversationSession.id;
+        console.log("Created conversation session:", conversationSession);
+      }
     }
   }
 
