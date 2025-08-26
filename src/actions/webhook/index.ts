@@ -2,10 +2,6 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Dm } from "@prisma/client";
 import { generateText, CoreMessage } from "ai";
-import { onCurrentUser } from "../user";
-import { createConversationSession, getConversationSession } from "./queries";
-import { handleRequest } from "@/lib/utils";
-import { m } from "motion/dist/react";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY as string,
