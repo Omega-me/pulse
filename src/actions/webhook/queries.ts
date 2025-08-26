@@ -247,8 +247,8 @@ export const createConversationSession = async (
 ) => {
   return await client.conversationSession.create({
     data: {
-      senderId,
       receiverId,
+      senderId,
       listenerId,
       keywordId,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000 * 12), // 12 hours from now
