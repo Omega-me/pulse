@@ -128,6 +128,7 @@ export const getKeywordAutomation = async (listenerId: string) => {
 };
 
 export const trackResponses = async (listenerId: string, type: TriggerType) => {
+  console.log("Tracking response for listener:", listenerId, "Type:", type);
   if (type === TriggerType.COMMENT) {
     return await client.listener.update({
       where: {
