@@ -94,6 +94,7 @@ export function ListenerCarousel(props: Props) {
                     className="font-bold text-gray-400"
                   />
                   <div className="flex items-center gap-x-2">
+                    {/* TODO: add settings config */}
                     <Switch
                       defaultChecked={listener.isActive}
                       id="switch_active"
