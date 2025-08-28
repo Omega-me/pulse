@@ -13,7 +13,6 @@ import {
   prefetchUserProfile,
   prefetchAutomations,
 } from "@/react-query/prefetch";
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import LogoutUser from "@/components/global/logout-user";
 
 interface Props extends PropsWithChildren {}

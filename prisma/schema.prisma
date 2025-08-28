@@ -162,7 +162,7 @@ model Dm {
   keywordId             String?              @db.Uuid
   keyword               Keyword?             @relation(fields: [keywordId], references: [id], onDelete: Cascade)
   order                 Order[]
-  conversationSession   ConversationSession? @relation(fields: [conversationSessionId], references: [id])
+  conversationSession   ConversationSession? @relation(fields: [conversationSessionId], references: [id], onDelete: Cascade)
   conversationSessionId String?              @db.Uuid
 
   @@map("dms")
@@ -179,8 +179,8 @@ model ConversationSession {
   metadata   Json?
 
   dms      Dm[]
-  listener Listener @relation(fields: [listenerId], references: [id])
-  keyword  Keyword  @relation(fields: [keywordId], references: [id])
+  listener Listener @relation(fields: [listenerId], references: [id], onDelete: Cascade)
+  keyword  Keyword  @relation(fields: [keywordId], references: [id], onDelete: Cascade)
 
   @@map("conversation_sessions")
 }
@@ -223,7 +223,7 @@ model Product {
   metadata    Json?
 
   integrationId String?      @db.Uuid
-  integration   Integration? @relation(fields: [integrationId], references: [id])
+  integration   Integration? @relation(fields: [integrationId], references: [id], onDelete: Cascade)
   OrderItem     OrderItem[]
 
   @@map("products")
